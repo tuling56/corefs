@@ -6,6 +6,7 @@
 * Reference:http://blog.sina.com.cn/s/blog_6ec980ee0101cgax.html
             http://www.udpwork.com/item/10422.html
             http://blog.csdn.net/nynyvkhhiiii/article/details/17525865
+	    http://blog.csdn.net/taiyang1987912/article/details/44779719（相互调用）
 * Status: 完成
 * Date:	[6/25/2015 jmy]
 ************************************************************************/
@@ -25,16 +26,16 @@ int main()
 	PyObject *pArg = NULL;
     PyObject *pRet=NULL;
 
-    //不带参数
-    char *res="zhang";
+    //不带参数（返回值）
+    	char *res="zhang";
 	pMode = PyImport_ImportModule("script");
 	pfunc = PyObject_GetAttrString(pMode, "hello");
 	pRet  = PyEval_CallObject(pfunc, NULL);
-    Py_DECREF(pfunc);
-    int retok=PyArg_Parse(pRet,"s",&res);
-    if (retok==0)
-        printf("这是返回值:%s",res);
-    printf("这是返回值:%s\n",res);
+    	Py_DECREF(pfunc);
+    	int retok=PyArg_Parse(pRet,"s",&res);
+    	if (retok==0)
+        	printf("这是返回值:%s",res);
+    	printf("这是返回值:%s\n",res);
 
     //带参数
 	pfunc = PyObject_GetAttrString(pMode, "world");
