@@ -12,6 +12,10 @@
 * Date:	[6/25/2015 jmy]
 ************************************************************************/
 #include<python2.7/Python.h>
+#include<string>
+#include<iostream>
+
+using namespace std;
 
 int main(int argc,char*argv[])
 {
@@ -26,6 +30,7 @@ int main(int argc,char*argv[])
 	PyObject* pClass = NULL;
 	PyObject *pInstance = NULL;
 	PyObject *pArg = NULL;
+	PyObject *pArgs = NULL;
 	PyObject *pRet=NULL;
 
 	//调用函数：不带参数（返回值）
@@ -60,7 +65,6 @@ int main(int argc,char*argv[])
 	}
 	else
 		return -1;	
-
 
 	//调用类
 	pClass = PyObject_GetAttrString(pMode, "Student");

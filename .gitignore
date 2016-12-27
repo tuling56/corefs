@@ -1,0 +1,10 @@
+data/
+dev/
+
+*.pyc
+*.log
+*.csv
+*.xls
+*.xlsx
+
+
