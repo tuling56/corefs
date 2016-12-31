@@ -1,3 +1,20 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+'''
+	Date:
+	Author:tuling56
+'''
+import os
+import sys
+#print sys.getdefaultencoding()
+reload(sys)
+sys.setdefaultencoding('utf-8')
+
+
+if not hasattr(sys, 'argv'):
+    sys.argv  = ['']
+
+
 #test function
 def add(a,b):
     print "in python function add"

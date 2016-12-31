@@ -10,6 +10,9 @@ import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
+if not hasattr(sys, 'argv'):
+    sys.argv  = ['']
+
 
 # 类调用
 class Student:

@@ -14,7 +14,7 @@
 #include<python2.7/Python.h>
 #include<string>
 #include<iostream>
-#includ<stdio.h>
+#include<stdio.h>
 
 using namespace std;
 
@@ -118,7 +118,7 @@ int invoke_method_2()
 	// 创建相关对象
     PyObject *pName,*pModule,*pDict,*pFunc,*pArgs;  
 
-	 // 载入名为pymodle_2的脚本  
+	// 载入名为pymodle_2的脚本  
     pName = PyString_FromString("pymodle_2");  
     pModule = PyImport_Import(pName);  
     if ( !pModule ) {  
@@ -131,7 +131,7 @@ int invoke_method_2()
         return -1;  
     }  
   
-    /*example1:找出函数名为add的函数 */ 
+    /*example1:找出函数名为add的函数(带两个参数) */ 
     printf("----------------------------------\n");  
     pFunc = PyDict_GetItemString(pDict, "add");  
     if ( !pFunc || !PyCallable_Check(pFunc) ) {  
@@ -141,7 +141,6 @@ int invoke_method_2()
      }  
   
     // 参数进栈  
-    PyObject *pArgs;  
     pArgs = PyTuple_New(2);  
   
     //  PyObject* Py_BuildValue(char *format, ...)  
@@ -158,7 +157,7 @@ int invoke_method_2()
     // 调用Python函数  
     PyObject_CallObject(pFunc, pArgs);  
   
-    /*example2:下面这段是查找函数foo 并执行foo*/  
+    /*example2:下面这段是查找函数foo 并执行foo（单参数）*/  
     printf("------------------------------------\n");  
     pFunc = PyDict_GetItemString(pDict, "foo");  
     if ( !pFunc || !PyCallable_Check(pFunc) ) {  
@@ -171,7 +170,7 @@ int invoke_method_2()
     PyTuple_SetItem(pArgs, 0, Py_BuildValue("l",2));   
     PyObject_CallObject(pFunc, pArgs);  
        
-    /*example3:下面这段是查找函数update 并执行update*/  
+    /*example3:下面这段是查找函数update 并执行update（单参数）*/  
     printf("------------------------------------\n");  
     pFunc = PyDict_GetItemString(pDict, "update");  
     if ( !pFunc || !PyCallable_Check(pFunc) ) {  
