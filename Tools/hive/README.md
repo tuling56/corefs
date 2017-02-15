@@ -1,0 +1,140 @@
+### HIVE积累
+
+#### 创建表
+##### 文本格式存储
+```sql
+use kankan_odl;drop table if exists hive_table_templete;
+create external table if not exists hive_table_templete(
+  subid int,
+  peerid string,
+  movieid int)
+partitioned by (ds string)
+row format delimited
+fields terminated by '\t'
+stored as textfile;
+```
+
+##### 序列化格式存储
+```sql
+use kankan_odl;drop table if exists hive_table_templete;
+create external table if not exists union_install(
+   Fu1 string,
+   Fu2 string,
+   Fu8 string,
+   Fu9 string,
+   Fip string,
+   Finsert_time int,
+   isp string
+  )
+partitioned by (ds string,hour string)
+row format delimited
+fields terminated by '\u0001'
+stored as inputformat
+  'org.apache.hadoop.mapred.SequenceFileInputFormat'
+outputformat
+  'org.apache.hadoop.hive.ql.io.HiveSequenceFileOutputFormat'
+```
+
+#### 数据导入导出
+
+##### 导入数据
+
+```shell
+ihql="use kankan_odl;delete from tbname where ds='${date}';load data local inpath  '/home/work/test.txt' into table tbname;"
+${HIVE} -e "{chql}"
+```
+
+##### 导出数据
+
+```shell
+esql="use kankan_odl;select '{date}',fu3,fu2,count(*) from xmpcloud2 where ds='{date}' and length(fu4)=16 group by fu3,fu2;"
+${HIVE} -e "{esql}" > datapath/xmp_cloud_{date}
+```
+
+- 导出数据到本地文件(并指定字段分割方式)
+
+```sql
+insert overwrite local directory '/tmp/xx' row format delimited fields terminated by '\t' select * from test;
+```
+
+
+
+- hive写本地数据
+
+```sql
+insert overwrite local directory '/data/access_log/access_log.45491' row format delimited fields terminated by ' ' collection items terminated by ' ' select *
+```
+
+#### 分区操作
+
+##### 显示分区
+
+`use xmp_odl;show partitions $tbl partition(ds='$date');`
+
+##### 添加分区
+`use xmp_odl;alter table $tbl add if not exists partition (ds='$date',hour='$hour');`
+
+##### 删除分区
+`use xmp_odl;alter table $tbl drop if exists partition(ds='20160808',hour='00');`
+
+##### 修改分区
+```sql
+use xmp_odl;alter table $tbl partition(ds='20160808',hour='00') set location "/user/kankan/warehouse/..."
+use xmp_odl;alter table $tbl partition(ds='20160808',hour='00') rename to partition(ds='20160808',hour='01')
+```
+
+#### 列操作
+
+
+##### 添加列
+`use xmp_odl;alter table $tbl add columns(col_name string);`
+
+##### 修改列
+`use xmp_odl;alter table $tbl change col_name newcol_name string [after x][first];`
+
+##### 删除列
+
+`use xmp_odl;alter table $tbl drop?`
+
+#### 表操作
+
+##### 表重命名
+
+`use xmp_odl;alter table $tbl rename to new_tbl_name;`
+
+##### 修改存储属性
+
+```sql
+# 修改存储格式
+alter TABLE  pusherdc   SET FILEFORMAT
+INPUTFORMAT "org.apache.hadoop.mapred.SequenceFileInputFormat"
+OUTPUTFORMAT "org.apache.hadoop.hive.ql.io.HiveSequenceFileOutputFormat";
+
+# 修改字段分割方式
+alter table xmp_subproduct_install set SERDEPROPERTIES('field.delim' = '\u0001');
+```
+
+##### 删除表
+
+> 对外部表（存储在本地文件系统）和内部表（存储在MetaStore），删除语句相同
+>
+> ` drop table if exists $tbl`
+
+#### 函数
+
+##### 日期时间操作
+
+```
+# 整型时间戳转日期
+select from_unixtime(finsert_time,'yyyyMMdd HH:mm:ss') from xmp_odl.xmp_pv where ds='20161206';
+# 日期转时间戳
+select unix_timestamp(’20111207 13:01:03′,’yyyyMMdd HH:mm:ss’) from test.dual;
+```
+
+### 参考
+
+[官方参考手册](https://cwiki.apache.org/confluence/display/Hive/LanguageManual+DML#LanguageManualDML-Delete)
+
+[ hive array、map、struct使用](http://blog.csdn.net/yfkiss/article/details/7842014)
+
+[HIVE 时间操作函数](http://www.cnblogs.com/moodlxs/p/3370521.html)
