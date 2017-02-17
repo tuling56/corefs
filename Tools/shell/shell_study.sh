@@ -106,7 +106,6 @@ function mconctr()
 
 		*) echo "not correct input";;   #*）是其他值、default的意思
 	esac
-
 }
 
 # 循环
@@ -228,7 +227,7 @@ function mexpect()
 
 
 # 统计n多个文件，保证每一行的中单词A和单词B出现的个数相等
-function pro()
+function checkpair_base()
 {
     fileName=$0
     lineContent=$1
@@ -245,7 +244,7 @@ function pro()
 }
 
 # 配对情况检查
-function checkpair()
+function checkpair_pro()
 {
 	# 统计文件
 	allfiles=`find -type f -name shet.txt -print`
@@ -369,7 +368,7 @@ function judge_date()
 
 
 # 文件关联去重复（注意文件要都是unix格式）
-rowdereplication(predatefile,todayfile)
+function rowdereplication(predatefile,todayfile)
 {
 	# awk '{if(NR<FNR) a[$2+$3]=$0;else{b[$1]++;if(b[$1]==1&&$2+$3 in a) print a[$1]}}' $predatefile  $todayfile>result.txt
 	awk '{if(NR==FNR) a[$2$3]=$0;else{if($2$3 not in a) print $0}}' $predatefile  $todayfile>result.txt
@@ -391,13 +390,13 @@ function mawk()
 
 
 # rsync的使用
-function rsyncuse()
+function mrsync()
 {
-	#只复制inputlist_from_pgv_stat.txt里的文件到目的地址，其他的不复制
+	# 只复制inputlist_from_pgv_stat.txt里的文件到目的地址，其他的不复制
 	rsync  -avz -P  --include-from=/usr/local/sandai/server/bin/xmp_habor/inputlist_from_pgv_stat.txt  --exclude=/*  ${pgv_stat_dir}  $destdir
-	#其中inputlist_from_pgv_stat.txt的格式如下：(注意对.进行转义，这里面使用了正则)
-	#xmpconv_group\.*
-    #xmp_tips\.*
+	# 其中inputlist_from_pgv_stat.txt的格式如下：(一行一个，注意对.进行转义，这里面使用了正则)
+	# xmpconv_group\.*
+	# xmp_tips\.*
 }
 
 # 小技巧
@@ -405,16 +404,25 @@ function tricks()
 {
 	# 添加双引号
 	echo "install,peerid,installtype,newinstall"|awk -F',' '{for(i=1;i<=NF;i++) printf("\"%s\",",$i)}'
+
 	# 分组求和(注意多条件匹配)
 	awk '{if($3==00 && $1~/8$/) a[$13"\t"$5"\t"$3"\t"$1]+=1}END{ for(i in a) print i"\t"a[i]}'
 }
 
 
-# 获取基本信息
+# 获取文件基本信息
 function getstat()
 {
 	# 获取文件的修改日期
 	stat main |grep Modify|grep -o '[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}'
+
+	# 获取文件的创建日期
+
+	# 获取文件的访问日期
+
+	# 获取文件的大小
+
+	# 获取文件所属组
 }
 
 
