@@ -1,7 +1,9 @@
-### HIVE积累
+## HIVE积累
 
-#### 创建表
-##### 文本格式存储
+[TOC]
+
+### 创建表
+#### 文本格式存储
 ```sql
 use kankan_odl;drop table if exists hive_table_templete;
 create external table if not exists hive_table_templete(
@@ -14,7 +16,7 @@ fields terminated by '\t'
 stored as textfile;
 ```
 
-##### 序列化格式存储
+#### 序列化格式存储
 ```sql
 use kankan_odl;drop table if exists hive_table_templete;
 create external table if not exists union_install(
@@ -35,16 +37,50 @@ outputformat
   'org.apache.hadoop.hive.ql.io.HiveSequenceFileOutputFormat'
 ```
 
-#### 数据导入导出
+### 查询
 
-##### 导入数据
+#### 基本查询
+
+> 不嵌套，只使用最基本的，无关联
+
+#### 子查询
+
+```mysql
+select a.mt,count(*) as cnt from (select from_unixtime(finsert_time,'yyyyMMdd HH:mm:ss') as mt from xmp_odl.xmp_pv where ds='20161206') a group by a.mt order by cnt desc;
+```
+
+####  连接
+
+```mysql
+insert overwrite table download_union.register_web_all partition(dt='$dt',stat_source='tel') 
+select utmp.mac, utmp.userdetails, utmp.createdtime, utmp.productflag 
+from (
+	select t1.mac, t1.userdetails, t1.createdtime, t1.productflag from 
+    
+    (select concat(substring(peerid,0,12),'0000') as mac, userdetails, createdtime, productflag from dbl.tb1 t where t.ds='$dt' and fproduct_type='web' and fisp='tel') t1 
+	left outer join  
+    (select concat(substring(peerid,0,12),'0000') as mac, userdetails, createdtime, productflag from db2.tb2 where stat_source='tel' ) t2 
+	on (t1.mac = t2.mac) 
+	where t2.mac is null or t2.mac=null
+) utmp;
+
+# 解读：
+# 其中utmp表是t1表和t2表关联的结果（t1表和t2进行左连接，连接条件是两个表的mac地址相等，且t2的mac地址为空）
+# 其中t1表结果来自dbl.tb1，t2表结果来自db2.tb2
+```
+
+
+
+### 数据导入导出
+
+#### 导入数据
 
 ```shell
 ihql="use kankan_odl;delete from tbname where ds='${date}';load data local inpath  '/home/work/test.txt' into table tbname;"
 ${HIVE} -e "{chql}"
 ```
 
-##### 导出数据
+#### 导出数据
 
 ```shell
 esql="use kankan_odl;select '{date}',fu3,fu2,count(*) from xmpcloud2 where ds='{date}' and length(fu4)=16 group by fu3,fu2;"
@@ -57,13 +93,13 @@ ${HIVE} -e "{esql}" > datapath/xmp_cloud_{date}
 insert overwrite local directory '/tmp/xx' row format delimited fields terminated by '\t' select * from test;
 ```
 
-
-
 - hive写本地数据
 
 ```sql
 insert overwrite local directory '/data/access_log/access_log.45491' row format delimited fields terminated by ' ' collection items terminated by ' ' select *
 ```
+
+### 属性修改
 
 #### 分区操作
 
@@ -120,21 +156,21 @@ alter table xmp_subproduct_install set SERDEPROPERTIES('field.delim' = '\u0001')
 >
 > ` drop table if exists $tbl`
 
-#### 函数
+### 函数
 
 ##### 日期时间操作
 
-```
+```mysql
 # 整型时间戳转日期
 select from_unixtime(finsert_time,'yyyyMMdd HH:mm:ss') from xmp_odl.xmp_pv where ds='20161206';
 # 日期转时间戳
-select unix_timestamp(’20111207 13:01:03′,’yyyyMMdd HH:mm:ss’) from test.dual;
+select unix_timestamp('20111207 13:01:03','yyyyMMdd HH:mm:ss') from test.dual;
 ```
 
-### 参考
+## 参考
 
 [官方参考手册](https://cwiki.apache.org/confluence/display/Hive/LanguageManual+DML#LanguageManualDML-Delete)
 
-[ hive array、map、struct使用](http://blog.csdn.net/yfkiss/article/details/7842014)
+[hive array、map、struct使用](http://blog.csdn.net/yfkiss/article/details/7842014)
 
 [HIVE 时间操作函数](http://www.cnblogs.com/moodlxs/p/3370521.html)

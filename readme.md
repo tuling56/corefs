@@ -19,15 +19,27 @@
 
 ### Invoke
 
- 语言之间的调用和数据传输
+> 语言之间的调用和数据传输
 
 #### cpp_invoke_python/
 
+//待添加
+
 #### cpp_io_json/
+
+//待添加
 
 #### cpp_protobuf_python/
 
+//待添加
+
 #### r_invoke_cpp/
+
+//待添加
+
+#### lua_invoke_c
+
+lua调用c模块，以.so的方式进行调用
 
 ### tools
 
