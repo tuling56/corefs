@@ -59,6 +59,83 @@ http://c.biancheng.net/cpp/html/1456.html
 
 #### 行转列
 
+```mysql
+# 原始的的数据格式是按行的，现在想拼接为列，其中还有汇总和所占比，实现方式如下:
+select a.date,a.f1 as '总量',b.f2 as '360域名总量',
+round(c.f3*100/b.f2,2) as 'http://hao.360.cn/?src=lm&ls=n4abc0a4199',
+round(d.f4*100/b.f2,2) as 'http://hao.360.cn/?src=lm&ls=n79f40a409c',
+round(e.f5*100/b.f2,2) as 'http://hao.360.cn/?src=lm&ls=n110c004e9b',
+round(f.f6*100/b.f2,2) as 'https://hao.360.cn/?src=lm&ls=n556c014b9f'
+from
+(select date,sum(cnts) as f1 from pgv_stat.xmpcloud2_ie_stat where date>=20161201 group by date) a
+inner join
+(select date,sum(cnts) as f2 from pgv_stat.xmpcloud2_ie_stat where date>=20161201 and host_url='360.cn' group by date) b on a.date=b.date
+inner join
+(select date,cnts as f3 from pgv_stat.xmpcloud2_ie_stat  where  date>=20161201 and url='http://hao.360.cn/?src=lm&ls=n4abc0a4199') c on a.date=c.date
+inner join
+(select date,cnts as f4 from pgv_stat.xmpcloud2_ie_stat  where  date>=20161201 and url='http://hao.360.cn/?src=lm&ls=n79f40a409c') d on a.date=d.date
+inner join
+(select date,cnts as f5 from pgv_stat.xmpcloud2_ie_stat  where  date>=20161201 and url='http://hao.360.cn/?src=lm&ls=n110c004e9b') e on a.date=e.date
+inner join
+(select date,cnts as f6 from pgv_stat.xmpcloud2_ie_stat  where  date>=20161201 and url='https://hao.360.cn/?src=lm&ls=n556c014b9f') f on a.date=f.date
+order by a.date desc;
+```
+
+案例参考：
+
+| 年    | 季度   | 销售量  |
+| ---- | ---- | ---- |
+| 1991 | 1    | 11   |
+| 1991 | 2    | 12   |
+| 1991 | 3    | 13   |
+| 1991 | 4    | 14   |
+| 1992 | 1    | 21   |
+| 1992 | 2    | 22   |
+| 1992 | 3    | 23   |
+| 1992 | 4    | 24   |
+
+| 年    | 一季度  | 二季度  | 三季度  | 四季度  |
+| ---- | ---- | ---- | ---- | ---- |
+| 1991 | 11   | 12   | 13   | 14   |
+| 1992 | 21   | 22   | 23   | 24   |
+
+```mysql
+# 实现的sql语句(借鉴意义很广泛)
+select 年, 
+sum(case when 季度=1 then 销售量 else 0 end) as 一季度, 
+sum(case when 季度=2 then 销售量 else 0 end) as 二季度, 
+sum(case when 季度=3 then 销售量 else 0 end) as 三季度, 
+sum(case when 季度=4 then 销售量 else 0 end) as 四季度 
+from sales group by 年;
+```
+
+
+
+#### 列转行
+
+```mysql
+# 利用序列化表的方式实现列转行
+SELECT
+	user_name,
+	REPLACE (SUBSTRING(SUBSTRING_INDEX(mobile, ',', a.id), CHAR_LENGTH(SUBSTRING_INDEX(mobile, ',', a.id - 1)) + 1), ',', '') as moblie
+FROM
+	seq_tb a
+CROSS JOIN (
+	SELECT
+		CONCAT(mobile, ',') as mobile,
+		LENGTH(mobile) - LENGTH(REPLACE(mobile, ',', '')) + 1 size
+	FROM
+		user1 b
+) b on a.id <= b.size;
+
+# 利用union实现列转行
+SELECT user_name,'skills1' as 'jineng',skills1 from nameskills_col
+UNION ALL
+SELECT user_name,'skills2',skills2 from nameskills_col
+UNION ALL
+SELECT user_name,'skills2',skills3 from nameskills_col ORDER BY user_name;
+```
+
 
 
 ### 查询
