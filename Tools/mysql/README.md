@@ -55,6 +55,24 @@ http://c.biancheng.net/cpp/html/1456.html
 
 命令行：mysqladmin variables -p，这个操作也就相当于登录时使用命令 show global variables;
 
+### 高级
+
+#### 过程和函数
+
+创建存储过程
+
+```sql
+CREATE PROCEDURE sp_name([IN|OUT|INOUT] param_name type) [characteristics] routine_body
+
+1.其中CREATE PROCEDURE为创建存储过程的关键字，sp_name为存储过程的名称，为指定存储过程的参数
+2.characteristics指定存储过程的特性
+3.routine_body是SQL代码的内容， 可以用BEGIG...END来表示SQL代码的开始和结束
+```
+
+调用存储过程：Call  sp_name;
+
+#### 事件 
+
 ### 应用
 
 #### 行转列
@@ -142,13 +160,23 @@ SELECT user_name,'skills2',skills3 from nameskills_col ORDER BY user_name;
 
 #### 子查询
 
+#### 连接
+
+### 调优
+
+
+
 
 
 ### 备份
 
-#### 导入和导出
+#### 导入和导出 
 
-**参考**
+## 参考
+
+[SQL的存储过程和函数](http://www.toutiao.com/a6391569028531831041/)
 
 [MySQL存储过程的动态行转列](http://www.tuicool.com/articles/FNRVJvb)
+
+[性能调优攻略:SQL语句优化](http://www.toutiao.com/a6391314783630770433/)
 
