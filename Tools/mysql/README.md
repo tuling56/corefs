@@ -1,5 +1,7 @@
 ## MySQL积累
 
+[TOC]
+
 ### 基本
 
 #### 创建
@@ -154,19 +156,117 @@ UNION ALL
 SELECT user_name,'skills2',skills3 from nameskills_col ORDER BY user_name;
 ```
 
+#### 同一属性多值过滤
 
+```mysql
+# 方法一
+#选出同时具有fei和bianhua能力的人
+SELECT DISTINCT a.name AS 'feibianren' from nameskills a 
+JOIN  nameskills b on a.name=b.name and b.skills='fei'
+join  nameskills c on a.name=c.`name` and c.skills='bianhua';
+
+# 方法二：
+# 同一属性多值过滤问题
+SELECT
+	a.`name`,
+	b.skills as bskill
+	#c.skills as cskill
+from
+	nameskills_row a
+INNER JOIN join nameskills_row b on a.name = b.name
+and b.skills = 'nianjing';
+#join nameskills_row c on a.name = c.name
+#and c.skills = 'fanren';
+```
 
 ### 查询
+
+#### 索引
+
+单索引和联合索引
 
 #### 子查询
 
 #### 连接
 
+##### join
+
+###### inner join
+
+```mysql
+#SELECT Persons.LastName, Persons.FirstName, Orders.OrderNo
+#FROM Persons
+#INNER JOIN Orders
+#ON Persons.Id_P = Orders.Id_P
+#ORDER BY Persons.LastName;
+
+# 该语句等效于
+SELECT
+	Persons.LastName,
+	Persons.FirstName,
+	Orders.OrderNo
+FROM
+	Persons,
+	Orders
+WHERE
+	Persons.Id_P = Orders.Id_P
+```
+
+###### left join
+
+```mysql
+SELECT
+	Persons.LastName,
+	Persons.FirstName,
+	Orders.OrderNo
+FROM
+	Persons
+LEFT JOIN Orders ON Persons.Id_P = Orders.Id_P
+WHERE persons.LastName like 'C%'
+ORDER BY
+	Persons.LastName 
+
+```
+
+###### right join
+
+```mysql
+SELECT
+	Persons.LastName,
+	Persons.FirstName,
+	Orders.OrderNo
+FROM
+	Persons
+RIGHT JOIN Orders ON Persons.Id_P = Orders.Id_P
+ORDER BY
+	Persons.LastName
+```
+
+###### union(all)
+
+```mysql
+# 请注意，UNION 内部的 SELECT 语句必须拥有相同数量的列。列也必须拥有相似的数据类型。同时，每条 SELECT 语句中的列的顺序必须相同。
+# 注释：默认地，UNION 操作符选取不同的值。如果允许重复的值，请使用 UNION ALL。
+SELECT	* from	persons
+UNION All
+SELECT	* from	persons;
+```
+
+##### exists和in
+
+```mysql
+#这条语句适用于a表比b表大的情况
+select * from ecs_goods a where cat_id in(select cat_id from ecs_category);
+
+#这条语句适用于b表比a表大的情况
+select * from ecs_goods a where EXISTS(select cat_id from ecs_category b where a.cat_id = b.cat_id);
+```
+
 ### 调优
 
+#### 索引
 
-
-
+如何调优索引的使用
 
 ### 备份
 
@@ -179,4 +279,6 @@ SELECT user_name,'skills2',skills3 from nameskills_col ORDER BY user_name;
 [MySQL存储过程的动态行转列](http://www.tuicool.com/articles/FNRVJvb)
 
 [性能调优攻略:SQL语句优化](http://www.toutiao.com/a6391314783630770433/)
+
+[mysql exists和in的效率比较](http://www.cnblogs.com/meibao/p/4973043.html)
 
