@@ -57,6 +57,14 @@ http://c.biancheng.net/cpp/html/1456.html
 
 命令行：mysqladmin variables -p，这个操作也就相当于登录时使用命令 show global variables;
 
+#### 技巧
+
+运行方式技巧：
+
+> ${MYSQL10} < xmp_version_active.sql
+>
+> 其中MYSQL10是:`/usr/bin/mysql -uroot -phive -N`
+
 ### 高级
 
 #### 过程和函数
@@ -178,6 +186,25 @@ and b.skills = 'nianjing';
 #join nameskills_row c on a.name = c.name
 #and c.skills = 'fanren';
 ```
+
+#### 关联更新
+
+根据另一个表的数据，更新当前表的数据:
+
+```mysql
+# 在a表和b表满足xx条件的时候更新a表的什么内容
+update pgv_stat.xmp_version_active a inner join (select date,version,sum(online_user) user,sum(total_uv) vod from pgv_stat.xmp_total_vod where date='$dt' and channel='all' group by version) b on a.date=b.date and substring_index(a.version,'.',-1)=b.version set a.online_user=b.user,a.total_uv=b.vod where a.date='$dt';
+```
+
+```mysql
+# 在a表和b表满足xx条件的时候更新a表的什么内容
+UPDATE downloaddatas a, downloadfee b SET a.ThunderPrice=$PRICE, a.ThunderAMT=(a.ThunderCop+a.btdownnum3)*$PRICE WHERE a.CopartnerId=b.copartnerid AND b.inuse=1 AND a.BalanceDate>=DATE_FORMAT(b.starttime,'%Y-%m-%d') AND a.BalanceDate='$BALANCEDATE'
+
+#在a表和b表满足xx条件的时候更新b表的什么内容
+update union_kuaichuan_download_data a,downloaddatas b set b.ThunderQty=b.ThunderQty+a.copdowntimes where a.dayno=$d and b.BalanceDate=_gbk\"${dt}\" and b.CopartnerId=a.copid  and b.ProductNo=4"
+```
+
+
 
 ### 查询
 
