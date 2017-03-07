@@ -59,11 +59,28 @@ http://c.biancheng.net/cpp/html/1456.html
 
 #### 技巧
 
-运行方式技巧：
+##### 运行方式技巧
 
-> ${MYSQL10} < xmp_version_active.sql
->
-> 其中MYSQL10是:`/usr/bin/mysql -uroot -phive -N`
+```shell
+${MYSQL10} < xmp_version_active.sql
+#其中MYSQL10是:`/usr/bin/mysql -uroot -phive -N`
+```
+
+##### 选取结果添加行号
+
+```mysql
+# 方法1 
+set @mycnt=0;
+select (@mycnt := @mycnt + 1) as ROWNUM , vv from task1_tbl order by vv;
+
+# 方法2
+# #将查询结果写入到某个拥有auto_increment字段的临时表中再做查询
+
+# 方法3
+# #用Python等脚本语言对查询结果进行二次组装
+```
+
+
 
 ### 高级
 
@@ -204,6 +221,22 @@ UPDATE downloaddatas a, downloadfee b SET a.ThunderPrice=$PRICE, a.ThunderAMT=(a
 update union_kuaichuan_download_data a,downloaddatas b set b.ThunderQty=b.ThunderQty+a.copdowntimes where a.dayno=$d and b.BalanceDate=_gbk\"${dt}\" and b.CopartnerId=a.copid  and b.ProductNo=4"
 ```
 
+#### 周同期
+
+```python
+# 这周的数据
+tablea="select date,sum(install_end) as s_install_end,sum(install_silence) as s_install_new from xmp_install where date>=date_sub(curdate(),interval 7 day) group by date"
+
+# 上周的数据
+tableb="select date,sum(install_end) as s_install_end,sum(install_silence) as s_install_new from xmp_install where date>=date_sub(curdate(),interval 14 day) group by date"
+
+# 要统计的数据
+whatis="a.date as '当前日期',b.date as '上周同期',a.s_install_end as '总安装量',b.s_install_end as '上周同期总安装量',concat(round((a.s_install_end-b.s_install_end)*100/b.s_install_end,2),'%') as '总装周同比'"
+
+# 展示结果
+sql = "SELECT {whatis} FROM ({tablea}) a INNER JOIN ({tableb}) b on b.date=DATE_FORMAT(DATE_SUB(a.date,INTERVAL 7 day),'%Y%m%d') order by a.date desc".format(whatis=whatis,tablea=tablea,tableb=tableb)
+```
+
 
 
 ### 查询
@@ -298,6 +331,33 @@ select * from ecs_goods a where EXISTS(select cat_id from ecs_category b where a
 ### 备份
 
 #### 导入和导出 
+
+#### mysql导入到redis
+
+方法1：
+
+> 遍历插入法
+
+方法2：
+
+命令行法
+
+```shell
+#创建shell脚本mysql2redis_mission.sh,（在mysql的结果中进行命令行的组合）内容如下：
+mysql db_name --skip-column-names --raw < mission.sql | redis-cli [--pipe]
+#进化方法
+mysql -uroot -proot -N <redis_pipe.sql |redis-cli
+
+# 例如
+(echo "set key1 vale1\r\n get key1\r\n") |redis-cli ［--pipe］#最后这个pipe选项可能导致问题
+#　或者（能得到返回结果）
+(echo -en "set key3 vale3\r\n get key2\r\n") |nc localhost 6379
+
+# 直接将文件内容输入到流
+cat xxx.file |redis-cli [--pipe]
+```
+
+
 
 ## 参考
 

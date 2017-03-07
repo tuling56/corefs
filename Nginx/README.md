@@ -306,7 +306,7 @@ server{}            # 块定义了虚拟主机
 
 [uwsgi是什么？](http://www.nowamagic.net/academy/detail/1330328)
 
-> WSGI是web服务网关接口，它是一个web服务器（如nginx）与应用服务器（如uWSGI服务器通信的一种规范）
+> WSGI是web服务网关接口，它是一个web服务器（如nginx）与应用服务器（如uWSGI服务器）通信的一种规范
 >
 > - uWSGI是什么？
 >

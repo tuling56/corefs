@@ -1,5 +1,47 @@
 ## Redis学习笔记
 
+### 安装
+
+#### 安装
+
+```shell
+#1.下载
+wget http://download.redis.io/redis-stable.tar.gz
+#2.解压
+tar –zxvf redis-stable.tar.gz
+#3.编译
+cd redis-stable&&make
+#4.安装
+make install
+```
+
+#### 配置
+
+```shell
+#配置文件(将压缩包目录的下的redis.conf拷贝到这个地方)
+/etc/redis/redis.conf
+# dumpfile 目录，进程pid目录，log目录
+/var/redis/data
+/var/redis/run
+/var/redis/log
+```
+
+> 运行：redis-server  /path/to/redis.conf
+
+#### 开启启动
+
+```shell
+# 1.创建启动脚本
+# 拷贝解压包下utils下redis启动脚本至/etc/init.d/
+cp redis_init_script /etc/init.d/redis-server
+
+# 2.开机启动
+# 添加以下内容到/etc/init.d/redis-server脚本头部
+> # Start Redis-server at the launch. It is used to serve
+> # chkconfig: 2345 90 10
+# 然后执行chkconfig redis-server on
+```
+
 ### 基础
 
 Redis中没有关系数据库中库表的概念，只有key:value的概念
