@@ -369,3 +369,4 @@ cat xxx.file |redis-cli [--pipe]
 
 [mysql exists和in的效率比较](http://www.cnblogs.com/meibao/p/4973043.html)
 
+[MyCli:支持自动补全和语法高亮的MySQL客户端](http://hao.jobbole.com/mycli-mysql/)

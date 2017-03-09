@@ -17,6 +17,8 @@ make install
 
 #### 配置
 
+redis.conf配置文件：[redis.conf配置文件详细说明](http://www.runoob.com/redis/redis-conf.html)
+
 ```shell
 #配置文件(将压缩包目录的下的redis.conf拷贝到这个地方)
 /etc/redis/redis.conf
@@ -27,6 +29,17 @@ make install
 ```
 
 > 运行：redis-server  /path/to/redis.conf
+
+命令行获取相关配置
+
+```shell
+# 获取某个变量的配置
+redis 127.0.0.1:6379> CONFIG GET CONFIG_SETTING_NAME
+# 获取所有配置项
+redis 127.0.0.1:6379> CONFIG GET *       
+# 使用CONFIG SET来设置变量
+redis 127.0.0.1:6379> CONFIG SET CONFIG_SETTING_NAME NEW_CONFIG_VALUE
+```
 
 #### 开启启动
 
@@ -73,9 +86,12 @@ OK
 4) "runoob"
 5) "points"
 6) "200"
+
+127.0.0.1:6379> HGET user:1 username
+runoob
 ```
 
-
+> 哈希的主要功能：删除某个字段，为哈希表key中的指定字段的整数值加上增量，重新设置某个字段的值
 
 ##### 列表
 
@@ -83,7 +99,7 @@ OK
 
 ##### 集合
 
-Set是string类型的无序集合，集合是通过hash表实现的，所以添加、删除、查找的复杂度都是O(1)
+Set是string类型的无序集合，集合是通过hash表实现的，所以添加、删除、查找的复杂度都是O(1)。
 
 ```shell
 redis 127.0.0.1:6379> sadd runoob redis
@@ -101,11 +117,11 @@ redis 127.0.0.1:6379> smembers runoob
 3) "redis"
 ```
 
+> 集合的作用主要用来计算集合的交集，并集，补集，差集等运算
+
 ##### 有序集合
 
 zset和set一样，是string类型元素的集合，切不允许重复成员。不同的是每个元素都会关联一个double类型的分数，redis正是通过分数来为集合中的成员进行按从小到大的排序。
-
-
 
 ```shell
 redis 127.0.0.1:6379> zadd runoob 0 redis
@@ -123,13 +139,15 @@ redis 127.0.0.1:6379> ZRANGEBYSCORE runoob 0 1000
 3) "rabitmq"
 ```
 
+有序集合按分数（值）筛选，按排名筛选，按域筛选等多种筛选方式的使用；指定成员分数的加减等
+
 #### 发布和订阅
 
 不知道有什么用，信息流推送？
 
 #### 事务
 
-
+//待补充
 
 ### 备份
 
@@ -137,13 +155,17 @@ redis 127.0.0.1:6379> ZRANGEBYSCORE runoob 0 1000
 
 数据导入和导出：SAVE和BGSAVE命令
 
-#### 和MySQL数据同步
+#### 同步数据到MySQL
 
+将redis数据导出成文件，然后一次性加载进mysql,关键是如何组织redis中的数据结构到mysql中数据结构的转换
 
+### 接口
 
+#### Python操作Redis
 
+//已基本掌握
 
-
+#### Lua操作Redis
 
 
 

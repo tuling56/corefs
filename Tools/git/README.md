@@ -26,3 +26,4 @@ ssh-keygen -t rsa -C “xxx@gmail.com” 
 
 [gitlab配置ssh-key](http://blog.csdn.net/breeze_life/article/details/45868045)
 
+[git查看远程仓库](http://blog.csdn.net/wanghuihui02/article/details/48155627)

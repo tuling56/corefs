@@ -314,42 +314,60 @@ server{}            # 块定义了虚拟主机
 
 ### 安装
 
-> sudo yum install uwsgi (这一步非必须，Linux系统一般都自带的安装在/usr/sbin目录下)
+> ~~sudo yum install uwsgi (这一步非必须，Linux系统一般都自带的安装在/usr/sbin目录下)~~
 >
-> 安装两个插件：
+> ~~安装两个插件：~~
 >
-> > - yum install  uwsgi-plugin-python  	# 可有可无
-> > - pip intsall uwsgi                                   #等效于sudo yum install uwsgi
+> > - ~~yum install  uwsgi-plugin-python  	# 可有可无~~
+> > - ~~pip intsall uwsgi                                   #等效于sudo yum install uwsgi~~
 >
-> [该部分的参考](http://blog.csdn.net/hshl1214/article/details/46764861)	
+> ~~[该部分的参考](http://blog.csdn.net/hshl1214/article/details/46764861)~~	
+>
+> 其实只需要用一句话：
+>
+> ```shell
+> sudo apt-get install uwsgi uwsgi-plugin-python
+> ```
 
-### 启动
+### 启动和关闭
 
-> 启动:
->
-> > /usr/sbin/uwsgi  -i  /home/celte/lovenote/uwsgi.ini --plugin python
-> >
-> > 一个启动配置文件的参考：
+启动:
 
-| [uwsgi]                                | 说明                      |
-| -------------------------------------- | ----------------------- |
-| socket = 127.0.0.1:9000                | 通信                      |
-| master = ture                          | 是否是主机                   |
-| processes = 1                          |                         |
-| daemonize = /usr/local/vod/log/vod.log |                         |
-| chdir = /usr/local/vod/                |                         |
-| pidfile = /usr/local/vod/.pid          |                         |
-| module = interface                     | 同级目录下有个interface.py的问文件 |
-| web.config.debug = False               | 是否是debug模式              |
-| socket-timeout = 120                   | 超时设置                    |
-| harakiri = 1200                        |                         |
-| py-autoreload = 1                      |                         |
+> /usr/sbin/uwsgi  -i  /home/celte/lovenote/uwsgi.ini --plugin python
+
+关闭：
+
+>  killall -9 uwsgi
+
+### 配置
+
+> uwsgi --help, #一个启动配置文件的参考：
+
+| [uwsgi]                                | 说明                                      |
+| -------------------------------------- | --------------------------------------- |
+| socket = 127.0.0.1:9000                | 通信                                      |
+| master = ture                          | 是否是主机                                   |
+| processes = 1                          | 开启的进程数量                                 |
+| daemonize = /usr/local/vod/log/vod.log |                                         |
+| chdir = /usr/local/vod/                | 指定运行目录                                  |
+| pidfile = /usr/local/vod/.pid          | 指定pid文件的位置，记录主进程的pid号                   |
+| module = interface                     | 同级目录下有个interface.py的问文件，注意和wsgi-file的区别 |
+| web.config.debug = False               | 是否开启debug模式                             |
+| socket-timeout = 120                   | 超时设置                                    |
+| harakiri = 1200                        |                                         |
+| py-autoreload = 1                      |                                         |
+| wsgi-file                              | 载入wsgi-file                             |
+| stats                                  | 在指定的地址上，开启状态服务                          |
+| thred                                  | 运行线程数量                                  |
+| log-maxsize                            | 以固定的文件大小（kb），切割日志文件                     |
+| vacuum                                 | 当服务器退出的时候自动清理环境，删除uinx socket和pid文件     |
+| disable-logging                        | 不记录请求信息的日志，只记录错误及uwsgi内部消息到日志中。         |
+|                                        |                                         |
+|                                        |                                         |
 
 ### 测试
 
-> 什么情况下代表uwsgi配置成功？如何确认
->
-> #### 测试uwsgi是否安装成功
+> 什么情况下代表uwsgi配置成功？如何确认,测试uwsgi是否安装成功
 >
 > 在你的django项目根目录下建一个test.py文件：
 >
@@ -369,10 +387,6 @@ server{}            # 块定义了虚拟主机
 > > uwsgi --socket 127.0.0.1:9000 --protocol=http --wait-interface test:application
 >
 > 访问网页 http://115.28.0.89:9000/，OK，显示 Hello World，说明 [uwsgi](http://www.nowamagic.net/academy/tag/uwsgi) 安装成功。
-
-### 关闭
-
-> killall -9 uwsgi
 
 ### 开启nginx+uwsgi
 
@@ -450,7 +464,7 @@ server{
 
 
 
-## php的配置
+## nginx+php的配置
 
 ### 安装依赖项
 
@@ -554,7 +568,7 @@ location ~ \.php$ {
 
 [Linux下配置安装PHP环境](http://www.cnblogs.com/lufangtao/archive/2012/12/30/2839679.html)（里面有配置mysql的支持）
 
-## web.py的配置
+## nginx+web.py的配置
 
 ### 安装
 
@@ -564,7 +578,7 @@ location ~ \.php$ {
 
 > 待完成
 
-## django的配置
+## nginx+django的配置
 
 ### django模块
 
@@ -637,7 +651,11 @@ stats = 127.0.0.1:9191
 
 Older (< 1.4) Django releases need to set `env`, `module` and the `pythonpath` (`..` allow us to reach the `myproject.settings` module).
 
-## lua的配置
+## nginx+flask的配置
+
+nginx是一个提供静态文件访问服务的web服务器，然后它不能直接执行托管Python应用程序，而uwsgi解决了这个问题，稍后配置nginx和uwsgi之间的交互。flask内置有web托管服务，开发和调试是个不错的工具，但生产中还是使用nginx。
+
+## nginx+lua的配置
 
 ### 安装
 
