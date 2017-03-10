@@ -156,7 +156,27 @@ server{}            # 块定义了虚拟主机
 
 ### nginx开启https支持
 
-生成证书
+SSL使用证书来创建安全连接，有两种验证模式：
+
+1. 仅客户端验证服务器的证书，客户端自己不提供证书；
+2. 客户端和服务器都互相验证对方的证书。
+
+#### 创建自签名SSL证书
+
+创建自签名证书需要安装openssl，使用以下步骤：[参考](http://www.liaoxuefeng.com/article/0014189023237367e8d42829de24b6eaf893ca47df4fb5e000)
+
+1. 创建Key；
+2. 创建签名请求；
+3. 将Key的口令移除；
+4. 用Key签名证书。
+
+```
+# 这个还是存在问题的，不同的机器访问不了
+```
+
+#### https配置方法
+
+**https配置方法1：**
 
 > 证书有服务器端证书和客户端证书
 
@@ -196,7 +216,7 @@ server{}            # 块定义了虚拟主机
 
 > 客户端证书如何配置？
 
-配置https方法2：
+**配置https方法2：**
 
 ``` shell
 # 自建CA
@@ -300,7 +320,7 @@ server{}            # 块定义了虚拟主机
 
 [nginx配置文件详解](https://www.zybuluo.com/phper/note/89391)
 
-## uwsgi的配置
+## nginx+uwsgi的配置
 
 ---
 
@@ -654,6 +674,8 @@ Older (< 1.4) Django releases need to set `env`, `module` and the `pythonpat
 ## nginx+flask的配置
 
 nginx是一个提供静态文件访问服务的web服务器，然后它不能直接执行托管Python应用程序，而uwsgi解决了这个问题，稍后配置nginx和uwsgi之间的交互。flask内置有web托管服务，开发和调试是个不错的工具，但生产中还是使用nginx。
+
+//始终得不到解决，也是烦死了
 
 ## nginx+lua的配置
 
