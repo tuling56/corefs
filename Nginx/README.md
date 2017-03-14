@@ -320,7 +320,7 @@ SSL使用证书来创建安全连接，有两种验证模式：
 
 [nginx配置文件详解](https://www.zybuluo.com/phper/note/89391)
 
-## nginx+uwsgi的配置
+## uwsgi的配置
 
 ---
 
@@ -366,12 +366,13 @@ SSL使用证书来创建安全连接，有两种验证模式：
 | [uwsgi]                                | 说明                                      |
 | -------------------------------------- | --------------------------------------- |
 | socket = 127.0.0.1:9000                | 通信                                      |
-| master = ture                          | 是否是主机                                   |
+| master = true                          | 是否是主机                                   |
 | processes = 1                          | 开启的进程数量                                 |
 | daemonize = /usr/local/vod/log/vod.log |                                         |
 | chdir = /usr/local/vod/                | 指定运行目录                                  |
 | pidfile = /usr/local/vod/.pid          | 指定pid文件的位置，记录主进程的pid号                   |
 | module = interface                     | 同级目录下有个interface.py的问文件，注意和wsgi-file的区别 |
+| plugins = python                       | ***这个配置在python应用的时候必须开启***              |
 | web.config.debug = False               | 是否开启debug模式                             |
 | socket-timeout = 120                   | 超时设置                                    |
 | harakiri = 1200                        |                                         |
@@ -382,10 +383,12 @@ SSL使用证书来创建安全连接，有两种验证模式：
 | log-maxsize                            | 以固定的文件大小（kb），切割日志文件                     |
 | vacuum                                 | 当服务器退出的时候自动清理环境，删除uinx socket和pid文件     |
 | disable-logging                        | 不记录请求信息的日志，只记录错误及uwsgi内部消息到日志中。         |
-|                                        |                                         |
-|                                        |                                         |
+| uid=root                               | 配置运行uwsgi用户的uid                         |
+| gid=root                               | 配置运行uwsgi用户的gid                         |
 
 ### 测试
+
+#### uwsig的安装是否成功
 
 > 什么情况下代表uwsgi配置成功？如何确认,测试uwsgi是否安装成功
 >
@@ -407,6 +410,22 @@ SSL使用证书来创建安全连接，有两种验证模式：
 > > uwsgi --socket 127.0.0.1:9000 --protocol=http --wait-interface test:application
 >
 > 访问网页 http://115.28.0.89:9000/，OK，显示 Hello World，说明 [uwsgi](http://www.nowamagic.net/academy/tag/uwsgi) 安装成功。
+
+#### 通过web页面执行服务器端脚本
+
+```python
+import os
+ 
+def application(env, start_response):
+    os.chdir('/usr/local/src/python-test')
+    retcode = os.system('sh dir.sh')
+    if retcode == 0:
+        ret = 'success!'
+    else:
+        ret = 'failure!'
+        start_response('200 OK', [('Content-Type','text/html')])
+    return [ret]
+```
 
 ### 开启nginx+uwsgi
 
@@ -430,14 +449,14 @@ server{
 
 ### 开启django+uwsgi
 
-> **先测试django自带web服务器**
->
-> python $projectroot/manage.py runserver 127.0.0.1:8801  # 此处8801是django自带的web服务器的端口
->
-> 然后访问http://127.0.0.1:8801,成功显示，则代表Django自带服务正确
->
-> **开启uwsgi与Django的连接**
->
+#### 先测试django自带web服务器
+
+python $projectroot/manage.py runserver 127.0.0.1:8801  # 此处8801是django自带的web服务器的端口
+
+然后访问http://127.0.0.1:8801,成功显示，则代表Django自带服务正确
+
+#### 开启uwsgi与Django的连接
+
 > - 在与manage.py同目录下新建django_wsgi.py文件：
 >
 > ```python
@@ -455,16 +474,37 @@ server{
 > os.environ.setdefault("DJANGO_SETTINGS_MODULE", "projectname.settings")
 >
 > from django.core.handlers.wsgi import WSGIHandler
-> application = WSGIHandler()
+> application = WSGIHandler()     # 使用此获取应用
 > ```
 >
 > - 执行
 >
->   > uwsgi --http :9000 --chdir $projectroot --module django_wsgi
->   >
->   > 更新为：uwsgi --socket 127.0.0.1:9000 --protocol=http --chdir $projectroot --module django_wsgi
 >
+> ```shell
+> uwsgi --http :9000 --chdir $projectroot --module django_wsgi
+> 更新为：uwsgi --socket 127.0.0.1:9000 --protocol=http --chdir $projectroot --module django_wsgi
+> ```
 >
+> > 其实在django项目的配置文件目录内有wsgi.py文件，可以直接作为uwsgi的入口文件
+>
+> ```python
+> """
+> WSGI config for django_project project.
+>
+> It exposes the WSGI callable as a module-level variable named ``application``.
+>
+> For more information on this file, see
+> https://docs.djangoproject.com/en/1.8/howto/deployment/wsgi/
+> """
+>
+> import os
+>
+> from django.core.wsgi import get_wsgi_application
+>
+> os.environ.setdefault("DJANGO_SETTINGS_MODULE", "django_project.settings")
+>
+> application = get_wsgi_application()  #使用此获取应用
+> ```
 
 ### uwsgi的处理过程
 
@@ -473,6 +513,8 @@ server{
 ### 参考
 
 [uWSGI搭配Nginx](http://www.nowamagic.net/academy/tag/uwsgi)(现代魔法学院)
+
+[uWSGI+Nginx安装配置（成功）](http://www.cnblogs.com/configure/p/6401695.html)
 
 [uWSGI的安装与配置（官网摘录）](http://blog.csdn.net/chenggong2dm/article/details/43937433)（参考链接很有价值）
 
@@ -592,11 +634,82 @@ location ~ \.php$ {
 
 ### 安装
 
-> 待完成  
+```shell
+pip install web.py 
+```
 
 ###  web.py+uwsqi的配置
 
-> 待完成
+接口配置
+
+```python
+import os
+import sys
+import web
+
+#web.config.debug = False
+
+# 以下承接各个app
+sys.path.append("./common")
+sys.path.append("./app_welcome")  
+sys.path.append("./app_add_num")
+
+# url路由列表
+urls = (
+        '/','welcome.Handler',
+		'/add_num','add_num.Handler',
+)
+
+# 启动应用接口
+app = web.application(urls, globals(), autoreload=True)
+#app.config['debug'] = False
+
+if __name__ == '__main__':
+        app.run()
+else:
+        application = app.wsgifunc()
+```
+
+nginx配置
+
+```nginx
+location / {
+                include uwsgi_params;
+                uwsgi_read_timeout 3600;
+                uwsgi_pass 127.0.0.1:9090;
+   }
+# 注意此处的路径必须是‘/’
+```
+
+uwsgi配置
+
+```uwsgi
+[uwsgi]
+socket = 127.0.0.1:9090
+wsgi-file = /usr/local/src/python-test/python-test.py
+plugins = python   				#这个必不可少
+chdir = /usr/local/src/python-test
+processes = 2
+threads = 2
+post-buffering = 8192
+buffer-size = 65535
+socket-timeout = 10
+stats = 127.0.0.1:9191
+# callable = python-test
+uid = uwsgi
+gid = uwsgi
+master = true
+protocol = uwsgi
+buffer-size = 8192
+pidfile = /var/run/uwsgi9090.pid
+# daemonize = /var/log/uwsgi9090.log
+```
+
+
+
+### 参考
+
+[web.py官方参考手册](http://webpy.org/cookbook/ctx)
 
 ## nginx+django的配置
 
