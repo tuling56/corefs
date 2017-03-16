@@ -320,6 +320,8 @@ SSL使用证书来创建安全连接，有两种验证模式：
 
 [nginx配置文件详解](https://www.zybuluo.com/phper/note/89391)
 
+[nginx日志分析及性能排查](http://mp.weixin.qq.com/s/A1ufVgi3VFuSGRh4Ju5puA)
+
 ## uwsgi的配置
 
 ---
