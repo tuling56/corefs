@@ -526,6 +526,10 @@ python $projectroot/manage.py runserver 127.0.0.1:8801  # 此处8801是django自
 
 (![CGI、FastCGI、PHP-CGI、PHP-FPM流程](http://p1.pstatp.com/large/1534000214d226572cc9)
 
+## nginx+fastcgi的配置
+
+这个部分还需要很大的完善，有很多的工作没有做
+
 
 
 ## nginx+php的配置

@@ -80,6 +80,37 @@ select (@mycnt := @mycnt + 1) as ROWNUM , vv from task1_tbl order by vv;
 # #用Python等脚本语言对查询结果进行二次组装
 ```
 
+##### 近段时间数据修复
+
+```mysql
+# 用上周同期的数据浮动修复本周的数据
+delete from db2.tb1 where date>=20160818 and date<=20160821;
+insert into db2.tb1 select
+	date_format(date_add(date, interval 7 day),'%Y%m%d'),
+	channel,
+	version,
+	install_begin + round(install_begin / 100),
+	install_end + round(install_end / 100),
+	uninstall+round(uninstall/100)
+from
+	db2.tb1
+where
+	date >= '20160811' and date <= '20160814';
+
+# 用除了修复日期外其它近段时间的数据平均修复
+delete from db2.tb1 where date='20170313';
+insert into db2.tb1 select
+	'20170313',
+	channel,
+	version,
+	avg(install_begin),
+	avg(install_end),
+from
+	db2.tb1
+where
+	date='20170309'  and  date<='20170315' and date!='20170313';
+```
+
 
 
 ### 高级
