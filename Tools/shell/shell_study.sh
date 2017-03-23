@@ -407,6 +407,10 @@ function tricks()
 
 	# 分组求和(注意多条件匹配)
 	awk '{if($3==00 && $1~/8$/) a[$13"\t"$5"\t"$3"\t"$1]+=1}END{ for(i in a) print i"\t"a[i]}'
+
+	# awk多维数组统计
+	awk '{if (a in arr) {split(arr[a],puv,"\t");pv=puv[1]+$2;uv=puv[2]+$3;} else arr[$1]=$2"\t"$3;}END{ for(a in arr) print a,arr[a]|"sort -rn -k2"}' 
+
 }
 
 

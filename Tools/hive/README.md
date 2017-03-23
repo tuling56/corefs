@@ -2,7 +2,44 @@
 
 [TOC]
 
+### 基础
+
+#### 命令行
+
+```shell
+# 静音模式
+$HIVE_HOME/bin/hive -S -e 'select a.col from tab1 a'
+# #加入-S，终端上的输出不会有mapreduce的进度，执行完毕，只会把查询结果输出到终端上。这个静音模式很实用，,通过第三方程序调用，第三方程序通过hive的标准输出获取结果集。
+
+# 设置
+set <key>=<value>	修改特定变量的值
+注意: 如果变量名拼写错误，不会报错
+set	输出用户覆盖的hive配置变量
+set -v	输出所有Hadoop和Hive的配置变量
+
+# 资源和分布式缓存
+add FILE[S] <filepath> <filepath>* 
+add JAR[S] <filepath> <filepath>* 
+add ARCHIVE[S] <filepath> <filepath>*	添加 一个或多个 file, jar,  archives到分布式缓存
+list FILE[S] 
+list JAR[S] 
+list ARCHIVE[S]	输出已经添加到分布式缓存的资源。
+list FILE[S] <filepath>* 
+list JAR[S] <filepath>* 
+list ARCHIVE[S] <filepath>*	检查给定的资源是否添加到分布式缓存
+delete FILE[S] <filepath>* 
+delete JAR[S] <filepath>* 
+delete ARCHIVE[S] <filepath>*
+
+# 执行
+! <command>	从Hive shell执行一个shell命令
+source FILE <filepath>	在CLI里执行一个hive脚本文件
+```
+
+
+
 ### 创建表
+
 #### 文本格式存储
 ```sql
 use kankan_odl;drop table if exists hive_table_templete;
@@ -48,6 +85,14 @@ outputformat
 ```mysql
 select a.mt,count(*) as cnt from (select from_unixtime(finsert_time,'yyyyMMdd HH:mm:ss') as mt from xmp_odl.xmp_pv where ds='20161206') a group by a.mt order by cnt desc;
 ```
+
+#### 正则
+
+```mysql
+ select  'abc'  regexp '^[a-z]*$'   from test.dual;
+```
+
+
 
 ####  连接
 

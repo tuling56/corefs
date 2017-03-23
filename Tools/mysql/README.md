@@ -6,6 +6,31 @@
 
 #### 创建
 
+创建新用户并设置密码
+
+create user 'username'@'host' identified by 'password';
+
+授权管理
+
+
+
+```mysql
+grant privileges on databasename.tablename to 'username'@'host';
+# 其中的privileges可以是SELECT , INSERT , UPDATE或者all等 
+```
+
+
+
+更改密码
+
+```shell
+# 命令:
+ set password for 'username'@'host' = password('newpassword');
+# 如果是当前登陆用户用
+ set password = password("newpassword");
+# 例子: set password for 'lin'@'%' = password("123456");
+```
+
 
 
 #### 索引
@@ -401,3 +426,5 @@ cat xxx.file |redis-cli [--pipe]
 [mysql exists和in的效率比较](http://www.cnblogs.com/meibao/p/4973043.html)
 
 [MyCli:支持自动补全和语法高亮的MySQL客户端](http://hao.jobbole.com/mycli-mysql/)
+
+[Linux下修改mysql的root密码](http://www.tuicool.com/articles/yQNZFfr)
