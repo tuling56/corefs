@@ -12,14 +12,21 @@ create user 'username'@'host' identified by 'password';
 
 授权管理
 
-
-
 ```mysql
 grant privileges on databasename.tablename to 'username'@'host';
 # 其中的privileges可以是SELECT , INSERT , UPDATE或者all等 
+# 查看所有用户的授权
+select * from information_schema.user_privileges;
+
+# 查看所有的用户
+select distinct concat('user: ''',user,'''@''',host,''';') as query from mysql.user;
+
+# 查看某用户的授权
+show grants for 'root'@'%';
+
+# 查看某用户的所有信息
+select * from mysql.user where user='cactiuser' \G;   
 ```
-
-
 
 更改密码
 
@@ -29,7 +36,19 @@ grant privileges on databasename.tablename to 'username'@'host';
 # 如果是当前登陆用户用
  set password = password("newpassword");
 # 例子: set password for 'lin'@'%' = password("123456");
+
+# 授权的同时修改密码
+GRANT ALL PRIVILEGES ON `db1`.* TO 'root'@'%' IDENTIFIED by '123';
 ```
+
+远程登陆
+
+```shell
+mysql -uroot -pxxx -P3316 -h127.0.0.1 -Ddb1
+# 其中-P3316是本机的转发端口（如果不转发的话，直接是远程机器的端口），注意在cmder中输入命令，不要在GitBash中输入，后者正确之后无响应
+```
+
+
 
 
 
