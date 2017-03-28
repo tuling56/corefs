@@ -101,16 +101,16 @@ http://c.biancheng.net/cpp/html/1456.html
 
 命令行：mysqladmin variables -p，这个操作也就相当于登录时使用命令 show global variables;
 
-#### 技巧
+### 技巧
 
-##### 运行方式技巧
+#### 运行方式技巧
 
 ```shell
 ${MYSQL10} < xmp_version_active.sql
 #其中MYSQL10是:`/usr/bin/mysql -uroot -phive -N`
 ```
 
-##### 选取结果添加行号
+#### 选取结果添加行号
 
 ```mysql
 # 方法1 
@@ -124,7 +124,7 @@ select (@mycnt := @mycnt + 1) as ROWNUM , vv from task1_tbl order by vv;
 # #用Python等脚本语言对查询结果进行二次组装
 ```
 
-##### 近段时间数据修复
+#### 近段时间数据修复
 
 ```mysql
 # 用上周同期的数据浮动修复本周的数据
@@ -407,6 +407,60 @@ select * from ecs_goods a where EXISTS(select cat_id from ecs_category b where a
 
 #### 导入和导出 
 
+##### 导入
+
+`load data方法` :将数据文件加载进mysql: [官方参考](https://dev.mysql.com/doc/refman/5.6/en/load-data.html)
+
+```shell
+# 指定编码，分割符之类的，如果不指定编码，容易出现乱码
+mysql -uroot -proot -e "delete from db1.tb1;load data local infile './members.csv' into table db1.tb1 character set utf8  fields terminated by ',' LINES TERMINATED BY '\n';"
+
+# 指定导入到哪几列
+sql="load data local infile '$datapath/db1.odl_put_context_${date}' into table  odl_put_context(Fdb,Ftbl,Fdate,Fhour,Fput_status);"
+```
+
+运行插入语句
+
+```
+首先将数据导出成可运行的sql语句，然后source xxx.sql,或者mysql -uxxxx -pxxx <xxx.sql
+```
+
+##### 导出
+
+导出可执行的sql语句,可跨平台执行
+
+```shell
+#1.导出整个数据库 
+#mysqldump -u用户名 -p密码  数据库名 > 导出的文件名 
+mysqldump -uroot -pmysql db1   > e:\db1.sql 
+
+#2.导出一个表，包括表结构和数据 
+#mysqldump -u用户名 -p密码  数据库名 表名> 导出的文件名 
+mysqldump -uroot -pmysql db1 tb1 tb2> e:\tb1_tb2.sql 
+
+#3.导出一个数据库结构 
+mysqldump -uroot -pmysql -d db1 > e:\db1.sql 
+
+#4.导出一个表，只有表结构 
+#mysqldump -u用户名 -p 密码 -d数据库名  表名> 导出的文件名 
+mysqldump -uroot -pmysql -d db1 tb1> e:\tb1.sql 
+```
+
+导出成文件
+
+```shell
+# 方法1：mysql语句
+> select * from db1.tb1 into outfile '/tmp/xxx.xls';
+# 注意mysql用户是否具有写的权限，另外可配置是否显示列名
+
+# 方法2：重定向(查询自动写入文件,查询结果不再显示在窗口
+> pager cat >> /tmp/test.xls;
+
+# 方法3:输出重定向
+mysql -h 127.0.0.1 -u root -p XXXX -P3306 -e "select * from table"  > /tmp/test.xls
+# 若不想显示列名，加—N参数即可
+```
+
 #### mysql导入到redis
 
 方法1：
@@ -447,3 +501,5 @@ cat xxx.file |redis-cli [--pipe]
 [MyCli:支持自动补全和语法高亮的MySQL客户端](http://hao.jobbole.com/mycli-mysql/)
 
 [Linux下修改mysql的root密码](http://www.tuicool.com/articles/yQNZFfr)
+
+[MySQL字符编码深入详解](http://www.jb51.net/article/29960.htm)

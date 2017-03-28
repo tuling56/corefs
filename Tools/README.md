@@ -2,24 +2,41 @@
 
 [TOC]
 
-### shell工具
+> 在更高的层次上配置工具
 
-#### 字符串处理
+### shell
 
-#### 数组
+- shellcheck
 
-#### 参考
+支持shell的语法检查
 
-### mysql工具
+### mysql
 
-#### 连接
+- Navicat Premium
 
-#### 子查询
+支持多种数据库，有数据导入和导出等多种功能
 
-#### 参考
+- mycli
 
-### hive工具
+代替原生的客户端，支持自动补全
 
-hive的语法查询
+### hive
 
-#### 参考
+hive工具
+
+### redis
+
+redis工具
+
+### perl
+
+perl工具
+
+### nginx
+
+nginx的配置安装等
+
+### git
+
+git使用手册
+
