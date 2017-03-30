@@ -29,12 +29,18 @@ yum install rsyslog rsyslog-mysql
 # 创建mysql的rsyslog用户并授权
 grant all on Syslog.* to rsyslog@localhost identified by '123';
 flush privileges;
-
 ```
 
 
 
+### 应用
 
+| 脚本                | 应用                 | 说明   |
+| ----------------- | ------------------ | ---- |
+| log_stat.awk      | awk实现基础版           |      |
+| log_stat_impl.awk | awk实现增强版，增加了类别的汇总量 |      |
+| log_stat.py       | python实现           |      |
+| log_stat.data     | 测试数据               | 测试数据 |
 
 
 
@@ -45,3 +51,5 @@ flush privileges;
 [Nginx日志分析及性能排查](http://mp.weixin.qq.com/s/A1ufVgi3VFuSGRh4Ju5puA)
 
 [Centos6.5利用Rsyslog+LogAnayzer+MySQL部署日志服务器](http://www.mamicode.com/info-detail-1165648.html)(推荐)
+
+[Nginx日志的可视化分析](http://www.toutiao.com/i6352290798666514945/)

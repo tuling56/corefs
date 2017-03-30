@@ -12,6 +12,26 @@
 
 > 主要用于列式文本处理，进行列的分割，判断处理
 
+循环
+
+```shell
+# while,for循环语句
+awk '{ i = 1; while ( i <= NF ) { print NF,$i; i++}}' test
+awk '{for (i = 1; i<NF; i++) print NF,$i}' test
+
+# break语句
+用于在满足条件的情况下跳出循环；
+
+# continue语句
+用于在满足条件的情况下忽略后面的语句，直接返回循环的顶端。
+
+# next语句
+next语句从输入文件中读取一行，然后从头开始执行awk脚本
+
+# exit语句
+exit语句用于结束awk程序，但不会略过END块。退出状态为0代表成功，非零值表示出错。
+```
+
 shell中调用awk脚本传递参数问题,[参考](http://www.2cto.com/os/201507/412860.html):
 
 ```shell
@@ -105,7 +125,6 @@ END{  # 这个括号不能移到下一行
 		print cl,urltypenum[cl]|"sort -r -n -k2";
 	}
 }
-
 ```
 
 #### awk数组
@@ -186,6 +205,12 @@ find . -name *.py -exec grep xhh {}\;  # 这个有问题，总提示exec缺少�
 [awk处理多维数组](http://blog.csdn.net/ithomer/article/details/8478716)
 
 [awk常见数组处理技巧](http://www.cnblogs.com/lixiaohui-ambition/archive/2012/12/11/2813419.html)
+
+[awk 内置变量使用介绍](http://blog.jobbole.com/92494/)
+
+[awk 内置函数详细介绍（实例）](http://blog.jobbole.com/92497/)
+
+[awk运算符介绍](http://blog.csdn.net/gaoming655/article/details/7390207)
 
 - **sed部分**
 

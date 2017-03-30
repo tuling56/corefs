@@ -45,3 +45,5 @@ chkconfig vsftpd on
 
 [Ubuntu下安装和配置FTP服务器](https://linux.cn/article-8312-1.html)
 
+[Centos生产环境部属Samba](http://www.toutiao.com/i6350479559573373442/)
+

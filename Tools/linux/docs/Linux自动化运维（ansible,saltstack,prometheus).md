@@ -507,7 +507,11 @@ yum install ganglia rrdtool ganglia-gmetad ganglia-gmond ganglia-web
 
 ```
 
+## nmon
 
+通过nmon可以获取的信息有：处理器利用率、内存利用率、运行队列信息、磁盘I/O统计和网络I/O统计、进程指标等
+
+nmon可定时采集数据然后生成报告，在本地使用nmon_analyser工具进行查看和分析
 
 # 参考
 
@@ -536,3 +540,7 @@ yum install ganglia rrdtool ganglia-gmetad ganglia-gmond ganglia-web
 
 - [Prometheus 和 Grafana 监控系统指南](https://blog.eood.cn/prometheus-grafana-monitoring?utm_source=tuicool&utm_medium=referral)（这个讲到mysql的配置）
 
+
+## nmon
+
+[监控Linux系统性能的工具--nmon(一)](http://toutiao.com/user/3163731884/pin/)

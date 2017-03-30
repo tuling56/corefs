@@ -13,6 +13,7 @@ BEGIN{	# 注意BEGIN后面的大括号不能换行
 	unerror=0;
 
 	### 如何控制get的参数按这个序列进行输出(["category","groupID","type","key","subkey","peerid","userid","action","title"])
+	### 如何先获取所有的序列
 	stat_dict["category"]="";
 	stat_dict["groupID"]="";
 	stat_dict["type"]="";
@@ -108,13 +109,13 @@ END{  # 注意END后面的大括号不能换行
 	tnum=num200+error404+unerror;
 	print "total:"tnum,"erro404:"error404,"unknown:"unerror;
 
-	#峰值请求量
+	# 峰值请求量
 	for(tmf in reqfreq)
 	{
 		print tmf,reqfreq[tmf]|"sort -r -n -k2";
 	}
 
-	#类别访问量
+	# 类别访问量
 	for(cl in urltypenum)
 	{
 		print cl,urltypenum[cl]|"sort -r -n -k2";

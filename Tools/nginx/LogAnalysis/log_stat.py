@@ -1,9 +1,9 @@
 #!/usr/local/bin/python2.7
 # -*- coding: utf-8 -*-
 '''
-	Fun:日志数据统计
+	Fun:日志数据统计（以弹幕数据为例）
 	Ref:
-	State：
+	State：进行中
 	Date:2016/12/21
 	Author:tuling56
 '''

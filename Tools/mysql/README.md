@@ -101,7 +101,7 @@ http://c.biancheng.net/cpp/html/1456.html
 
 命令行：mysqladmin variables -p，这个操作也就相当于登录时使用命令 show global variables;
 
-### 技巧
+### 积累
 
 #### 运行方式技巧
 
@@ -153,6 +153,12 @@ from
 	db2.tb1
 where
 	date='20170309'  and  date<='20170315' and date!='20170313';
+```
+
+选取指定日期
+
+```mysql
+select (DATEDIFF(DATE_ADD(curdate, INTERVAL - DAY(curdate)+ 1 DAY), date_add(curdate- DAY(curdate)+ 1, INTERVAL -1 MONTH)))  as '上月总天数', DATE_ADD(curdate,interval -day(curdate)+1 day) as '当月第一天', date_add(curdate-day(curdate)+1,interval -1 month ) as '上月第一天';
 ```
 
 

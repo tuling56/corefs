@@ -347,6 +347,23 @@ function statlen_v3（）
 	done
 }
 
+#上个月的区间（第一天和最后一天）
+function lastmon_band()
+{
+	date=$1
+	[ -z $date ]&&date=`date -d "-1 day" +%Y%m%d`
+	echo "CalcDay:"$date
+
+	lastmon=$(date -d"$date last month" +%Y%m)
+	lastmon_first=${lastmon}01
+
+	curmon=$(date -d"$date" +%Y%m)
+	lastmon_last=$(date -d"${curmon}01 -1 day" +%Y%m%d)
+
+	echo -e "\e[1;31mlastmon_first:\e[0m"${lastmon_first}
+	echo -e "\e[1;31mlastmon_last:\e[0m" ${lastmon_last}
+}
+
 
 # 判读日期
 function judge_date()

@@ -40,3 +40,4 @@ vim /var/www/html/index.php
 
 ## 参考
 
+[Ubuntu16.04.1搭建LAMP开发环境](http://www.toutiao.com/i6349408678034014722/)
