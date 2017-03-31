@@ -18,14 +18,13 @@
 
 #### glances
 
-> glances支持web访问，数据格式的导出是csv和html，方便和其它的应用做交互
->
-> > glances依赖psutil,bottle,jinja
->
+glances支持web访问，数据格式的导出是csv和html，方便和其它的应用做交互
+
+> glances依赖psutil,bottle,jinja
 
 #### nmon
 
->  独特的数据格式，只能在excel里自动绘图和查看
+独特的数据格式，只能在excel里自动绘图和查看
 
 ####   参考
 

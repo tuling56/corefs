@@ -12,6 +12,17 @@
 
 > 主要用于列式文本处理，进行列的分割，判断处理
 
+#### 基础
+
+基本
+
+```
+# getline 语句
+实现两个文件的同步读取，当然另一种方法是利用字典实现
+```
+
+
+
 循环
 
 ```shell
@@ -56,7 +67,7 @@ END{
 }
 ```
 
-#### 纯awk脚本
+awk脚本
 
 ```shell
 #!/usr/bin/awk -f
@@ -127,13 +138,13 @@ END{  # 这个括号不能移到下一行
 }
 ```
 
-#### awk数组
-
-[参考1](http://blog.csdn.net/beyondlpf/article/details/7024730)
+awk数组[(参考)](http://blog.csdn.net/beyondlpf/article/details/7024730)
 
 ```shell
 awk 'BEGIN{a[0,0]=12;a[1,1]=13;}END{for(k in a) {print k,a[k];split(k,idx,SUBSEP);print idx[1],idx[2],a[idx[1],idx[2]]}}' </dev/null
 ```
+
+#### 应用
 
 多维数组统计
 
@@ -157,11 +168,26 @@ zhibo	2332	1447
 awk '{if (a in arr) {split(arr[a],puv,"\t");pv=puv[1]+$2;uv=puv[2]+$3;} else arr[$1]=$2"\t"$3;}END{ for(a in arr) print a,arr[a]|"sort -rn -k2"}' 
 ```
 
+awk计算文件重合度
+
+```shell
+# 同时会给出两个文件各自的行数
+awk '{if(NR==FNR){a[$1]=$1;overlap_num=0;f1num=f1num+1;}else{if($1 in a) overlap_num++;}}END{print ARGV[1]"\t"f1num"\n"ARGV[2]"\t"FNR"\noverlap\t"overlap_num}' file1 file2  
+```
+
+awk计算时间差（[参考](http://bbs.chinaunix.net/forum.php?mod=viewthread&tid=2316841&page=1#pid15618823)）
+
+``` shell
+awk -v s="20110510" -v t="20110605" 'BEGIN{"date +%s -d "s|getline a;"date +%s -d "t|getline b;print (b/3600-a/3600)/24}'
+```
+
+
+
 ### sed
 
-#### 基本使用
+#### 基础
 
-#### 模式空间
+##### 模式空间
 
 > 流文本编辑器，处理行的时候十分方便。
 
@@ -190,7 +216,7 @@ find . -name *.py -exec grep xhh {}\;  # 这个有问题，总提示exec缺少�
 
 
 
-## 参考
+### 参考
 
 - **bash部分**
 
@@ -212,6 +238,20 @@ find . -name *.py -exec grep xhh {}\;  # 这个有问题，总提示exec缺少�
 
 [awk运算符介绍](http://blog.csdn.net/gaoming655/article/details/7390207)
 
+[awk中的输入和输出重定向](http://blog.chinaunix.net/uid-10540984-id-356795.html)
+
 - **sed部分**
 
 [sed简明教程](http://coolshell.cn/articles/9104.html?hmsr=toutiao.io&utm_medium=toutiao.io&utm_source=toutiao.io)
+
+- grep部分
+
+
+
+## 效率工具
+
+文件自动备份
+
+### 参考
+
+[Rsync与inotify 进行实时同步](http://www.toutiao.com/i6351627805494608385/)

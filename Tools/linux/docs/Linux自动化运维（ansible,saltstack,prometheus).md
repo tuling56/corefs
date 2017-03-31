@@ -511,7 +511,113 @@ yum install ganglia rrdtool ganglia-gmetad ganglia-gmond ganglia-web
 
 通过nmon可以获取的信息有：处理器利用率、内存利用率、运行队列信息、磁盘I/O统计和网络I/O统计、进程指标等
 
-nmon可定时采集数据然后生成报告，在本地使用nmon_analyser工具进行查看和分析
+nmon可定时间隔采集数据然后生成报告，在本地使用nmon_analyser工具进行查看和分析
+
+缺点是没有网络访问，不能实时方便的查看
+
+## glances
+
+Glances用各个分离的表列展示了你机器当前正运行的各种有用的实时数据。Glances旨在用最小的空间显示尽可能多的信息，我认为它的目标完全达到了。Glances用有限的交互可能性和更深层的信息监控PerCPU, Load, Memory, Swap, Network, Disk i/O, Mount data 和processes，但对于获得一个整体概貌绝对是完美的。有以下特点：
+
+- 使用Python开发基于psutil
+- 实时动态显示（CPU、内存、磁盘、网络使用等情况，内核、运行队列、负载、IO状态、消耗资源最多的进程等）
+- 提供了基于XML/RPC的API便于编程使用
+- 可将数据导出成csv或html格式，方便其它程序处理
+
+![glances数据视图](https://raw.githubusercontent.com/nicolargo/glances/develop/docs/_static/glances-summary.png)
+
+### 安装和使用
+
+安装
+
+```
+sudo apt-get install glances
+# 或者
+pip install glances
+```
+
+]配置文件
+
+```
+# 若使用yum安装
+vim /etc/glances/glances.conf
+
+# 若使用pip安装
+/usr/local/share/doc/glances/glances.conf
+```
+
+使用模式
+
+```
+# 单机模式
+$ glances
+
+# 客户端-服务器模式
+step1：首先在服务器端（ip:192.168.2.2）运行
+glances -s （可以使用-B来绑定服务器端的端IP，-p绑定端口）
+
+
+step2:然后在客户端连接：
+glances -c 192.168.2.2
+
+# web服务模式
+$glances -w
+and enter the URL http://<ip>:61208 in your favorite web browser.
+```
+
+服务发现
+
+```
+You can also detect and display all Glances servers available on your network or defined in the configuration file:
+
+$ glances --browser
+```
+
+结果导出
+
+```
+glances -o CSV -f /home/cjh/glances.csv
+glances -o HTML -f /var/www/glances.html  #可能需要先pip install Jinja2
+```
+
+可以通过AMP等进行扩展，包括nginx的状态页
+
+### 数据编程
+
+#### xml-rpc协议
+
+在系统的80端口提供RPC的服务，而又不影响正在执行的WEB服务，而采用HTTP协议传输RPC包的办法，但http协议本身是用于传输文本的，要在其上传输RPC封包，最方便的方法莫过于把RPC封包编码成文本的形式（例如XML文件）。
+
+XML- RPC（http://www.xml-rpc.com）是由美国UserLand公司指定的一个RPC协议。它将RPC信息封包编码为XML，然后通过 HTTP传输封包；
+简单的理解：
+
+ 将数据定义为xml格式，通过http协议进行远程传输。
+
+**配置**
+
+服务器端配置成:`glances -s`
+
+客户端通过编程访问
+
+```python
+import xmlrpclib
+s = xmlrpclib.ServerProxy('http://192.168.2.22:61209')
+print s.getCpu()
+```
+
+> 调用不同的api，返回响应的json数据
+
+参考:[glances中使用xml-rpc](https://github.com/nicolargo/glances/wiki/The-Glances-2.x-API-How-to)
+
+#### 	RESTFULL JSON 
+
+服务器端配置成:`glances -w`
+
+客户端访问url:`http://{glances server IP@}:61208/api/2/xxx`
+
+使用url配置的方式进行数据访问，返回json数据
+
+参考:[glances中使用restfull json](https://github.com/nicolargo/glances/wiki/The-Glances-RESTFULL-JSON-API)
 
 # 参考
 
@@ -544,3 +650,13 @@ nmon可定时采集数据然后生成报告，在本地使用nmon_analyser工具
 ## nmon
 
 [监控Linux系统性能的工具--nmon(一)](http://toutiao.com/user/3163731884/pin/)
+
+## glances
+
+[四个Linux服务器监控工具htop,iotop,apachetop,glances](http://blog.jobbole.com/58003/)
+
+[Linux下安装和使用glances系统监控工具](http://www.tuicool.com/articles/rMjIju)
+
+[glances官方文档](https://github.com/nicolargo/glances)
+
+[使用资源监控工具glances(推荐)](https://www.ibm.com/developerworks/cn/linux/1304_caoyq_glances/)
