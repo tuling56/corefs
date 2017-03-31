@@ -6,7 +6,34 @@
 
 #### 字符串操作
 
+参考
+
+[shell脚本8种字符串截取方法](http://www.jb51.net/article/56563.htm)
+
 #### 数组操作
+
+#### 积累
+
+##### 文件重命名
+
+``` sh
+# 第一种实现 find+awk+sh
+find . -maxdepth 1 -type f | awk '!/png$/{print "mv" $1,$1".png" }' |sh
+
+# 第二种实现 for+sed实现
+for sql in `find /root -name “*.sql”`;do  mv $sql `echo $sql|sed  ‘s/sql/txt/'` ;done
+
+# 第三种实现 rename
+rename  .sql  .txt *.sql  //好像不能递归目录,其中最后一个是要修改文件类型的列表
+
+# find+xargs+sed
+```
+
+参考：
+
+[Shell脚本批量重命名文件后缀的3种实现](http://www.jb51.net/article/55255.htm)
+
+[Shell重命名（智慧大碰撞）](http://www.oschina.net/question/75009_111550)
 
 ### awk
 
@@ -217,10 +244,6 @@ find . -name *.py -exec grep xhh {}\;  # 这个有问题，总提示exec缺少�
 
 
 ### 参考
-
-- **bash部分**
-
-[shell脚本8种字符串截取方法](http://www.jb51.net/article/56563.htm)
 
 - **awk部分**
 
