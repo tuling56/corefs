@@ -1,6 +1,8 @@
 ## 日志分析系统
 
-目的在于日志分析接口模块化
+[TOC]
+
+目的在于日志分析接口模块化，减少初期的重复数据加工
 
 ### 基础
 
@@ -53,3 +55,5 @@ flush privileges;
 [Centos6.5利用Rsyslog+LogAnayzer+MySQL部署日志服务器](http://www.mamicode.com/info-detail-1165648.html)(推荐)
 
 [Nginx日志的可视化分析](http://www.toutiao.com/i6352290798666514945/)
+
+[Linux日志分析终极指南](http://blog.jobbole.com/110660/)
