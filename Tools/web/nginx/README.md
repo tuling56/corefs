@@ -298,6 +298,44 @@ SSL使用证书来创建安全连接，有两种验证模式：
 
 ![nginx开启https](http://p1.pstatp.com/large/159f00042b57b14e3efa)
 
+### nginx开启http_stub_status_module监控其运行状态
+
+#### 安装
+
+编译nginx的时候加上:**--with-http_stub_status_module**
+
+#### 配置
+
+在nginx.conf的server里配置
+
+```和
+location /nginx_status {
+    # Turn on nginx stats
+    stub_status on;
+    # I do not need logs for stats
+    access_log   off;
+    # Security: Only allow access from 192.168.1.100 IP #
+    #allow 192.168.1.100;
+    # Send rest of the world to /dev/null #
+    #deny all;
+}
+```
+
+#### 结果和说明
+
+```
+Active connections: 1 
+server accepts handled requests
+ 1 1 1 
+Reading: 0 Writing: 1 Waiting: 0 
+```
+
+- **Active connections** – Number of all open connections. This doesn’t mean number of users. A single user, for a single pageview can open many concurrent connections to your server.
+- **Server accepts handled requests** – This shows three values.First is total *accepted* connections.Second is total *handled* connections. Usually first 2 values are same.Third value is number of and handles *requests. *This is usually greater than second value.Dividing third-value by second-one will give you number of requests per connection handled by Nginx. In above example, 10993/7368, **1.49 requests per connections**.
+- **Reading** – nginx reads request header
+- **Writing** – nginx reads request body, processes request, or writes response to a client
+- **Waiting** – keep-alive connections, actually it is `active – (reading + writing).`This value depends on [keepalive-timeout](http://wiki.nginx.org/HttpCoreModule#keepalive_timeout). Do not confuse non-zero waiting value for poor performance. It can be ignored. Although, you can force zero waiting by setting `keepalive_timeout 0;`
+
 ### 参考
 
 [Nginx安装](http://blog.csdn.net/carlos1992/article/details/48194321)
@@ -321,6 +359,10 @@ SSL使用证书来创建安全连接，有两种验证模式：
 [nginx配置文件详解](https://www.zybuluo.com/phper/note/89391)
 
 [nginx日志分析及性能排查](http://mp.weixin.qq.com/s/A1ufVgi3VFuSGRh4Ju5puA)
+
+[http_stub_status_module监控其运行状态](http://www.cnblogs.com/94cool/p/3872492.html)
+
+[开启nginx的状态监控模块](https://easyengine.io/tutorials/nginx/status-page/)
 
 ## uwsgi的配置
 

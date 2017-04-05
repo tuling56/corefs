@@ -8,6 +8,34 @@
 
 #### 系统启动
 
+#### 定时任务
+
+##### crontab配置
+
+在计算机正常的情况下，才执行
+
+```
+
+```
+
+在crontab中使用命令和变量牵涉到%的时候要用“\”转义
+
+```
+00 01 * * * mysqldump -u root --password=passwd-d mustang > /tmp/mustang_$(date +\%Y\%m\%d_\%H\%M\%S).sql
+```
+
+##### anacron配置
+
+处理服务器开关机问题,在该执行的时候因为故障没有执行，在服务器正常的时候，重新执行
+
+```
+
+```
+
+参考
+
+[Linux crontab定时任务管理](http://www.imooc.com/video/10979)
+
 #### 参考
 
 -  [linux系统的7种运行级别](http://blog.chinaunix.net/uid-22746363-id-383989.html) 
@@ -18,7 +46,7 @@
 
 #### glances
 
-glances支持web访问，数据格式的导出是csv和html，方便和其它的应用做交互
+glances支持web访问，数据格式的导出是csv和==html==，方便和其它的应用做交互
 
 > glances依赖psutil,bottle,jinja
 
