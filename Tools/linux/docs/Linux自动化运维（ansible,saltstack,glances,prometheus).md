@@ -619,6 +619,46 @@ print s.getCpu()
 
 参考:[glances中使用restfull json](https://github.com/nicolargo/glances/wiki/The-Glances-RESTFULL-JSON-API)
 
+## netdata
+
+Netdata 是一款 Linux 性能实时监测工具.。以web的可视化方式展示系统及应用程序的实时运行状态（包括cpu、内存、硬盘输入/输出、网络等linux性能的数据）
+
+![可视化的图形指标窗口](http://dl2.iteye.com/upload/attachment/0116/6734/34c5753d-0ce6-3058-b80f-ce5f9ee2c417.gif)
+
+主要功能发现：
+
+1. 可以实时监控主机各项信息：包括CPU，内存，网络，磁盘，整体负载等等。
+2. 可以拖动各个监控图表，查看历史信息
+3. 发报警邮件
+4. 更多的功能等待发掘，查看[官方的文档](https://github.com/firehol/netdata/wiki)
+
+### 安装
+
+```shell
+# 可能需要事先安装依赖项
+yum install zlib-devel gcc make git autoconf autogen automake pkgconfig
+
+# 从git clone 
+git clone git@github.com:firehol/netdata.git
+cd netdata
+./netdata-installer.sh   
+```
+
+> 注意安装过程的修改项,可查看有道云笔记的记录
+
+至此Netdata就安装完了，Netdata安装完后，本身就启动了（或者使用 `/usr/sbin/netdata`启动,使用`killall netdata`关闭）。
+
+直接用浏览器访问：`http://127.0.0.1:19999 `即可进入主界面。(19999是软件默认的端口，在配置文件中配置)
+
+### 配置
+
+``` shell
+vim /etc/netdata/netdata.conf
+# 更详细的配置参考等待以后发现
+```
+
+
+
 # 参考
 
 ## Ansible部分
@@ -656,6 +696,10 @@ print s.getCpu()
 [四个Linux服务器监控工具htop,iotop,apachetop,glances](http://blog.jobbole.com/58003/)
 
 [Linux下安装和使用glances系统监控工具](http://www.tuicool.com/articles/rMjIju)
+
+## netdata部分
+
+[Netdata安装和使用（Linux 性能实时监测工具）](http://soluck.iteye.com/blog/2291618)
 
 [glances官方文档](https://github.com/nicolargo/glances)
 
