@@ -4,19 +4,27 @@
 
 ### 安装
 
-> [下载：](https://github.com/medcl/)
->
-> `git clone git://github.com/medcl/elasticsearch-rtf.git -b master --depth 1`
+下载
 
-### 启动
+https://github.com/medcl/
 
-> ```shell
-> cd elasticsearch/bin
-> ./elasticsearch
->
-> # 或者
-> sudo -u ops ES_JAVA_OPTS="-Xms2024m -Xmx2024m"  ./bin/elasticsearch  -d
-> ```
+`git clone git://github.com/medcl/elasticsearch-rtf.git -b master --depth 1`
+
+启动
+
+```shell
+cd elasticsearch/bin
+./elasticsearch
+
+# 或者
+sudo -u ops ES_JAVA_OPTS="-Xms2024m -Xmx2024m"  ./bin/elasticsearch  -d
+```
+
+测试
+
+```
+测试用例
+```
 
 
 
