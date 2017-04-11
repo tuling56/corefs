@@ -536,15 +536,32 @@ sudo apt-get install glances
 pip install glances
 ```
 
-]配置文件
+> 安装注意事项（从日志的中发现的问题）
+
+```
+WARNING -- PyStache lib not installed (action script with mustache will not work)
+ERROR -- Scandir not found. Please use Python 3.5+ or install the scandir lib
+
+#因此需要额外安装两个python包
+pip install PyStache
+pip install scandir   #folder插件要用
+```
+
+配置文件
 
 ```
 # 若使用yum安装
 vim /etc/glances/glances.conf
 
 # 若使用pip安装
-/usr/local/share/doc/glances/glances.conf
+/usr/local/share/doc/glances/glances.conf，需要将该文件移动到以下的目录
 ```
+
+You can put your own `glances.conf` file in the following locations:
+
+| `Linux`, `SunOS` | ~/.config/glances/, /etc/glances/        |
+| ---------------- | ---------------------------------------- |
+| `*BSD`           | ~/.config/glances, /usr/local/etc/glances |
 
 使用模式
 
