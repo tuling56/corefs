@@ -665,6 +665,14 @@ cd netdata
 
 至此Netdata就安装完了，Netdata安装完后，本身就启动了（或者使用 `/usr/sbin/netdata`启动,使用`killall netdata`关闭）。
 
+```
+netdata被配置成服务并开机启动，可以使用service命令进行控制：
+service netdata restart
+service netdata stop
+```
+
+
+
 直接用浏览器访问：`http://127.0.0.1:19999 `即可进入主界面。(19999是软件默认的端口，在配置文件中配置)
 
 ### 配置
