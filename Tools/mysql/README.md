@@ -155,13 +155,23 @@ where
 	date='20170309'  and  date<='20170315' and date!='20170313';
 ```
 
-选取指定日期
+#### 选取指定日期
 
 ```mysql
 select (DATEDIFF(DATE_ADD(curdate, INTERVAL - DAY(curdate)+ 1 DAY), date_add(curdate- DAY(curdate)+ 1, INTERVAL -1 MONTH)))  as '上月总天数', DATE_ADD(curdate,interval -day(curdate)+1 day) as '当月第一天', date_add(curdate-day(curdate)+1,interval -1 month ) as '上月第一天';
 ```
 
+> 这段还没有完全调通
 
+#### GroupSelect问题
+
+问题描述：先分组，然后在从分组中选取某些值，比如topN
+
+```mysql
+//待补充
+```
+
+用awk如何实现
 
 ### 高级
 
@@ -509,3 +519,5 @@ cat xxx.file |redis-cli [--pipe]
 [Linux下修改mysql的root密码](http://www.tuicool.com/articles/yQNZFfr)
 
 [MySQL字符编码深入详解](http://www.jb51.net/article/29960.htm)
+
+[MySQL分组后选取指定值问题](http://www.jb51.net/article/31590.htm)

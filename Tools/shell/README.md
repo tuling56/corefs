@@ -1,4 +1,4 @@
-## shell学习笔记
+## Shell学习笔记
 
 [TOC]
 
@@ -280,6 +280,32 @@ awk计算时间差（[参考](http://bbs.chinaunix.net/forum.php?mod=viewthread&
 awk -v s="20110510" -v t="20110605" 'BEGIN{"date +%s -d "s|getline a;"date +%s -d "t|getline b;print (b/3600-a/3600)/24}'
 ```
 
+awk输入输出重定向
+
+> 输出重定向：
+
+```shell
+awk '$1=100{print $1 > "output_file"}' file
+```
+
+> 输入重定向：
+
+输入重定向需用到getline函数。getline从标准输入、管道或者当前正在处理的文件之外的其他输入文件获得输入。它负责从输入获得下一行的内容，并给NF,NR和FNR等内建变量赋值。如果得到一条记录，getline函数返回1，如果到达文件的末尾就返回0，如果出现错误，例如打开文件失败，就返回-1。如：
+
+可以在awk中直接执行shell命令
+
+```shell
+awk 'BEGIN{"date"|getline d;split(d,a);print a[2]}'
+
+# 执行linux的date命令，并通过管道输出给getline，然后再把输出赋值给自定义变量d，并以默认空格为分割符把它拆分开以数字1开始递增方式为下标存入数组a中，并打印数组a下标为2的值。下面我们再看看一些复杂的运用。
+```
+
+在awk中
+
+```
+
+```
+
 
 
 ### sed
@@ -333,7 +359,7 @@ find . -name *.py -exec grep xhh {}\;  # 这个有问题，总提示exec缺少�
 
 [awk运算符介绍](http://blog.csdn.net/gaoming655/article/details/7390207)
 
-[awk中的输入和输出重定向](http://blog.chinaunix.net/uid-10540984-id-356795.html)
+[awk中的输入和输出重定向](http://blog.chinaunix.net/uid-10540984-id-356795.html)（推荐）
 
 - **sed部分**
 
