@@ -145,11 +145,76 @@ gitbook-cli是gitbook的命令行，可以方便的管理多个gitbook版本
 
 #### 发布
 
-使用gitbook editor可以轻松发布[^1]
+##### 官网发布
 
-[^1]: 还没有实现
+使用gitbook editor可以轻松发布，但发布的只能是gitbook官网上的，要自己构建发布系统
 
-### 参考
+##### 自建发布
+
+方法1：
+
+在要发布的机器上，构建gitbook文档，并使用git进行管理，远程机器可以git clone该版本库，但不能git push,所有的修改只能在要发布的机器上进行，修改完文档后重启gitbook服务，重新构建文档
+
+方法2：
+
+在要发布的机器上构建git版本管理的仓库，配置`post-receive`钩子如下：
+
+```shell
+vim hooks/post-receive
+
+#!/bin/bash
+# gitbook工作目录的设置
+gitbook_home=/home/yjm/Projects/webframe/gitbook
+
+set GIT_INDEX_FILE
+GIT_WORK_TREE=${gitbook_home} git checkout -f
+
+cd ${gitbook_home}
+echo "`date +%F\ %T`" >>timettt
+gitbook build #&& gitbook serve  这部分启动的代码暂时不需要
+#sh ${gitbook_home}/run.sh
+
+exit 0
+```
+
+注意事项：
+
+> 需要先把gitbook用到的node插件的目录如下：node_modules/  拷贝到gitbook的工作目录内，避免重复的插件下载和安装。
+
+从远程机器上clone下仓库，编辑然后推送
+
+```shell
+git clone root@127.0.0.1:/home/yjm/Documents/gitrepo/gitbook.git
+git add .
+git commit -m "添加内容和修改等"
+git push 
+# 会在推送之后，显示gitbook build的信息如下：
+Total 4 (delta 1), reused 0 (delta 0)
+remote: info: 17 plugins are installed
+remote: info: 12 explicitly listed
+remote: info: loading plugin "navigator"... OK
+remote: info: loading plugin "toolbar"... OK
+remote: info: loading plugin "edit-link"... OK
+remote: info: loading plugin "ad"... OK
+remote: info: loading plugin "chart"... OK
+remote: info: loading plugin "highlight"... OK
+remote: info: loading plugin "search"... OK
+remote: info: loading plugin "lunr"... OK
+remote: info: loading plugin "sharing"... OK
+remote: info: loading plugin "fontsettings"... OK
+remote: info: loading plugin "theme-default"... OK
+remote: info: found 17 pages
+remote: info: found 2 asset files
+remote: warn: "this.generator" property is deprecated, use "this.output.name" instead
+remote: warn: "navigation" property is deprecated
+remote: warn: "book" property is deprecated, use "this" directly instead
+remote: warn: "options" property is deprecated, use config.get(key) instead
+remote: info: >> generation finished with success in 6.5s !
+```
+
+通过http://localhost:4000来web访问修改的内容
+
+## 参考
 
 - Disqus插件
 
