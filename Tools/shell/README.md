@@ -113,16 +113,14 @@ rename  .sql  .txt *.sql  //好像不能递归目录,其中最后一个是要修
 
 #### 基础
 
-基本
+##### 基本
 
 ```
 # getline 语句
 实现两个文件的同步读取，当然另一种方法是利用字典实现
 ```
 
-
-
-循环
+##### 循环
 
 ```shell
 # while,for循环语句
@@ -142,7 +140,7 @@ next语句从输入文件中读取一行，然后从头开始执行awk脚本
 exit语句用于结束awk程序，但不会略过END块。退出状态为0代表成功，非零值表示出错。
 ```
 
-shell中调用awk脚本传递参数问题,[参考](http://www.2cto.com/os/201507/412860.html):
+##### 向awk脚本传参
 
 ```shell
 #!/bin/bash
@@ -166,7 +164,11 @@ END{
 }
 ```
 
-awk脚本
+参考：
+
+[shell中调用awk脚本传递参数问题](http://www.2cto.com/os/201507/412860.html)
+
+##### awk脚本
 
 ```shell
 #!/usr/bin/awk -f
@@ -237,15 +239,19 @@ END{  # 这个括号不能移到下一行
 }
 ```
 
-awk数组[(参考)](http://blog.csdn.net/beyondlpf/article/details/7024730)
+##### awk数组
 
 ```shell
 awk 'BEGIN{a[0,0]=12;a[1,1]=13;}END{for(k in a) {print k,a[k];split(k,idx,SUBSEP);print idx[1],idx[2],a[idx[1],idx[2]]}}' </dev/null
 ```
 
+参考:
+
+[awk数组的使用](http://blog.csdn.net/beyondlpf/article/details/7024730)
+
 #### 应用
 
-多维数组统计
+##### 多维数组统计
 
 ```shell
 # 数据格式（按第一列汇总，求第二列和第三列的和）
@@ -267,20 +273,24 @@ zhibo	2332	1447
 awk '{if (a in arr) {split(arr[a],puv,"\t");pv=puv[1]+$2;uv=puv[2]+$3;} else arr[$1]=$2"\t"$3;}END{ for(a in arr) print a,arr[a]|"sort -rn -k2"}' 
 ```
 
-awk计算文件重合度
+##### awk计算文件重合度
 
 ```shell
 # 同时会给出两个文件各自的行数
 awk '{if(NR==FNR){a[$1]=$1;overlap_num=0;f1num=f1num+1;}else{if($1 in a) overlap_num++;}}END{print ARGV[1]"\t"f1num"\n"ARGV[2]"\t"FNR"\noverlap\t"overlap_num}' file1 file2  
 ```
 
-awk计算时间差（[参考](http://bbs.chinaunix.net/forum.php?mod=viewthread&tid=2316841&page=1#pid15618823)）
+##### awk计算时间差
 
 ``` shell
 awk -v s="20110510" -v t="20110605" 'BEGIN{"date +%s -d "s|getline a;"date +%s -d "t|getline b;print (b/3600-a/3600)/24}'
 ```
 
-awk输入输出重定向
+参考：
+
+[awk计算时间差](http://bbs.chinaunix.net/forum.php?mod=viewthread&tid=2316841&page=1#pid15618823)
+
+##### awk输入输出重定向
 
 > 输出重定向：
 

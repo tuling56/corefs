@@ -1,0 +1,50 @@
+{
+    "plugins": ["navigator","toolbar","edit-link","ad","chart","-prism","highlight"],
+    "pluginsConfig": {
+        "disqus": {
+            "shortName": "tuling56"
+        },
+		"toolbar": {
+            "buttons":
+            [
+                {
+                    "label": "GitHub",
+                    "icon": "fa fa-github",
+                    "url": "https://github.com/"
+                },
+                {
+                    "label": "Search page title on StackOverflow",
+                    "icon": "fa fa-stack-overflow",
+                    "url": "http://stackoverflow.com/search?q={{title}}"
+                }
+            ]
+ 		},
+        "edit-link": {
+              "base":"https://github.com/tuling56/GitBook/edit/master/",
+              "label": {
+                    "en": "Edit This Page"
+                }
+        },
+        "ad": {
+      		  "contentTop": "<div>Ads at the top of the page</div>",
+      		  "contentBottom": "%3Cdiv%3EAds%20at%20the%20bottom%20of%20the%20page%3C/div%3E"
+    	},
+        "chart":{
+             "type": "c3"
+        },
+        "prism":{
+            "css":["prismjs/themes/prism-solarizedlight.css"]
+        }
+    },
+   "links": {
+        "sidebar": {
+            "自定义左侧超链接": "http://www.baidu.com"
+        },
+        "sharing": {
+            "baidu": "www.baidu.com",
+            "weibo": false,
+            "all": null
+        }
+    }
+
+}
