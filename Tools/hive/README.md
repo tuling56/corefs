@@ -89,10 +89,67 @@ select a.mt,count(*) as cnt from (select from_unixtime(finsert_time,'yyyyMMdd HH
 #### 正则
 
 ```mysql
- select  'abc'  regexp '^[a-z]*$'   from test.dual;
+# 正则匹配
+select  'abc'  regexp '^[a-z]*$'   from test.dual;
+
+# 正则抽取（注意此处不能使用\d和\w等类似的字符）
+select regexp_extract('http://xxx/details/0/40.shtml','http://xxx/details/([0-9]{1,})/([0-9]{1,})\.shtml',1) from test.dual; # 返回40
+
+
+# 正则替换
+select regexp_replace('foobar','oo|ba','') from test.dual; # 返回fr
 ```
 
+#### url解析
 
+##### url还原
+
+上报的url大多都经过uriencode进行编码，对`[:?,/]`等进行编码，若要正常解析，先使用uridecode对url解析，如下：
+
+```
+# 解析前：
+http%3A%2F%2Flist.v.xunlei.com%2Fv%2Ctype%2Cgenre%2F5%2Cteleplay%2Cjd%2Fpage6%2F
+# 解析后
+http://list.v.xunlei.com/v,type,genre/5,teleplay,jd/page6/
+```
+
+此外还对中文字符进行了hex，要先反hex，并去掉其中的`%`,如下：
+
+```
+# unhex前
+http://48.fans.xunlei.com/catalog/catalog.shtml?type=%E9%9F%B3%E4%B9%90
+# unhex后
+http://48.fans.xunlei.com/catalog/catalog.shtml?type=音乐
+```
+
+综述，完整的hive还原url语句是：
+
+```mysql
+unhex(regexp_replace(parse_url(uridecode(fu4),'QUERY','type'),'%',''))
+```
+
+##### url参数解析
+
+```mysql
+select parse_url('http://facebook.com/path/p1.php?query=1', 'PROTOCOL') from dual;  
+# 返回结果：http
+select parse_url('http://facebook.com/path/p1.php?query=1', 'HOST') from dual;
+# 返回结果：facebook.com
+select parse_url('http://facebook.com/path/p1.php?query=1', 'REF') from dual;
+# 返回结果：空
+select parse_url('http://facebook.com/path/p1.php?query=1', 'PATH') from dual;
+# 返回结果：/path/p1.php
+select parse_url('http://facebook.com/path/p1.php?query=1', 'QUERY') from dual;
+# 返回结果:query=1
+select parse_url('http://facebook.com/path/p1.php?name=zhang&age=12','QUERY','name') from dual;
+# 返回结果:zhang
+select parse_url('http://facebook.com/path/p1.php?query=1', 'FILE') from dual;
+# 返回结果：/path/p1.php?query=1
+select parse_url('http://facebook.com/path/p1.php?query=1', 'AUTHORITY') from dual;
+# 返回结果：facebook.com
+select parse_url('http://facebook.com/path/p1.php?query=1', 'USERINFO') from dual;
+# 返回结果：空
+```
 
 ####  连接
 
