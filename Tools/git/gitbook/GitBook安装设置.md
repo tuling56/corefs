@@ -258,7 +258,11 @@ https://github.com/tuling56/shared_common_libs.git
 git clone https://127.0.0.1/home/yjm/Documents/gitrepo/gitbook.git
 ```
 
-参考：[搭建git https服务器](http://www.cnblogs.com/clcvampire/p/6290471.html)
+参考：
+
+[搭建git https服务器](http://www.cnblogs.com/clcvampire/p/6290471.html)
+
+[利用Nginx搭建HTTP访问的Git服务器](http://www.tuicool.com/articles/bAZvEz3)
 
 ## 参考
 
