@@ -100,7 +100,7 @@ tips:如何将一个应用程序做成一个[^服务]：
 
 ### nginx配置文件
 
-**主nginx.conf配置文件**
+#### **nginx.conf主配置文件**
 
 ```nginx
 worker_process      # 表示工作进程的数量，一般设置为cpu的核数
@@ -123,17 +123,59 @@ server{}            # 块定义了虚拟主机
         index       # 指定首页index文件的名称，可以配置多个，以空格分开。如有多个，按配置顺序查找。
 ```
 
-注:location的匹配规则
+>  nginx的配置和参数优化比较复杂，需要不断的根据实际使用进行调整。
+
+#### location的匹配规则
+
+| 模式                  | 含义                                       |
+| ------------------- | ---------------------------------------- |
+| location = /uri     | = 表示精确匹配，只有完全匹配上才能生效                     |
+| location ^~ /uri    | ^~ 开头对URL路径进行前缀匹配，并且在正则之前。               |
+| location ~ pattern  | 开头表示区分大小写的正则匹配                           |
+| location ~* pattern | 开头表示不区分大小写的正则匹配                          |
+| location /uri       | 不带任何修饰符，也表示前缀匹配，但是在正则匹配之后                |
+| location /          | 通用匹配，任何未匹配到其它location的请求都会匹配到，相当于switch中的default |
+
+匹配顺序
 
 ```
+首先精确匹配 =
+其次前缀匹配 ^~
+其次是按文件中顺序的正则匹配
+然后匹配不带任何修饰的前缀匹配。
+最后是交给 / 通用匹配
+当有匹配成功时候，停止匹配，按当前匹配规则处理请求
+```
+
+
+
 //待补充，比较多
-```
 
-> nginx的配置和参数优化比较复杂，需要不断的根据实际使用进行调整。
+**root和alias的区别**
+
+> ```nginx
+> location /request_path/image/ {
+>     root /local_path/image/;
+> }
+> ```
 >
-> 
+> 这样配置的结果就是当客户端请求 /request_path/image/cat.png 的时候， 
+> Nginx把请求映射为**/local_path/image/request_path/image/cat.png**
+>
+> 再看alias的用法
+>
+> ```nginx
+> location /request_path/image/ {
+>     alias /local_path/image/; # 目录名后面一定要加"/"。
+> }
+> ```
+>
+> 这时候，当客户端请求 /request_path/image/cat.png 的时候， 
+> Nginx把请求映射为**/local_path/image/cat.png** 
 
-**内置变量介绍**
+参考:[nginx的location匹配规则](http://wiki.jikexueyuan.com/project/openresty/ngx/nginx_local_pcre.html)
+
+#### 内置变量
 
 | 字段                                 | 作用                                       |
 | ---------------------------------- | ---------------------------------------- |
