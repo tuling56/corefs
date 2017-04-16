@@ -214,6 +214,52 @@ remote: info: >> generation finished with success in 6.5s !
 
 通过http://localhost:4000来web访问修改的内容
 
+**增强**：通过配置nginx的服务器的方式来实现gitbook内容的访问，这样就不必再启动gitbook serve了
+
+```nginx
+server {
+        listen  80;
+        server_name  gitbook.me;
+        charset utf-8;
+        access_log    logs/gitbook_acc.log;
+        error_log     logs/gitbook_error.log;
+
+        root /home/yjm/Projects/webframe/gitbook/_book;  # gitbook的根目录
+
+        location /{
+            #default_type application/json;  	# 处理json数据的时候中文乱码，暂时未解决
+            default_type 'text/plain';
+            index index.html index.htm;
+        }
+ }
+```
+
+##### 结合发布
+
+结合发布是融合了官网发布和自建发布两个方式的优缺点，既利用了官网发布的可视化操作的优势，又利用了自建发布的定制和完全控制的优点。
+
+用GitBook Editor打开自建发布导出的仓库的时候，可以编辑和修改，但是在推送（Publish）的时候，提示Gitbook Editor暂时只支持https协议，而自己在版本库clone的时候使用的是git协议，如何使用https协议访问git仓库？
+
+两者的对比如下：
+
+```shell
+# Clone with ssh
+# Use an SSH key and passphrase from account.
+git@github.com:tuling56/shared_common_libs.git
+
+# Clone with https
+# Use Git or checkout with SVN using the web URL.
+https://github.com/tuling56/shared_common_libs.git
+```
+
+>  怎么配置git仓库的https访问？
+
+```
+git clone https://127.0.0.1/home/yjm/Documents/gitrepo/gitbook.git
+```
+
+参考：[搭建git https服务器](http://www.cnblogs.com/clcvampire/p/6290471.html)
+
 ## 参考
 
 - Disqus插件
