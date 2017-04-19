@@ -93,7 +93,79 @@ MySQL ALTER TABLE table_name DROP field_name;
 
 http://c.biancheng.net/cpp/html/1456.html
 
+#### 编码
 
+查看字符数据库的字符集
+
+```mysql
+show variables like 'character\_set\_%';
+show variables like 'collation_%';
+
+# 或者直接使用status命令查看
+```
+
+设置数据库字符编码
+
+```mysql
+create database mydb character set utf8; 	# 创建的时候指定字符编码
+
+# 以下修改是永久性的修改
+alter database mydb character set utf8;		# 修改数据库编码(若之前的设置不是utf8编码的话)
+alter table tbl character set utf8;			# 修改表的编码
+alter table tbl modify col_name varchar(50) CHARACTER SET utf8;	# 修改字段的编码
+
+# 以下的修改是基于窗口的修改，窗口关闭则失效
+set names 'utf8'; 					# 等同于执行client,connection,results三个的设置
+set character_set_client=utf8;		# 客户端编码方式
+set character_set_connection=utf8;	# 建立连接使用的编码
+set character_set_database=utf8;	# 数据库的编码
+set character_set_results=utf8;		# 结果集的编码
+set character_set_server=utf8;		# 数据库服务器的编码
+set character_set_system=utf8;
+
+set character_set_filesystem=binary; 
+
+set collation_connection=utf8;
+set collation_database=utf8;
+set collation_server=utf8;
+```
+
+转换路径
+
+```
+信息输入路径：client→connection→server；
+信息输出路径：server→connection→results。
+
+换句话说，每个路径要经过3次改变字符集编码。以出现乱码的输出为例，server里utf8的数据，传入connection转为latin1，传入results转为latin1，utf-8页面又把results转过来。如果两种字符集不兼容，比如latin1和utf8，转化过程就为不可逆的，破坏性的。所以就转不回来了。
+```
+
+解决办法
+
+```
+# CLIENT SECTION
+[mysql]
+default-character-set=utf8
+
+# SERVER SECTION
+[mysqld]
+default-character-set=utf8
+# init_connect='SET NAMES utf8' # 设定连接mysql数据库时使用utf8编码，以让mysql数据库为utf8运行
+# character_set_server = utf8 	# 其它类似的设置都可以在这里指定(有问题，设置不了)
+```
+
+> 以上两个设置会导致以下的字符集设置为utf8:
+>
+> - character_set_database utf8
+> - character_set_server utf8
+> - character_set_system utf8
+>
+> 而以下的的设置还是默认值：
+>
+> - character_set_client latin1
+> - character_set_connection latin1
+> - character_set_results latin1
+
+然后重启mysql服务`service mysql restart`,或者`/etc/init.d/mysql restart`
 
 #### 信息查看
 
