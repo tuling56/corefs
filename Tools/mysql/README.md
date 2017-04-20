@@ -83,11 +83,11 @@ mysql> alter table 表名 drop index 索引名;
 
 > 修改原字段名称及类型
 
-mysql> ALTER TABLE table_name CHANGE old_field_name new_field_name field_type;
+ alter table table_name change old_field_name new_field_name field_type;
 
 > 删除字段
 
-MySQL ALTER TABLE table_name DROP field_name;
+ alter table table_name drop field_name;
 
 **参考**
 
@@ -174,7 +174,26 @@ default-character-set=utf8
 mysql --default-character-set=utf8  -uroot -proot -Dpgv_stat_yingyin
 ```
 
-#### 信息查看
+汇总：
+
+> 需要保证的是，以下4个的编码方式一致：
+>
+> - character_set_database utf8
+> - character_set_client utf8
+> - character_set_connection utf8
+> - character_set_results utf8
+>
+> 可通过以下方式达到：
+>
+> - 客户端在连接的时候使用set names utf8;
+>
+>
+> - 创建数据库的时候指定create database mydb character set utf8;
+>
+>
+> - 在load数据的时候保证文件是utf8编码的
+
+#### 信息查看编码
 
 >  查看全局变量
 
@@ -510,7 +529,7 @@ select * from ecs_goods a where EXISTS(select cat_id from ecs_category b where a
 # 指定编码，分割符之类的，如果不指定编码，容易出现乱码
 mysql -uroot -proot -e "delete from db1.tb1;load data local infile './members.csv' into table db1.tb1 character set utf8  fields terminated by ',' LINES TERMINATED BY '\n';"
 
-# 指定导入到哪几列
+# 指定导入到哪几列(这几列不一定要连续)
 sql="load data local infile '$datapath/db1.odl_put_context_${date}' into table  odl_put_context(Fdb,Ftbl,Fdate,Fhour,Fput_status);"
 ```
 
