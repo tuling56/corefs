@@ -143,14 +143,15 @@ set collation_server=utf8;
 
 ```
 # CLIENT SECTION
-[mysql]
+[mysql] 
 default-character-set=utf8
 
 # SERVER SECTION
 [mysqld]
 default-character-set=utf8
 # init_connect='SET NAMES utf8' # 设定连接mysql数据库时使用utf8编码，以让mysql数据库为utf8运行
-# character_set_server = utf8 	# 其它类似的设置都可以在这里指定(有问题，设置不了)
+# character-set-server=utf8 	# 其它类似的设置都可以在这里指定(有问题，设置不了)，# The default 									character set that will be used when a new schema or table is
+								created and no character set is defined
 ```
 
 > 以上两个设置会导致以下的字符集设置为utf8:
@@ -159,13 +160,19 @@ default-character-set=utf8
 > - character_set_server utf8
 > - character_set_system utf8
 >
-> 而以下的的设置还是默认值：
+> 而以下的的设置还是默认值（当换成[client]目录下的修改，则生效）：
 >
 > - character_set_client latin1
 > - character_set_connection latin1
 > - character_set_results latin1
 
 然后重启mysql服务`service mysql restart`,或者`/etc/init.d/mysql restart`
+
+命令行链接的时候指定编码:
+
+```
+mysql --default-character-set=utf8  -uroot -proot -Dpgv_stat_yingyin
+```
 
 #### 信息查看
 
