@@ -369,6 +369,14 @@ awk 'BEGIN{"date"|getline d;split(d,a);print a[2]}'
 
 ![img](http://coolshell.cn//wp-content/uploads/2013/02/sed_demo_00.jpg)
 
+##### 向sed命令中传递变量
+
+```shell
+ststr=`date +%d\\\/%b\\\/%Y:%H`	# 这个日期的转换，在脚本内要使用三个\才能代表一个\，脚本外可使用两个
+sed -n "/${ststr}/p" ${log_path}/${log} > ${log_path_bak}/${log}_${datehour}
+# 注意使用双引号，而不是单引号，这样变量才能传递过去
+```
+
 ### grep
 
 grep查找指定类型文件的内容
