@@ -6,6 +6,16 @@
 
 ----
 
+#### 文件目录
+
+一次性创建多级目录
+
+```shell
+mkdir -p ./application/{controllers,models,static,static/css,static/js,templates}
+```
+
+
+
 #### 系统启动
 
 #### 定时任务
