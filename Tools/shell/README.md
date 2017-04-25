@@ -282,7 +282,19 @@ awk 'BEGIN{a[0,0]=12;a[1,1]=13;}END{for(k in a) {print k,a[k];split(k,idx,SUBSEP
 
 #### 应用
 
-##### 多维数组统计
+##### awk区间统计
+
+问题描述，给出一堆数据，然后将该堆数据进行分组（分组区间自己指定），然后统计每个分组内的个数
+
+```shell
+# 统计落在每个区间段内的数量
+awk '{intfloat=$1/500;split(intfloat,intn,".");v=intn[1];dict[v]++;}END{for(i in dict) print i*500"\t"i*500"~"(i+1)*500"\t"dict[i]|"sort -n -k1"}'  view_num
+
+#改进版（利用awk提供的int函数，获取除法的整数部分）
+awk '{v=int($1/500);dur[v]++;}END{for(i in dur) print i*500"\t"i*500"~"(i+1)*500"\t"dur[i]|"sort -n -k1"}'  view_num
+```
+
+##### awk多维数组统计
 
 ```shell
 # 数据格式（按第一列汇总，求第二列和第三列的和）
