@@ -212,6 +212,112 @@ Ansible是属于Extra Packages for Enterprise Linux (EPEL)库的一部分，因�
 >
 >
 
+配置参考
+
+```
+[root@local122 prometheus-1.3.1.linux-386]# cat prometheus.yml 
+# my global config
+global:
+  scrape_interval:     15s # By default, scrape targets every 15 seconds.
+  evaluation_interval: 15s # By default, scrape targets every 15 seconds.
+  # scrape_timeout is set to the global default (10s).
+
+  # Attach these labels to any time series or alerts when communicating with
+  # external systems (federation, remote storage, Alertmanager).
+  external_labels:
+      monitor: 'codelab-monitor'
+
+# Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
+rule_files:
+   - "rules/first.rules"
+  # - "second.rules"
+
+# A scrape configuration containing exactly one endpoint to scrape:
+# Here it's Prometheus itself.
+scrape_configs:
+  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+  - job_name: 'prometheus'
+
+    # Override the global default and scrape targets from this job every 5 seconds.
+    scrape_interval: 5s
+
+    # metrics_path defaults to '/metrics'
+    # scheme defaults to 'http'.
+
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'mysql'
+
+    # Override the global default and scrape targets from this job every 5 seconds.
+    scrape_interval: 5s
+
+    # metrics_path defaults to '/metrics'
+    # scheme defaults to 'http'.
+
+    static_configs:
+      - targets: ['localhost:9104']
+        labels:
+          instance: mysql
+
+  - job_name: 'node'
+
+    # Override the global default and scrape targets from this job every 5 seconds.
+    scrape_interval: 5s
+
+    # metrics_path defaults to '/metrics'
+    # scheme defaults to 'http'.
+
+    static_configs:
+      - targets: ['localhost:9100']
+        labels:
+          instance: node
+
+
+  - job_name: 'nginx'
+
+    # Override the global default and scrape targets from this job every 5 seconds.
+    scrape_interval: 5s
+
+    # metrics_path defaults to '/metrics'
+    # scheme defaults to 'http'.
+
+    static_configs:
+      - targets: ['localhost:9145'] #,'localhost:3003']
+        labels:
+          instance: nginx
+          
+  - job_name: 'owndefine'
+
+    # Override the global default and scrape targets from this job every 5 seconds.
+    scrape_interval: 5s
+
+    # metrics_path defaults to '/metrics'
+    # scheme defaults to 'http'.
+
+    static_configs:
+      - targets: ['localhost:8000'] #,'localhost:3003']
+        labels:
+          instance: owndefine
+          group: 自定义exporter监控
+  
+  - job_name: 'owndefine2'
+
+    # Override the global default and scrape targets from this job every 5 seconds.
+    scrape_interval: 5s
+
+    # metrics_path defaults to '/metrics'
+    # scheme defaults to 'http'.
+
+    static_configs:
+      - targets: ['localhost:3003']
+        labels:
+          instance: owndefine2
+          group: 自定义exporter监控2
+```
+
+由上图可知，只需要在prometheus的监控机器上配置受监控机器的主机和端口就ok了,对监控队主机的情况下，是如何进行区分的呢，比如同时监控机器A的mysql和机器B的mysql，这两者是如何在主监控机器上进行区分展示的
+
 ### Exporter
 
 > 目前主要是node_exporter和mysql_exporter两个组件
@@ -239,6 +345,7 @@ Ansible是属于Extra Packages for Enterprise Linux (EPEL)库的一部分，因�
 > 配置mysql访问权限
 >
 > ```mysql
+> # 创建用户并赋予用户权限
 > CREATE USER 'mysqlexporter'@'localhost' IDENTIFIED BY 'myaqlexporter';
 > GRANT PROCESS, REPLICATION CLIENT, SELECT ON *.* TO 'mysqlexporter'@'localhost'
 > WITH MAX_USER_CONNECTIONS 3;
@@ -271,6 +378,7 @@ Ansible是属于Extra Packages for Enterprise Linux (EPEL)库的一部分，因�
 ```
 lua_shared_dict prometheus_metrics 10M;
 lua_package_path "/path/to/nginx-lua-prometheus/?.lua";   #注意此处下载的prometheus.lua文件的放置
+
 init_by_lua '
   prometheus = require("prometheus").init("prometheus_metrics")
   metric_requests = prometheus:counter(
@@ -278,6 +386,7 @@ init_by_lua '
   metric_latency = prometheus:histogram(
     "nginx_http_request_duration_seconds", "HTTP request latency", {"host"})
 ';
+
 log_by_lua '
   local host = ngx.var.host:gsub("^www.", "")
   metric_requests:inc(1, {host, ngx.var.status})
@@ -722,10 +831,13 @@ vim /etc/netdata/netdata.conf
 
 [Linux下安装和使用glances系统监控工具](http://www.tuicool.com/articles/rMjIju)
 
+[glances官方文档](https://github.com/nicolargo/glances)
+
+[使用资源监控工具glances(推荐)](https://www.ibm.com/developerworks/cn/linux/1304_caoyq_glances/)
+
 ## netdata部分
 
 [Netdata安装和使用（Linux 性能实时监测工具）](http://soluck.iteye.com/blog/2291618)
 
-[glances官方文档](https://github.com/nicolargo/glances)
 
-[使用资源监控工具glances(推荐)](https://www.ibm.com/developerworks/cn/linux/1304_caoyq_glances/)
+
