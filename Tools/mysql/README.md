@@ -517,6 +517,69 @@ select * from ecs_goods a where EXISTS(select cat_id from ecs_category b where a
 
 如何调优索引的使用
 
+#### 慢查询
+
+慢查询日志将日志记录写入文件，也将日志记录写入数据库表。
+
+##### 配置
+
+```mysql
+# 查询慢日志是否开启及文件存储位置
+show variables  like '%slow_query_log%';
+
+# 查询慢日志查询时间
+show variables like 'long_query_time%';
+#　注意：使用命令 set global long_query_time=4修改后，需要重新连接或新开一个会话才能看到修改值。你用show variables like 'long_query_time'查看是当前会话的变量值，你也可以不用重新连接会话，而是用show global variables like 'long_query_time'; 
+
+# 输出存储格式
+show variables like '%log_output%';
+# MySQL数据库支持同时两种日志存储方式，配置的时候以逗号隔开即可，如：log_output='FILE,TABLE'
+
+# 未使用索引的查询是否被记录到慢查询日志中
+show variables like 'log_queries_not_using_indexes';
+
+# 系统变量log_slow_admin_statements表示是否将慢管理语句例如ANALYZE TABLE和ALTER TABLE等记入慢查询日志
+show variables like 'log_slow_admin_statements';
+
+
+# 如果你想查询有多少条慢查询记录，可以使用系统变量。  
+show global status like '%Slow_queries%';
+```
+
+##### 分析
+
+mysqldumpslow分析工具提供对慢日志查询的分析
+
+```
+-s, 是表示按照何种方式排序，
+  c: 访问计数
+  l: 锁定时间
+  r: 返回记录
+  t: 查询时间
+  al:平均锁定时间
+  ar:平均返回记录数
+  at:平均查询时间
+-t, 是top n的意思，即为返回前面多少条的数据；
+-g, 后边可以写一个正则匹配模式，大小写不敏感的；
+```
+
+```mysql
+
+# 得到返回记录集最多的10个SQL。
+mysqldumpslow -s r -t 10 /database/mysql/mysql06_slow.log
+
+# 得到访问次数最多的10个SQL
+mysqldumpslow -s c -t 10 /database/mysql/mysql06_slow.log
+
+# 得到按照时间排序的前10条里面含有左连接的查询语句。
+mysqldumpslow -s t -t 10 -g “left join” /database/mysql/mysql06_slow.log
+
+# 另外建议在使用这些命令时结合 | 和more 使用 ，否则有可能出现刷屏的情况。
+mysqldumpslow -s r -t 20 /mysqldata/mysql/mysql06-slow.log | more
+```
+
+
+
 ### 备份
 
 #### 导入和导出 
@@ -606,16 +669,24 @@ cat xxx.file |redis-cli [--pipe]
 
 [SQL的存储过程和函数](http://www.toutiao.com/a6391569028531831041/)
 
-[MySQL存储过程的动态行转列](http://www.tuicool.com/articles/FNRVJvb)
-
-[性能调优攻略:SQL语句优化](http://www.toutiao.com/a6391314783630770433/)
-
-[mysql exists和in的效率比较](http://www.cnblogs.com/meibao/p/4973043.html)
-
 [MyCli:支持自动补全和语法高亮的MySQL客户端](http://hao.jobbole.com/mycli-mysql/)
 
 [Linux下修改mysql的root密码](http://www.tuicool.com/articles/yQNZFfr)
 
 [MySQL字符编码深入详解](http://www.jb51.net/article/29960.htm)
 
+- 查询技巧
+
 [MySQL分组后选取指定值问题](http://www.jb51.net/article/31590.htm)
+
+[MySQL存储过程的动态行转列](http://www.tuicool.com/articles/FNRVJvb)
+
+- 调优部分
+
+[MySQL慢查询日志的使用](http://www.cnblogs.com/kerrycode/p/5593204.html)
+
+[MySQL慢查询官方参考](https://dev.mysql.com/doc/refman/5.7/en/slow-query-log.html)
+
+[性能调优攻略:SQL语句优化](http://www.toutiao.com/a6391314783630770433/)
+
+[mysql exists和in的效率比较](http://www.cnblogs.com/meibao/p/4973043.html)
