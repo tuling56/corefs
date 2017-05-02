@@ -286,6 +286,8 @@ awk 'BEGIN{a[0,0]=12;a[1,1]=13;}END{for(k in a) {print k,a[k];split(k,idx,SUBSEP
 
 问题描述，给出一堆数据，然后将该堆数据进行分组（分组区间自己指定），然后统计每个分组内的个数
 
+固定区间间隔
+
 ```shell
 # 统计落在每个区间段内的数量
 awk '{intfloat=$1/500;split(intfloat,intn,".");v=intn[1];dict[v]++;}END{for(i in dict) print i*500"\t"i*500"~"(i+1)*500"\t"dict[i]|"sort -n -k1"}'  view_num
@@ -293,6 +295,14 @@ awk '{intfloat=$1/500;split(intfloat,intn,".");v=intn[1];dict[v]++;}END{for(i in
 #改进版（利用awk提供的int函数，获取除法的整数部分）
 awk '{v=int($1/500);dur[v]++;}END{for(i in dur) print i*500"\t"i*500"~"(i+1)*500"\t"dur[i]|"sort -n -k1"}'  view_num
 ```
+
+指定区间间隔
+
+```shell
+awk '{if(1<=$1&& $1<2) dur[1,2]++;else if (2<=$1 && $1<5) dur[2,5]++;else if( 5<=$1 && $1<10) dur[5,10]++; else if(10<=$1 && $1<50) dur[10,50]++;else if(50<=$1) dur[50,"+"]++; else print "nodur"}END{split(i,idx,SUBSEP);	print "["idx[1]"~"idx[2]")\t"dur[i]"\t"dur[i]*100/NR"%"|"sort -t'~' -n -k1.2";}'  view_num
+```
+
+
 
 ##### awk多维数组统计
 
