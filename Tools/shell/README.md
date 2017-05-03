@@ -359,14 +359,21 @@ awk '$1=100{print $1 > "output_file"}' file
 
 ```shell
 awk 'BEGIN{"date"|getline d;split(d,a);print a[2]}'
-
 # 执行linux的date命令，并通过管道输出给getline，然后再把输出赋值给自定义变量d，并以默认空格为分割符把它拆分开以数字1开始递增方式为下标存入数组a中，并打印数组a下标为2的值。下面我们再看看一些复杂的运用。
 ```
 
-在awk中
+| 文件a:                 | 文件b: |
+| -------------------- | ---- |
+| 220 34 50 70         | 10   |
+| 553 556 32 21        | 8    |
+| 1 1 14 98 33         | 2    |
+| 2 2 3 3 4  5 5  6 34 | 7    |
 
-```
+要求文件a的每行数据与文件b的相对应的行的值相减，得到其绝对值
 
+```shell
+awk '{getline j<"b";for(i=1;i<=NF;i++){$i>j?$i=$i-j:$i=j-$i}}1' a|column -t
+# columnt -t的作用是让结果列对齐，该程序还有些问题
 ```
 
 
@@ -376,6 +383,20 @@ awk 'BEGIN{"date"|getline d;split(d,a);print a[2]}'
 [sed](http://man.linuxde.net/sed)是一种流编辑器，它是文本处理中非常中的工具，能够完美的配合正则表达式使用，功能不同凡响。处理时，把当前处理的行存储在临时缓冲区中，称为“模式空间”（pattern space），接着用sed命令处理缓冲区中的内容，处理完成后，把缓冲区的内容送往屏幕。接着处理下一行，这样不断重复，直到文件末尾。文件内容并没有 改变，除非你使用重定向存储输出。Sed主要用来自动编辑一个或多个文件；简化对文件的反复操作；编写转换程序等。
 
 #### 基础
+
+sed多条指令执行
+
+```shell
+sed '/test/d;/boy/d' test.txt > test_new.txt      # 删除含字符串"test"或“boy"的行
+# 等效于
+sed -e '/test/d' -e'/boy/d' test.txt > test_new.txt 
+```
+
+显示从第n行到结尾
+
+```shell
+sed -n '2,$p' xxxx
+```
 
 打印匹配行和行号
 
@@ -482,11 +503,28 @@ chmod u+x
 
 ### grep
 
+####  基础
+
+grep排除指定的文件夹
+
+```shell
+grep -i --exclude-dir=\.svn --exclude-dir=".git" -Rl --color
+#或者
+grep -i --exclude-dir={.svn,.git} -Rl --color
+```
+
 grep查找指定类型文件的内容
 
 ```shell
 find . -name *.py |xargs grep xxxx
-find . -name *.py -exec grep xhh {}\;  # 这个有问题，总提示exec缺少参数
+find . -name *.py -exec grep xhh {} \;  # 问题修正，注意{}和 \;之间的空格，不然给提示exec缺少参数
+```
+
+grep和sed结合使用
+
+```shell
+# 批量替换多个文件中的字符串
+sed -i 's/oldstr/newstr/g' `grep oldstr -rl odlstr $datadir`
 ```
 
 
