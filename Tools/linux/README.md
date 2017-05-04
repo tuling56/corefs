@@ -113,6 +113,19 @@ Rsync的命令格式可以为以下六种：
 
 #### sendEmail
 
+sendEmail是一个轻量级，命令行的SMTP邮件客户端。如果你需要使用命令行发送邮件，那么sendEmail是非常完美的选择:使用简单并且功能强大
+
+安装
+
+```
+wget http://caspian.dotconf.net/menu/Software/SendEmail/sendEmail-v1.56.tar.gz
+tar -zxvf sendEmail-v1.56.tar.gz
+chmod u+x 
+mv sendEmail /usr/local/bin
+```
+
+使用
+
 ```shell
 perl sendEmail -s mail.cc.sandai.net -f monitor@cc.sandai.net -xu monitor@cc.sandai.net -xp 121212 -t yuanjunmiao@cc.sandai.net -u "email title" -m "email body info"  -a "attachment files"
 
@@ -194,6 +207,12 @@ Synopsis:  sendEmail -f ADDRESS [options]
     --help networking         explain -s, -b, etc
     --help output             explain logging and other output options
     --help misc               explain -o options, TLS, SMTP auth, and more
+
+参考：
+
+[不可或缺的sendEmail](http://blog.csdn.net/leshami/article/details/8314570)
+
+[如何使用sendEmail发送邮件](http://www.ttlsa.com/linux/use-sendemail/)
 
 ### 软件安装
 
