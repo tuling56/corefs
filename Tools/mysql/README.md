@@ -208,6 +208,47 @@ ${MYSQL10} < xmp_version_active.sql
 #其中MYSQL10是:`/usr/bin/mysql -uroot -phive -N`
 ```
 
+#### restful接口
+
+```shell
+pip install sandman2
+sandman2ctl 'mysql+mysqldb://root:root@localhost/pgv_stat_yingyin'
+* Running on http://0.0.0.0:5000/
+```
+
+其中mysql的链接方式可以有[以下几种](http://docs.sqlalchemy.org/en/latest/core/engines.html#mysql)：
+
+```python
+# default
+engine = create_engine('mysql://scott:tiger@localhost/foo')
+
+# mysql-python
+engine = create_engine('mysql+mysqldb://scott:tiger@localhost/foo')
+
+# MySQL-connector-python
+engine = create_engine('mysql+mysqlconnector://scott:tiger@localhost/foo')
+
+# OurSQL
+engine = create_engine('mysql+oursql://scott:tiger@localhost/foo')
+```
+
+sandman2ctl的配置有以下：
+
+```
+optional arguments:
+  -h, --help            show this help message and exit
+  -d, --debug           Turn on debug logging
+  -p PORT, --port PORT  Port for service to listen on
+  -l, --local-only      Only provide service on localhost (will not be
+                        accessible from other machines)
+  -r, --read-only       Make all database resources read-only (i.e. only the
+                        HTTP GET method is supported)
+  -s SCHEMA, --schema SCHEMA
+                        Use this named schema instead of default
+```
+
+> 问题是中午的查询结果是unicode显示，命令行配置jq才能正常显示，而web访问还没有查到显示中文的方式
+
 #### 选取结果添加行号
 
 ```mysql
@@ -670,6 +711,8 @@ cat xxx.file |redis-cli [--pipe]
 [SQL的存储过程和函数](http://www.toutiao.com/a6391569028531831041/)
 
 [MyCli:支持自动补全和语法高亮的MySQL客户端](http://hao.jobbole.com/mycli-mysql/)
+
+[是否存在根据MySQL表格自动生成restful接口的技术](https://segmentfault.com/q/1010000008335958?_ea=1878275)
 
 [Linux下修改mysql的root密码](http://www.tuicool.com/articles/yQNZFfr)
 

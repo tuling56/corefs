@@ -77,6 +77,41 @@ echo ${var:0-7}
 
 [shell脚本8种字符串截取方法](http://www.jb51.net/article/56563.htm)
 
+字符串替换
+
+```
+b=${a/123/321};将${a}里的第一个123替换为321
+b=${a//123/321};将${a}里的所有123替换为321
+```
+
+字符串匹配
+
+```shell
+# 方式0（利用第三方匹配）
+export LANG=zh_CN.UTF-8
+A="米饭 + 爆炒牛肉 + 豉汁肉片 + 蒜蓉芥蓝"
+B="牛肉"
+echo $A | grep "$B" &>/dev/null  # 该等同于echo $A | grep -q "$B" 抑制grep的输出
+test $? -eq 0 && echo "[Match]:$A include $B" ||echo "[NotMatch]:$A  not include $B"
+if [[ $? == 0 ]]; then
+   echo "[Match]:$A include $B"
+else
+   echo "[NotMatch]:$A  not include $B"
+fi
+
+# 方式1（利用bash的匹配）
+A="米饭 + 爆炒牛肉 + 豉汁肉片 + 蒜蓉芥蓝"
+F="牛肉"
+if [[ $A =~ $F ]] ; then echo "$A include $F" ;else echo "$A not include $F";fi
+
+# 方式2(注意不要加[],此处不利用返回值)
+if  echo "aha"|grep "x" &>/dev/null ;then echo "find";else echo "no find";fi
+```
+
+参考：
+
+[linux shell中做匹配](https://segmentfault.com/q/1010000000504746)
+
 ##### 数组
 
 读取
@@ -140,11 +175,18 @@ rename  .sql  .txt *.sql  //好像不能递归目录,其中最后一个是要修
 awk 'BEGIN{ print "start" } pattern{ commands } END{ print "end" }' file
 ```
 
-
-
 #### 基础
 
 ##### 基本
+
+内置变量
+
+```
+NR：表示awk开始执行程序后所读取的数据行数。
+FNR：awk当前读取的记录数，其变量值小于等于NR（比如当读取第二个文件时，FNR是从0开始重新计数，而NR不会）。
+```
+
+关键语句
 
 ```
 # getline 语句
