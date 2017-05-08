@@ -1,0 +1,11 @@
+
+w
+e
+w
+echo kankan |kinit kankan/user
+t
+4r
+tr
+t
+e
+

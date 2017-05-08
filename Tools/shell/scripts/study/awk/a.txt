@@ -1,0 +1,4 @@
+100 wang man     
+200 wangsan woman
+300 wangming man 
+400 wangzheng man

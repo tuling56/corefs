@@ -1,0 +1,7 @@
+1 wine wine we
+echo kankan |kinit kankan/user
+echo kankan |kinit kankan/user 
+2 line wew new
+echo kankan |kinit kankan/user
+4 line 12 werwe
+5 vine hh vver
