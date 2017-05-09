@@ -54,6 +54,8 @@ mysql -uroot -pxxx -P3316 -h127.0.0.1 -Ddb1
 
 #### 索引
 
+##### 创建和删除索引
+
 >加索引
 
 mysql> alter table 表名 add index 索引名 (字段名1[，字段名2 …]);
@@ -73,6 +75,27 @@ mysql> alter table 表名 add primary key (字段名);
 >删除某个索引
 
 mysql> alter table 表名 drop index 索引名;
+
+##### 表指定key
+
+```mysql
+CREATE TABLE `user_follow` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `userID` varchar(16) NOT NULL DEFAULT '',
+  `starID` varchar(16) NOT NULL DEFAULT '',
+  `status_e` tinyint(4) NOT NULL DEFAULT '0',
+  `follow_t` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `insert_t` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `update_t` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `ts` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `follow` (`userID`,`starID`),
+  KEY `userID` (`userID`),
+  KEY `starID` (`starID`)
+) ENGINE=MyISAM AUTO_INCREMENT=13912 DEFAULT CHARSET=utf8;
+```
+
+注意`PRIMARY KEY`,`UNIQUE KEY`,	`KEY`的区别
 
 #### 字段
 
