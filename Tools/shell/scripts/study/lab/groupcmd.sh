@@ -3,7 +3,7 @@ cd `dirname $0`
 
 function t1()
 {
-     echo "函数t1外围"
+     echo "函数t1外围";
 
      {
          echo "组命令1";
