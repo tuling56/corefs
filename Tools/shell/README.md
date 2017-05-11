@@ -486,7 +486,7 @@ awk '{if(NR%2==0){printf $0 "\n"}else{printf "%s\t",$0}}' /etc/passwd
 sed '/hrwang/{s/hrwang/HRWANG/;q;}' datafile  #匹配到hrwang的行处理后就退出sed程序
 ```
 
-
+##### 正则匹配
 
 ##### 模式空间
 
@@ -506,7 +506,7 @@ sed '/hrwang/{s/hrwang/HRWANG/;q;}' datafile  #匹配到hrwang的行处理后就
 
 ![img](http://coolshell.cn//wp-content/uploads/2013/02/sed_demo_00.jpg)
 
-##### 向sed命令中传递变量
+##### 向sed传递变量
 
 ```shell
 ststr=`date +%d\\\/%b\\\/%Y:%H`	# 这个日期的转换，在脚本内要使用三个\才能代表一个\，脚本外可使用两个
@@ -525,7 +525,7 @@ sed -f sedscript.sh
 > sedscript.sh的内容如下：
 >
 > ```shell
-> !/bib/sed -f
+> !/bin/sed -f
 > s/root/yerik/p  
 > s/bash/csh/p
 > ```
@@ -538,6 +538,8 @@ Sed对于脚本中输入的命令非常挑剔，在命令的末尾不能有任�
 chmod u+x
 ./sedscript.sh xxxxfile
 ```
+
+sed命令如何接收外部参数
 
 #### 应用
 
@@ -569,7 +571,9 @@ grep和sed结合使用
 sed -i 's/oldstr/newstr/g' `grep oldstr -rl odlstr $datadir`
 ```
 
+#### 应用
 
+//待完善
 
 ### 参考
 

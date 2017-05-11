@@ -260,7 +260,7 @@ alter table xmp_subproduct_install set SERDEPROPERTIES('field.delim' = '\u0001')
 
 ### 函数
 
-##### 日期时间操作
+#### 日期时间操作
 
 ```mysql
 # 整型时间戳转日期
@@ -268,6 +268,22 @@ select from_unixtime(finsert_time,'yyyyMMdd HH:mm:ss') from xmp_odl.xmp_pv where
 # 日期转时间戳
 select unix_timestamp('20111207 13:01:03','yyyyMMdd HH:mm:ss') from test.dual;
 ```
+
+#### 字符串
+
+字符串分割
+
+```mysql
+# 一般字符
+select split('a,b,c,d',',')[0] from test.dual;
+# 特殊字符
+split('192.168.0.1','\\.') from test.dual;
+# 在shell脚本或者“”内
+当然当split包含在 "" 之中时 需要加4个\，如 
+hive -e "....  split('192.168.0.1','\\\\.') ... "  不然得到的值是null
+```
+
+
 
 ## 参考
 
