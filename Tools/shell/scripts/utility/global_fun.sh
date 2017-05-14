@@ -4,13 +4,13 @@
 # Author:tuling56
 # State:
 # Created_Time: 2017-05-09 17:12
-# Last modified: 2017-05-09 05:21:48 PM
+# Last modified: 2017-05-13 08:15:12 PM
 #########################################################################
 #!/bin/bash
 
 
 ########################### 信息显示 ##########################
-function show_info()
+function showstep()
 {
     local info=$1
     echo -e "\e[1;31mstep:$info\e[0m-->`date +%F\ %T`"
