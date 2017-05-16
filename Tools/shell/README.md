@@ -543,7 +543,11 @@ sed命令如何接收外部参数
 
 #### 应用
 
+##### 包含指定内容的行替换为新行
 
+```shell
+ sed -i '/g_tool_hive=/c g_tool_hive="/usr/local/complat/cdh5.10.0/hive/bin/hive"' `sl 'g_tool_hive'`
+```
 
 ### grep
 
