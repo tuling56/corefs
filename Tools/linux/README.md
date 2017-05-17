@@ -14,7 +14,70 @@
 mkdir -p ./application/{controllers,models,static,static/css,static/js,templates}
 ```
 
+##### 解压缩
 
+zip 命令（zip格式）
+
+```shell
+压缩：
+    压缩文件：zip 压缩文件名 源文件
+    压缩目录： zip -r 压缩文件名 源目录
+
+解压缩
+	unzip 压缩文件名（不区分文件和目录）
+```
+
+gzip命令（gz格式）
+
+```shell
+压缩
+    压缩文件：
+        gzip 源文件 # 压缩为.gz格式的压缩文件，源文件会消失
+        gzip -c 源文件>压缩文件.gz #可以保留源文件
+    压缩目录： 不支持，但可以用gzip -r 来递归压缩文件夹内的每个文件（这个指的是每个文件都会被压缩）
+
+解压缩
+    解压文件：gzip -d 压缩文件或者gunzip 压缩文件，压缩包会消失
+    解压目录：gzip -d -r 压缩文件或者gunzip -r 压缩文件 压缩包会消失
+```
+
+bzip2命令（bz2格式）
+
+```shell
+压缩
+    压缩文件：
+        bz2 源文件 	 # 压缩为bz2格式的文件，不保留源文件
+        bzip2 -k 源文件 # 压缩之后保留源文件
+    压缩目录： 根本不支持
+解压缩
+    bzip2 -d 压缩文件 # 压缩文件会消失，-k保留压缩文件
+    bunzip2 压缩文件  # -k保留压缩文件
+```
+
+tar命令和格式.tar.gz和.tar.bz2
+
+```shell
+压缩	
+    压缩文件和目录（不作区分） 
+        1）打包：tar -cvf 打包文件名 源文件  # tar -cvf jaw.tar  jaw
+        2）压缩：zip jaw.tar.zip jaw.tar
+    其便捷方式是：
+    tar -zcvf 压缩文件名.tar.gz  源文件1 源文件2  #-z 压缩格式为.tar.gz格式
+    tar -jcvf 压缩文件名.tar.bz2 源文件1 源文件2  #-j 压缩格式为.tar.bz2格式
+    注意压缩文件名用绝对路劲指定压缩文件存放的目录
+
+解压缩
+    解压文件和目录（不作区分）
+        1）解压缩 gzip -d
+        2）解包： tar -xvf 打包文件名
+    其便捷方式是：
+    tar -zxvf 压缩文件名.tar.gz  
+    tar -jxvf 压缩文件名.tar.bz2 -C "destdir"  
+    注意用"-C"选择指定解压到的目录
+
+    补充：
+    只查看 tar -ztvf xx.tar.gz 只查看
+```
 
 #### 系统启动
 
