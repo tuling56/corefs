@@ -357,6 +357,8 @@ CREATE PROCEDURE sp_name([IN|OUT|INOUT] param_name type) [characteristics] routi
 
 #### 行转列
 
+有两种实现方式`case when`和`inner join`:
+
 ```mysql
 # 原始的的数据格式是按行的，现在想拼接为列，其中还有汇总和所占比，实现方式如下:
 select a.date,a.f1 as '总量',b.f2 as '360域名总量',
@@ -407,9 +409,9 @@ sum(case when 季度=4 then 销售量 else 0 end) as 四季度
 from sales group by 年;
 ```
 
-
-
 #### 列转行
+
+有两种实现方式:`序列化表`和`union`
 
 ```mysql
 # 利用序列化表的方式实现列转行
@@ -488,6 +490,13 @@ whatis="a.date as '当前日期',b.date as '上周同期',a.s_install_end as '�
 
 # 展示结果
 sql = "SELECT {whatis} FROM ({tablea}) a INNER JOIN ({tableb}) b on b.date=DATE_FORMAT(DATE_SUB(a.date,INTERVAL 7 day),'%Y%m%d') order by a.date desc".format(whatis=whatis,tablea=tablea,tableb=tableb)
+```
+
+#### 字符分割的数组长度
+
+```mysql
+# imgName格式：bc9077f6.jpg,073eb23f.jpg
+select if(imgName='',0,1+(length(imgName)-length(replace(imgName,',','')))) as arraycnt from contribute;
 ```
 
 
@@ -746,6 +755,8 @@ cat xxx.file |redis-cli [--pipe]
 [MySQL分组后选取指定值问题](http://www.jb51.net/article/31590.htm)
 
 [MySQL存储过程的动态行转列](http://www.tuicool.com/articles/FNRVJvb)
+
+[重温SQL:行转列，列转行](http://mp.weixin.qq.com/s/pd4sEFa9oq0Lw5aaagmsxw)
 
 - 调优部分
 
