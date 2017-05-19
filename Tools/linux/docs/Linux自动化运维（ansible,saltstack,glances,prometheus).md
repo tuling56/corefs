@@ -674,7 +674,7 @@ You can put your own `glances.conf` file in the following locations:
 
 使用模式
 
-```
+```shell
 # 单机模式
 $ glances
 
@@ -687,8 +687,9 @@ step2:然后在客户端连接：
 glances -c 192.168.2.2
 
 # web服务模式
-$glances -w
+$glances -w   
 and enter the URL http://<ip>:61208 in your favorite web browser.
+# 使用`glances -w 2>&1 &` 让服务在后台运行 
 ```
 
 服务发现
