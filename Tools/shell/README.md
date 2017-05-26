@@ -117,25 +117,34 @@ if  echo "aha"|grep "x" &>/dev/null ;then echo "find";else echo "no find";fi
 读取
 
 ```shell
-
+a=(1 2 3 4 5)
+echo ${a[0]}
+echo ${a[@]} # 或者echo ${a[*]}
 ```
 
 删除
 
 ```shell
+unset a
+echo ${a[*]}  # 结果为空
 
+unset a[1]
+echo ${a[*]}  # 结果为1 3 4 5
+echo ${#a[*]} # 结果为4
 ```
 
 赋值
 
 ```shell
-
+a[1]=100
+echo ${a[*]} # 结果为1 100 2 3 4 5
 ```
 
 分片
 
 ```shell
-
+echo ${a[@]:0:3}  # 结果为 1 2 3
+# 直接通过 ${数组名[@或*]:起始位置:长度} 切片原先数组，返回是字符串，中间用“空格”分开，因此如果加上”()”，将得到切片数组，上面例子：c 就是一个新数据
 ```
 
 替换
@@ -143,6 +152,10 @@ if  echo "aha"|grep "x" &>/dev/null ;then echo "find";else echo "no find";fi
 ```shell
 # ${数组名[@或*]/查找字符/替换字符} 该操作不会改变原先数组内容，如果需要修改，可以看上面例子，重新定义数据。
 ```
+
+参考：
+
+[Linux Shell数组建立及使用技巧](https://mp.weixin.qq.com/s?__biz=MzAxODI5ODMwOA==&mid=2666540837&idx=1&sn=f74069270e46c66e9a8bf398e2bc5393&chksm=80dceb8eb7ab6298f57e78a07a217ef8784bb505a800177e0fbdf8c01a0cea645e94becb99cb&scene=0&key=6f6e2130da6015f10fb0174028d998ccfa947b568766e6506a0a2b36dc0d0a6b4553dbb0851e1ab32b6ed2a9179a6294b6b35f43ddda6d17aee9c38b6578f4f1d091b004cdc4dd3723396390ccacdb87&ascene=0&uin=MjQxMzQ2MjU0Mg%3D%3D&devicetype=iMac+MacBookPro12%2C1+OSX+OSX+10.12.4+build(16E195)&version=12010310&pass_ticket=iRlWFNF8bDqkSyuDbwzP7HxW3MoqbC2TNA7mipckDMJx2QkUizxvlkIKyBJb0LkY&winzoom=1&nettype=WIFI&fontScale=100)
 
 ##### 运算符
 
