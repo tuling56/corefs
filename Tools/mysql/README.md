@@ -39,6 +39,9 @@ select * from mysql.user where user='cactiuser' \G;
 
 # 授权的同时修改密码
 GRANT ALL PRIVILEGES ON `db1`.* TO 'root'@'%' IDENTIFIED by '123';
+
+# 授权给已有的用户
+GRANT ALL PRIVILEGES ON `snh48`.* TO 'root'@'%';
 ```
 
 远程登陆
@@ -54,7 +57,7 @@ mysql -uroot -pxxx -P3316 -h127.0.0.1 -Ddb1
 
 #### 索引
 
-##### 创建和删除索引
+##### 创建和删除
 
 >加索引
 
@@ -76,7 +79,23 @@ mysql> alter table 表名 add primary key (字段名);
 
 mysql> alter table 表名 drop index 索引名;
 
-##### 表指定key
+> 添加约束
+
+```mysql
+# 单列约束
+ALTER TABLE Persons ADD UNIQUE (Id_P);
+# 多列约束
+ALTER TABLE Persons ADD CONSTRAINT uc_PersonID UNIQUE (Id_P,LastName);
+```
+
+> 撤销约束
+
+```mysql
+# unique是索引的一种
+ALTER TABLE Persons DROP INDEX uc_PersonID;
+```
+
+##### 索引和KEY
 
 ```mysql
 CREATE TABLE `user_follow` (
@@ -96,6 +115,32 @@ CREATE TABLE `user_follow` (
 ```
 
 注意`PRIMARY KEY`,`UNIQUE KEY`,	`KEY`的区别
+
+**索引和约束**
+
+`UNIQUE KEY`和`PRIMARY KEY`约束均为列或列集合提供了唯一性的保证，`PRIMARY KEY `拥有自动定义的 `UNIQUE` 约束,一个表可以有多个`UNIQUE KEY`约束，但是只能有一个`PRIMARY KEY`约束。
+
+```mysql
+CREATE TABLE Persons(
+    Id_P int NOT NULL,
+    LastName varchar(255) NOT NULL,
+    FirstName varchar(255),
+    Address varchar(255),
+    City varchar(255),
+    UNIQUE (Id_P)
+);
+
+CREATE TABLE Persons(
+    Id_P int NOT NULL,
+    LastName varchar(255) NOT NULL,
+    FirstName varchar(255),
+    Address varchar(255),
+    City varchar(255),
+    CONSTRAINT uc_PersonID UNIQUE (Id_P,LastName)
+)
+```
+
+
 
 #### 字段
 
@@ -216,7 +261,7 @@ mysql --default-character-set=utf8  -uroot -proot -Dpgv_stat_yingyin
 >
 > - 在load数据的时候保证文件是utf8编码的
 
-#### 信息查看编码
+#### 变量查看
 
 >  查看全局变量
 
@@ -499,7 +544,22 @@ sql = "SELECT {whatis} FROM ({tablea}) a INNER JOIN ({tableb}) b on b.date=DATE_
 select if(imgName='',0,1+(length(imgName)-length(replace(imgName,',','')))) as arraycnt from contribute;
 ```
 
+#### 不存在则插入，存在则更新
 
+```mysql
+INSERT INTO tablename (field1, field2, field3, ...) VALUES ('value1', 'value2','value3', ...) ON DUPLICATE KEY UPDATE field1='value1', field2='value2', field3='value3', ...
+
+# 这个语句的意思是，插入值，如果没有该记录执行
+INSERT INTO tablename (field1, field2, field3, ...) VALUES ('value1', 'value2','value3', ...)
+# 这一段，如果存在该记录，那么执行
+UPDATE field1='value1', field2='value2', field3='value3', ...
+```
+
+一个例子：
+
+```mysql
+INSERT INTO tablea (peerid,new_install_date,new_install_source,new_install_version,new_install_type,insert_date,insert_source,insert_version,insert_type) VALUES("%s","%s","%s","%s","%s","%s","%s","%s","%s") ON DUPLICATE KEY UPDATE new_install_type="%s"' 
+```
 
 ### 查询
 

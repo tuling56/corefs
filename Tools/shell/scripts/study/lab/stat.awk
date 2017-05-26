@@ -1,4 +1,4 @@
-#!/usr/bin/awk -f 
+#!/usr/bin/awk -f
 
 BEGIN{
     a=0;
@@ -6,7 +6,7 @@ BEGIN{
 
 {
     a++;
-    
+
 }
 
 END{
