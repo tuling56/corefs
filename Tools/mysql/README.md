@@ -272,8 +272,17 @@ mysql --default-character-set=utf8  -uroot -proot -Dpgv_stat_yingyin
 #### 运行方式技巧
 
 ```shell
+# 方法1
 ${MYSQL10} < xmp_version_active.sql
 #其中MYSQL10是:`/usr/bin/mysql -uroot -phive -N`
+
+# 方法2
+MYSQL="/usr/bin/mysql -uxxxx -pxxxx -hxxxx -Pxxxx"
+sql="select movieid,pageurl,posterurl from poster_to_down where image_type='poster' and ts >='${time_start}'"
+echo "${sql}" | ${MYSQL} media_info |sed '1d' > ${file}
+
+# 方法3
+cat /data/rsync_data/kk_sql/videos.sql |$mysql video
 ```
 
 #### restful接口
