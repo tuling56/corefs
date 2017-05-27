@@ -379,3 +379,33 @@ uuid             	# 用途未知
 ##### 参考
 
 [Centos上安装和配置PostgreSQL](http://www.linuxidc.com/Linux/2016-09/135538.htm)
+
+#### percona-xtrabackup
+
+开源的MySQL热备份工具
+
+> Xtrabackup是由percona开发的一个开源软件，它是innodb热备工具ibbackup（收费的商业软件）的一个开源替代品。Xtrabackup由个部分组成:xtrabackup和innobackupex，其中xtrabackup工具用于备份innodb和 xtraDB引擎的表；而innobackupex工具用于备份myisam和innodb引擎的表，本文将介绍如何用innobackupex工具做全量和增量备份。
+
+##### 安装
+
+```shell
+yum install percona-xtrabackup
+```
+
+##### 使用
+
+全量备份
+
+```
+
+```
+
+增量备份
+
+```shell
+
+```
+
+##### 参考：
+
+[innobackupex的安装和使用](http://blog.csdn.net/dbanote/article/details/13295727)
