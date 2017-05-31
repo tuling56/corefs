@@ -792,7 +792,25 @@ vim /etc/netdata/netdata.conf
 # 更详细的配置参考等待以后发现
 ```
 
+## linfo
 
+Linfo 是一个自由开源的跨平台的服务器统计 UI 或库，它可以显示大量的系统信息。Linfo 是可扩展的，通过 composer，很容易使用 PHP5 库以程序化方式获取来自 PHP 应用的丰富的系统统计数据。它有 Web UI 及其Ncurses CLI 视图，在 Linux、Windows、BSD、Darwin/Mac OSX、Solaris 和 Minix 系统上均可用。
+
+Linfo 显示的系统信息包括 CPU 类型/速度[1]、服务器的体系结构、挂载点用量、硬盘/光纤／Flash 驱动器、硬件设备、网络设备和统计信息、运行时间／启动日期、主机名、内存使用量（RAM 和 swap）、温度/电压/风扇速度和 RAID 阵列等。
+
+### 安装
+
+```shell
+git clone https://github.com/jrgp/linfo.git
+cd linfo
+cp sample.config.inc.php config.inc.php
+```
+
+### 使用
+
+浏览器打开 http://SERVER_IP/linfo，界面展示如下：
+
+![linfo监控界面](https://camo.githubusercontent.com/55148adb650735288e569e43f0c13c1f1e10e06e/687474703a2f2f6a7267702e75732f6d6973632f6c696e666f2e706e67)
 
 # 参考
 
@@ -840,5 +858,10 @@ vim /etc/netdata/netdata.conf
 
 [Netdata安装和使用（Linux 性能实时监测工具）](http://soluck.iteye.com/blog/2291618)
 
+## linfo部分
 
+[Linfo：实时显示你的 Linux 服务器运行状况](http://www.toutiao.com/i6425010590959272449/)
 
+[PHP端的linfo](https://github.com/jrgp/linfo)
+
+[Shell端的linfo](https://github.com/vigeek/linfo)

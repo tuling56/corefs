@@ -113,9 +113,51 @@ tar命令和格式.tar.gz和.tar.bz2
 
 -  [linux系统的7种运行级别](http://blog.chinaunix.net/uid-22746363-id-383989.html) 
 
-### 系统监控
+### 环境配置
 
-----
+#### JDK环境
+
+删除openjdk安装sun jdk
+
+##### 查询是否安装默认jdk
+
+```shell
+java -version
+```
+
+#####  删除默认安装的openjdk
+
+```
+rpm -qa |grep jdk
+```
+
+> java-1.6.0-openjdk-javadoc-1.6.0.0-1.41.1.10.4.el6.x86_64
+>
+> java-1.6.0-openjdk-1.6.0.0-1.41.1.10.4.el6.x86_64
+>
+> java-1.6.0-openjdk-devel-1.6.0.0-1.41.1.10.4.el6.x86_64
+
+```
+rpm -e --nodeps 以上查询到的几个
+```
+
+##### 安装sun jdk
+
+```shell
+#解压: tar -xvf jdk-8u121-linux-x64.tar.gz -C /usr/local/java
+# 配置环境变量: vi /etc/profile，在文件末尾加上如下配置:
+export JAVA_HOME=/usr/local/java/jdk1.8.0_121
+export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib.tools.jar
+export PATH=$JAVA_HOME/bin:$PATH
+#生效配置: source /etc/profile
+#验证安装是否成功: java -version
+```
+
+参考：
+
+[Linux下安装Sun JDK（删除Open JDK）](http://www.toutiao.com/i6416458864656384514/)
+
+### 系统监控
 
 #### glances
 
@@ -277,10 +319,6 @@ Synopsis:  sendEmail -f ADDRESS [options]
 
 [如何使用sendEmail发送邮件](http://www.ttlsa.com/linux/use-sendemail/)
 
-### 软件安装
-
-----
-
 #### rpm
 
 ```shell
@@ -406,6 +444,6 @@ yum install percona-xtrabackup
 
 ```
 
-##### 参考：
+##### 参考
 
 [innobackupex的安装和使用](http://blog.csdn.net/dbanote/article/details/13295727)
