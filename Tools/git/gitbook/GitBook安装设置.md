@@ -147,7 +147,7 @@ gitbook-cli是gitbook的命令行，可以方便的管理多个gitbook版本
 
 ##### 官网发布
 
-使用gitbook editor可以轻松发布，但发布的只能是gitbook官网上的，要自己构建发布系统
+使用gitbook editor可以轻松发布，但发布的只能是gitbook官网上的，要自己构建发布系统，若是https协议的也可发布，先在本地创建book,然后git init,git add,git commit等系列操作后，添加远程的https仓库，即可实现推送
 
 ##### 自建发布
 
@@ -233,6 +233,76 @@ server {
         }
  }
 ```
+
+###### 自建发布（合集）
+
+将多本书籍进行集中管理，git上配置的推送钩子不用修改(只需要对每本书籍的钩子地址改变下即可)
+
+```shell
+[root@local122 hooks]# cat post-receive 
+#!/bin/bash
+# gitbook工作目录的设置
+gitbook_home=/home/yjm/Documents/gitbook/git_demo.me
+
+set GIT_INDEX_FILE
+GIT_WORK_TREE=${gitbook_home} git checkout -f
+
+# 以下的内容可以自动忽略（不需要额外的操作）
+cd ${gitbook_home}
+echo "`date +%F\ %T`" >>timettt
+gitbook build #&& gitbook serve  #这部分启动的代码暂时不需要
+#sh ${gitbook_home}/run.sh
+
+exit 0
+```
+
+只用在nginx上配置如下:
+
+```nginx
+# 静态Gitbook服务器
+server {
+        listen  80;
+        server_name  gitbook.me;
+        charset utf-8;
+        access_log    logs/gitbook_acc.log;
+        error_log     logs/gitbook_error.log;
+      
+        location ~ / {
+            root /home/yjm/Documents/gitbook;
+        	index index.html index.htm index.php; 
+        	autoindex on;
+    	} 
+
+        location ^~ /git_demo{
+            alias /home/yjm/Documents/gitbook/git_demo.me/_book/;
+            #default_type application/json;
+            default_type 'text/plain';
+            index index.html index.htm;
+        }
+        
+        location ^~ /go_web{
+            alias /home/yjm/Documents/gitbook/go_web.me/_book/;
+            #default_type application/json;
+            default_type 'text/plain';
+            index index.html index.htm;
+        }
+ }
+```
+
+然后通过:http://gitbook.me/git_demo/ 和http://gitbook.me/go_web/ 分布方位对应的书籍。
+
+本地书籍的目录方式如下(子目录就是书籍)：
+
+```shell
+[root@local122 gitbook]# ls -lh
+/home/yjm/Documents/gitbook
+drwxr-xr-x. 11 root root 4.0K Jun 12 10:25 git_demo.me
+drwxr-xr-x.  6 root root 4.0K Jun 12 10:23 go_web.me
+```
+
+
+
+
 
 ##### 结合发布
 
