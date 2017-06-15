@@ -53,7 +53,7 @@ gitbook-cli是gitbook的命令行，可以方便的管理多个gitbook版本
 
 3. gitbook build 生成书籍
 
-该步骤会会在书籍目录生成_book文件夹，里面是书籍的静态html网页
+该步骤会在书籍目录生成_book文件夹，里面是书籍的静态html网页
 
 4. gitbook serve 网页浏览
 
@@ -66,15 +66,15 @@ gitbook-cli是gitbook的命令行，可以方便的管理多个gitbook版本
 
 #### 多人协作
 
-若使用GitBook官方，可以在设置中找到协作这，进行添加。对于绑定GitHub repo的GitBook项目，其协作方式和普通的项目没有差异，插件 [edit-link](https://github.com/rtCamp/gitbook-plugin-edit-link)可以在每个页面生成指向 GitHub repo 相应文件的链接，十分方便！
+若使用GitBook官方，可以在设置中找到协作这，进行添加。对于绑定GitHub repo的GitBook项目，其协作方式和普通的项目没有差异，插件 [edit-link](https://github.com/rtCamp/gitbook-plugin-edit-link)可以在每个页面生成指向 GitHub repo 相应文件的链接，十分方便！但需要版本库支持web编辑的方式，若搭建本地的，要自己实现。
 
 ###  功能扩展
 
 #### 评论互动
 
-> Gitbook本身提供了对所有电子书按段落评论的功能
+> Gitbook本身提供了对所有电子书按段落评论的功能，（但在本地搭建的gitbook仓库没有这个功能）
 >
-> 通过disqus,多数等第三方插件支持
+> 通过disqus,多说等第三方插件支持
 
 #### 插件配置
 
@@ -137,17 +137,21 @@ gitbook-cli是gitbook的命令行，可以方便的管理多个gitbook版本
 
 #### 导出
 
-支持网页输出，epub,mobi和pdf等格式的数据，需要配合calibre使用。
+支持html、epub、mobi和pdf等格式的数据，需要配合calibre使用。
 
-> pdf,epub,mobi格式导出
+> pdf、epub、mobi格式导出
 
-在电子书存档目录，如：E:\xx\gitbook\mybook_test执行` gitbook pdf|epub|mobi .`或者上一级目录执行``gitbook pdf|epub|mobi ./mybook_test`
+在电子书存档目录，如:`E:\xx\gitbook\mybook_test`执行` gitbook pdf|epub|mobi .`或者上一级目录执行
+
+``gitbook pdf|epub|mobi ./mybook_test`
+
+类似的转换方式还有`pandoc xx.md -o xx.pdf|epub|mobi`
 
 #### 发布
 
 ##### 官网发布
 
-使用gitbook editor可以轻松发布，但发布的只能是gitbook官网上的，要自己构建发布系统，若是https协议的也可发布，先在本地创建book,然后git init,git add,git commit等系列操作后，添加远程的https仓库，即可实现推送
+使用gitbook editor可以轻松发布，但只能发布到gitbook官网，要自己构建发布系统，若是https协议的也可发布，先在本地创建gitbook,然后git init->git add->git commit等系列操作后，添加远程的https仓库，即可实现推送
 
 ##### 自建发布
 
@@ -212,7 +216,7 @@ remote: warn: "options" property is deprecated, use config.get(key) instead
 remote: info: >> generation finished with success in 6.5s !
 ```
 
-通过http://localhost:4000来web访问修改的内容
+通过http://localhost:4000来web访问修改的内容(若要支持在线编辑，需要通过web服务器来实现，暂时没有)
 
 **增强**：通过配置nginx的服务器的方式来实现gitbook内容的访问，这样就不必再启动gitbook serve了
 
@@ -236,13 +240,13 @@ server {
 
 ###### 自建发布（合集）
 
-将多本书籍进行集中管理，git上配置的推送钩子不用修改(只需要对每本书籍的钩子地址改变下即可)
+将多本书籍进行集中管理，git上配置的推送钩子不用修改(只需要改变下每本书籍的钩子地址即可)
 
 ```shell
 [root@local122 hooks]# cat post-receive 
 #!/bin/bash
-# gitbook工作目录的设置
-gitbook_home=/home/yjm/Documents/gitbook/git_demo.me
+# gitbook工作目录的设置（书籍的钩子地址）
+gitbook_home=/home/yjm/Documents/gitbook/git_demo.me 
 
 set GIT_INDEX_FILE
 GIT_WORK_TREE=${gitbook_home} git checkout -f
@@ -289,7 +293,7 @@ server {
  }
 ```
 
-然后通过:http://gitbook.me/git_demo/ 和http://gitbook.me/go_web/ 分布方位对应的书籍。
+然后通过:http://gitbook.me/git_demo/ 和http://gitbook.me/go_web/ 方式访问对应的书籍。
 
 本地书籍的目录方式如下(子目录就是书籍)：
 
@@ -299,10 +303,6 @@ server {
 drwxr-xr-x. 11 root root 4.0K Jun 12 10:25 git_demo.me
 drwxr-xr-x.  6 root root 4.0K Jun 12 10:23 go_web.me
 ```
-
-
-
-
 
 ##### 结合发布
 
@@ -324,7 +324,7 @@ https://github.com/tuling56/shared_common_libs.git
 
 >  怎么配置git仓库的https访问？
 
-```
+```shell
 git clone https://127.0.0.1/home/yjm/Documents/gitrepo/gitbook.git
 ```
 
@@ -351,3 +351,7 @@ git clone https://127.0.0.1/home/yjm/Documents/gitrepo/gitbook.git
   [Gitbook实用配置](http://www.cnblogs.com/zhangjk1993/p/5066771.html)
 
   [GitBook配置步步详解](http://www.chengweiyang.cn/gitbook/customize/book.json.html)
+
+  [解决导出的文件中文乱码问题](http://www.tuicool.com/articles/nQNZ3yJ)
+
+  [Linux安装新字体](http://www.cnblogs.com/MonkeyF/archive/2013/05/13/3076466.html)
