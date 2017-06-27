@@ -29,6 +29,33 @@ make && make install
 .width 8
 ```
 
+#### 使用
+
+基础命令
+
+```sql lite
+.databases             List names and files of attached databases
+.dbinfo ?DB?           Show status information about the database
+
+# 显示数据库中的所有表
+.table		
+
+# 显示列名（表头）
+.header on
+
+# 显示表结构
+.schema tablename
+select * from sqlite_master where type="table" and name="tablename";
+
+#　显示索引
+.indexes ?TABLE?       Show names of all indexes
+                         If TABLE specified, only show indexes for tables
+                         matching LIKE pattern TABLE.
+
+# 退出
+.exit
+```
+
 #### sqlite实现web查询
 
 ##### flask-restless实现
@@ -71,6 +98,10 @@ sandman2ctl 'sqlite+pysqlite:///D:/test.db'
 ```
 
 实现参考：http://sandman2.readthedocs.io/en/latest/quickstart.html
+
+### 高级
+
+高级使用
 
 ## 参考
 

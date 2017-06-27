@@ -45,6 +45,8 @@ redis 127.0.0.1:6379> CONFIG SET CONFIG_SETTING_NAME NEW_CONFIG_VALUE
 
 #### 开启启动
 
+创建过程
+
 ```shell
 # 1.创建启动脚本
 # 拷贝解压包下utils下redis启动脚本至/etc/init.d/
@@ -56,6 +58,63 @@ cp redis_init_script /etc/init.d/redis-server
 > # chkconfig: 2345 90 10
 # 然后执行chkconfig redis-server on
 ```
+
+样例：
+
+```shell
+[root@local122 init.d]# cat redis-server 
+#!/bin/sh
+#
+
+# Start Redis-server at the launch. It is used to serve
+# chkconfig: 2345 90 10
+
+# Simple Redis init.d script conceived to work on Linux systems
+# as it does use of the /proc filesystem.
+
+REDISPORT=6379
+EXEC=/usr/local/redis/bin/redis-server
+CLIEXEC=/usr/local/redis/bin/redis-cli
+
+PIDFILE=/usr/local/redis/run/redis_${REDISPORT}.pid
+CONF="/usr/local/redis/conf/redis.conf"
+
+case "$1" in
+    start)
+        if [ -f $PIDFILE ]
+        then
+                echo "$PIDFILE exists, process is already running or crashed"
+        else
+                echo "Starting Redis server..."
+                $EXEC $CONF
+        fi
+        ;;
+    stop)
+        if [ ! -f $PIDFILE ]
+        then
+                echo "$PIDFILE does not exist, process is not running"
+        else
+                PID=$(cat $PIDFILE)
+                echo "Stopping ..."
+                $CLIEXEC -p $REDISPORT shutdown
+                while [ -x /proc/${PID} ]
+                do
+                    echo "Waiting for Redis to shutdown ..."
+                    sleep 1
+                done
+                echo "Redis stopped"
+        fi
+        ;;
+    *)
+        echo "Please use start or stop as first argument"
+        ;;
+esac
+# 然后使用service redis-server start/stop进行服务的启动和关闭
+[root@local122 init.d]# service redis-server start
+/usr/local/redis/run/redis_6379.pid exists, process is already running or crashed
+```
+
+
 
 ### 基础
 

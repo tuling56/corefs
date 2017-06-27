@@ -51,6 +51,12 @@ mysql -uroot -pxxx -P3316 -h127.0.0.1 -Ddb1
 # 其中-P3316是本机的转发端口（如果不转发的话，直接是远程机器的端口），注意在cmder中输入命令，不要在GitBash中输入，后者正确之后无响应
 ```
 
+修改表名
+
+```mysql
+alter table media_relation_search_pc rename media_relation_search_pc_old_20170627;
+```
+
 
 
 
@@ -280,6 +286,9 @@ ${MYSQL10} < xmp_version_active.sql
 MYSQL="/usr/bin/mysql -uxxxx -pxxxx -hxxxx -Pxxxx"
 sql="select movieid,pageurl,posterurl from poster_to_down where image_type='poster' and ts >='${time_start}'"
 echo "${sql}" | ${MYSQL} media_info |sed '1d' > ${file}
+
+Local_MYSQL="/usr/bin/mysql -uxxxxx -pxxxx -hxxxxx media_info"
+echo "alter table media_relation_search_pc rename media_relation_search_pc_old_$(date +'%Y%m%d');" | $Local_MYSQL
 
 # 方法3
 cat /data/rsync_data/kk_sql/videos.sql |$mysql video
@@ -724,6 +733,15 @@ mysqldumpslow -s r -t 20 /mysqldata/mysql/mysql06-slow.log | more
 
 ### 备份
 
+备份对比
+
+| 备份方法       | 备份速度 | 恢复速度 | 便捷性                 | 功能   | 应用场景      | 备注   |
+| ---------- | ---- | ---- | ------------------- | ---- | --------- | ---- |
+| cp         | 快    | 快    | 一般、灵活性低             | 很弱   | 少量数据备份    |      |
+| mysqldump  | 慢    | 慢    | 一般、可无视存储引擎的差异       | 一般   | 中小型数据量的备份 |      |
+| lvm2快照     | 快    | 快    | 一般、支持几乎热备、速度快       | 一般   | 中小型数据量的备份 |      |
+| xtrabackup | 较快   | 较快   | 实现innodb热备、对存储引擎有要求 | 强大   | 较大规模的备份   |      |
+
 #### 导入和导出 
 
 ##### 导入
@@ -740,8 +758,8 @@ sql="load data local infile '$datapath/db1.odl_put_context_${date}' into table  
 
 运行插入语句
 
-```
-首先将数据导出成可运行的sql语句，然后source xxx.sql,或者mysql -uxxxx -pxxx <xxx.sql
+```shell
+# 首先将数据导出成可运行的sql语句，然后source xxx.sql,或者mysql -uxxxx -pxxx <xxx.sql
 ```
 
 ##### 导出
@@ -765,11 +783,22 @@ mysqldump -uroot -pmysql -d db1 > e:\db1.sql
 mysqldump -uroot -pmysql -d db1 tb1> e:\tb1.sql 
 ```
 
+注意：
+
+> 可以给mysqldump添加以下参数，来设置输出格式：
+>
+> fields terminated by '字符串'：设置字符串为字段之间的分隔符，可以为单个或多个字符。默认值是“\t”。
+> fields enclosed by '字符'：设置字符来括住字段的值，只能为单个字符。默认情况下不使用任何符号。
+> fields optionally enclosed by '字符'：设置字符来括住CHAR、VARCHAR和TEXT等字符型字段。默认情况下不使用任何符号。
+> fields escaped by '字符'：设置转义字符，只能为单个字符。默认值为“\”。
+> lines starting by '字符串'：设置每行数据开头的字符，可以为单个或多个字符。默认情况下不使用任何字符。
+> lines terminated by '字符串'：设置每行数据结尾的字符，可以为单个或多个字符。默认值是“\n”。
+
 导出成文件
 
 ```shell
 # 方法1：mysql语句
-> select * from db1.tb1 into outfile '/tmp/xxx.xls';
+> select * from db1.tb1 limit 2 into outfile '/tmp/xxx.xls'  fields terminated by ',' ;
 # 注意mysql用户是否具有写的权限，另外可配置是否显示列名
 
 # 方法2：重定向(查询自动写入文件,查询结果不再显示在窗口
@@ -836,3 +865,11 @@ cat xxx.file |redis-cli [--pipe]
 [性能调优攻略:SQL语句优化](http://www.toutiao.com/a6391314783630770433/)
 
 [mysql exists和in的效率比较](http://www.cnblogs.com/meibao/p/4973043.html)
+
+- 备份
+
+[学会用各种姿势备份MySQL](http://www.cnblogs.com/liangshaoye/p/5464794.html)
+
+[数据库频道:MySQL大表备份策略](http://database.51cto.com/art/201011/234560.htm)
+
+[Xtrabackup热备份MySQL](http://www.tuicool.com/articles/MJzEFnE)

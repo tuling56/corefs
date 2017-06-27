@@ -258,6 +258,8 @@ alter table xmp_subproduct_install set SERDEPROPERTIES('field.delim' = '\u0001')
 >
 > ` drop table if exists $tbl`
 
+删除的时候会连分区和文件(内部表)一起删除
+
 ### 函数
 
 #### 日期时间操作
