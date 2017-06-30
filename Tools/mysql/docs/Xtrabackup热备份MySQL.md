@@ -12,15 +12,12 @@
 
 #### 安装MySQL
 
-1.安装MySQL
+1. 安装MySQL
+2. 更改时间戳设置
+3. 启动MySQL
+4. 配置MySQL密码
 
-2.更改时间戳设置
-
-3.启动MySQL
-
-4.配置MySQL密码
-
-a.新版本MySQL安装完成后会生成临时的初始密码
+a. 新版本MySQL安装完成后会生成临时的初始密码
 
 修改MySQL密码
 
@@ -94,9 +91,13 @@ c.官方数据库示例
 
 ### Innobackupex
 
+备份流程
+
+![全备份流程](http://p1.pstatp.com/large/2a48000321a5c30c59d4)
+
 #### Innobackupex备份
 
-1.创建全备
+1. 创建全备
 
 ```shell
 # innobackupex --defaults-file=/etc/my.cnf  --user=root --password=12345678 /backup/
@@ -104,9 +105,11 @@ c.官方数据库示例
 completed OK!
 ```
 
-> 不能指定到数据库，也不能指定到表
+> 该操作会在`/backup/`目录下创建时间戳格式的文件夹，里面存储的是备份文件，
+>
+> 局限:不能指定到数据库，也不能指定到表
 
-2.应用全备日志
+2. 应用全备日志
 
 ```shell
 # innobackupex --apply-log /backup/2017-04-03_12-45-44/
@@ -114,7 +117,9 @@ completed OK!
 completed OK!
 ```
 
-3.查看备份状态
+> 这一步对mysql的备份日志进行恢复，不然数据无法直接使用
+
+3. 查看备份状态
 
 ```shell
 # cat /backup/2017-04-03_12-45-44/xtrabackup_checkpoints 
@@ -126,7 +131,7 @@ compact = 0
 recover_binlog_info = 0
 ```
 
-4.查看二进制日志事件信息
+4. 查看二进制日志事件信息
 
 ```shell
 # cat /backup/2017-04-03_12-45-44/xtrabackup_info 
@@ -243,4 +248,6 @@ d.基于全备份和第一次增量备份，恢复第二次增量备份
 ## 参考
 
 注:官方文档地址:[https://www.percona.com/doc/percona-xtrabackup/LATEST/index.html](https://www.percona.com/doc/percona-xtrabackup/LATEST/index.html)
+
+[使用xtrabackup同步主从及数据备份](http://www.toutiao.com/i6436511518929453569/)
 
