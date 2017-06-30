@@ -742,6 +742,22 @@ mysqldumpslow -s r -t 20 /mysqldata/mysql/mysql06-slow.log | more
 | lvm2快照     | 快    | 快    | 一般、支持几乎热备、速度快       | 一般   | 中小型数据量的备份 |      |
 | xtrabackup | 较快   | 较快   | 实现innodb热备、对存储引擎有要求 | 强大   | 较大规模的备份   |      |
 
+#### 备份
+
+只复制数据
+
+```mysql
+create table if not exists xx_bak select * from xxx;
+# 该语句只复制数据，不复制索引和key
+```
+
+若要完整的复制表，使用下面的方式：
+
+```mysql
+CREATE TABLE 复制表 LIKE 表;
+INSERT INTO 复制表 SELECT * FROM 表
+```
+
 #### 导入和导出 
 
 ##### 导入
