@@ -59,8 +59,6 @@ alter table media_relation_search_pc rename media_relation_search_pc_old_2017062
 
 
 
-
-
 #### 索引
 
 ##### 创建和删除
@@ -146,22 +144,26 @@ CREATE TABLE Persons(
 )
 ```
 
-
-
 #### 字段
 
->增加字段
+增加字段
 
- mysql> ALTER TABLE table_name ADD field_name field_type;
- alter table newexample add address varchar(110) after stu_id;
+```mysql
+alter table table_name add field_name field_type;
+alter table newexample add address varchar(110) after stu_id;
+```
 
-> 修改原字段名称及类型
+修改原字段名称及类型
 
- alter table table_name change old_field_name new_field_name field_type;
+```mysql
+alter table table_name change old_field_name new_field_name field_type;
+```
 
-> 删除字段
+删除字段
 
- alter table table_name drop field_name;
+```mysql
+alter table table_name drop field_name;
+```
 
 **参考**
 
