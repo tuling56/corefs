@@ -57,6 +57,21 @@ mysql -uroot -pxxx -P3316 -h127.0.0.1 -Ddb1
 alter table media_relation_search_pc rename media_relation_search_pc_old_20170627;
 ```
 
+查看包含某字段的所有表名和所在的数据库
+
+```mysql
+#TABLE_SCHEMA字段为db的名称（所属的数据库），字段TABLE_NAME为表的名称。
+SELECT TABLE_SCHEMA,TABLE_NAME FROM information_schema.columns WHERE column_name='brand_id';
+show tables like "xxx%";
+```
+
+查看一个表的所有字段
+
+```shell
+# shell的方式（得到的结果是一串由空格分割的字符串，然后再进行遍历即可）
+fields=$(echo "desc media_info.${TABLE_NAME};"| ${LOCAL_MYSQL} | grep -v Field | grep -v auto_increment | awk '{print $1}')
+```
+
 
 
 #### 索引
