@@ -285,6 +285,27 @@ split('192.168.0.1','\\.') from test.dual;
 hive -e "....  split('192.168.0.1','\\\\.') ... "  不然得到的值是null
 ```
 
+字符串截取
+
+```mysql
+select substr('123456',0,2) from test.dual; # 其等价于substr('123456',1,2),从0开始和从1开始的结果是相同的
+```
+
+字符串替换
+
+```mysql
+regexp_replace(string INITIAL_STRING, string PATTERN, string REPLACEMENT)
+select regexp_replace("foobar", "oo|ar", "")  from test.dual;
+select unhex(regexp_replace('%E4%B8%AD%E5%9B%BD','%','')) from test.dual;
+```
+
+字符串抽取
+
+```mysql
+regexp_extract(string subject, string pattern, int index)
+select regexp_extract('foothebar', 'foo(.*?)(bar)', 1) from test.dual;
+```
+
 
 
 ## 参考
@@ -294,3 +315,9 @@ hive -e "....  split('192.168.0.1','\\\\.') ... "  不然得到的值是null
 [hive array、map、struct使用](http://blog.csdn.net/yfkiss/article/details/7842014)
 
 [HIVE 时间操作函数](http://www.cnblogs.com/moodlxs/p/3370521.html)
+
+[HIVE常用字符串操作函数](https://www.iteblog.com/archives/1639.html)
+
+[HIVE常见数学函数](http://blog.csdn.net/zhoufen12345/article/details/53608271)
+
+[HIVE常见内置函数及其使用(推荐)](http://blog.csdn.net/scgaliguodong123_/article/details/46954009)

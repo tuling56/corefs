@@ -72,7 +72,19 @@ show tables like "xxx%";
 fields=$(echo "desc media_info.${TABLE_NAME};"| ${LOCAL_MYSQL} | grep -v Field | grep -v auto_increment | awk '{print $1}')
 ```
 
+存储引擎
 
+```mysql
+# 修改表的存储引擎
+alter table table_name engine=innodb;
+
+# 关闭InnoDB的存储引擎
+#修改my.ini文件：
+找到default-storage-engine=INNODB 改为default-storage-engine=MYISAM
+找到#skip-innodb 改为skip-innodb
+```
+
+> MyISAM引擎格式的数据可以被文件复制，然后恢复，而InnoDB引擎不可以同步文件使用。
 
 #### 索引
 
