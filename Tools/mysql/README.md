@@ -445,6 +445,39 @@ CREATE PROCEDURE sp_name([IN|OUT|INOUT] param_name type) [characteristics] routi
 
 #### 事件 
 
+//这个部分要好好搞搞
+
+查看事件是否开启：
+
+```
+SHOW VARIABLES LIKE 'event_scheduler';
+SELECT @@event_scheduler;
+SHOW PROCESSLIST;
+```
+
+> 如果看到event_scheduler为on或者PROCESSLIST中显示有event_scheduler的信息说明就已经开启了事件。如果显示为off或者在PROCESSLIST中查看不到event_scheduler的信息，那么就说明事件没有开启，我们需要开启它。
+
+开启事件
+
+```
+SET GLOBAL event_scheduler = ON;
+更改完这个参数就立刻生效了
+
+注意：还是要在my.cnf中添加event_scheduler=ON。因为如果没有添加的话，mysql重启事件又会回到原来的状态了。
+
+更改配置文件然后重启
+
+在my.cnf中的[mysqld]部分添加如下内容，然后重启mysql。
+event_scheduler=ON
+
+通过制定事件参数启动
+mysqld ... --event_scheduler=ON
+```
+
+
+
+
+
 ### 应用
 
 #### 行转列
