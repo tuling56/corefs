@@ -176,6 +176,72 @@ require和use
 
 待完成
 
+##### 模块的安装
+
+模块的搜索地址
+
+```
+[root@local122 web]# perl urldecode.pl 
+Can't locate URI/Escape.pm in @INC (you may need to install the URI::Escape module) (@INC contains: /usr/local/lib64/perl5 
+/usr/local/share/perl5 
+/usr/lib64/perl5/vendor_perl 
+/usr/share/perl5/vendor_perl 
+/usr/lib64/perl5 
+/usr/share/perl5 
+```
+
+> 据考证，主要是安装在/usr/lib64/perl5 和/usr/share/perl5目录下，尤其是/usr/share/perl5/vendor_perl目录下安装的最多
+
+perl如何安装第三方的模块
+
+```
+一些常用模块的简单描述 http://www.perldoc.com/perl5.6/pod/perlmodlib.html 
+
+在perl 中使用模块： 
+模块的下载地址：http://www.cpan.org/modules/01modules.index.html 
+安装模块： 
+1. perl Makefile.PL 
+2. make 
+3. make test 
+4. make install 
+也可以用如下命令安装模块(已知的适用的系统redhat 9.0，其他的我不知道，请大家试试看 :) 。 
+perl -MCPAN -e shell> 
+
+接着输入：install MODEL_NAME 
+
+查看模块的帮助： 
+perldoc MODEL_NAME 
+例如： 
+perldoc Net::FTP 
+```
+
+> 注:要使用perl -MCPAN -e shell命令，需要先安装yum install perl-CPAN,然后运行,如下提示：
+>
+> [root@local122 vendor_perl]# perl -MCPAN -e shell
+>
+> CPAN.pm requires configuration, but most of it can be done automatically.
+> If you answer 'no' below, you will enter an interactive dialog for each
+> configuration option instead.
+>
+> Would you like to configure as much as possible automatically? [yes] yes
+>
+> Perl site library directory "/usr/local/share/perl5" does not exist.
+> Perl site library directory "/usr/local/share/perl5" created.
+> Perl site library directory "/usr/local/lib64/perl5" does not exist.
+> Perl site library directory "/usr/local/lib64/perl5" created.
+>
+> Autoconfiguration complete.
+>
+> commit: wrote '/root/.local/share/.cpan/CPAN/MyConfig.pm'
+>
+> You can re-run configuration any time with 'o conf init' in the CPAN shell
+> Terminal does not support AddHistory.
+>
+> cpan shell -- CPAN exploration and modules installation (v2.05)
+> Enter 'h' for help.
+>
+> cpan[1]> 
+
 #### 进程管理
 
 变量环境的传递，子进程的退出和进入
@@ -229,3 +295,8 @@ perl的正则表达是最强大的，主要有以下匹配、替换和转化三�
 ##  参考
 
 [菜鸟网络Perl教程](http://www.runoob.com/perl/perl-process-management.html)
+
+[Perl已有和常用模块使用总结](http://blog.csdn.net/wangwenwen/article/details/17427967)
+
+[Perl模块的安装](http://www.cnblogs.com/wangkangluo1/archive/2012/06/14/2548677.html)
+
