@@ -429,23 +429,58 @@ select (DATEDIFF(DATE_ADD(curdate, INTERVAL - DAY(curdate)+ 1 DAY), date_add(cur
 
 ### 高级
 
-#### 过程和函数
+#### 存储过程
+
+存储过程和函数的区别：
+
+> 
 
 创建存储过程
 
-```sql
+```mysql
 CREATE PROCEDURE sp_name([IN|OUT|INOUT] param_name type) [characteristics] routine_body
 
-1.其中CREATE PROCEDURE为创建存储过程的关键字，sp_name为存储过程的名称，为指定存储过程的参数
-2.characteristics指定存储过程的特性
-3.routine_body是SQL代码的内容， 可以用BEGIG...END来表示SQL代码的开始和结束
+#1.其中CREATE PROCEDURE为创建存储过程的关键字，sp_name为存储过程的名称，为指定存储过程的参数
+#2.characteristics指定存储过程的特性
+#3.routine_body是SQL代码的内容， 可以用BEGIG...END来表示SQL代码的开始和结束
+
+#例子：
+DROP PROCEDURE IF EXISTS test_add;
+DELIMITER //
+CREATE PROCEDURE test_add()
+BEGIN
+  DECLARE 1_id INT DEFAULT 1;
+  DECLARE 1_id2 INT DEFAULT 0;
+  DECLARE error_status INT DEFAULT 0;
+  DECLARE datas CURSOR  FOR SELECT id FROM test;
+  DECLARE CONTINUE HANDLER FOR NOT FOUND SET error_status=1;
+  OPEN datas;
+  FETCH datas INTO 1_id;
+  REPEAT
+  	SET  1_id2=1_id2+2;
+  	UPDATE test SET id2=1_id2 WHERE id=1_id;
+  	FETCH datas INTO 1_id;
+  	UNTIL  error_status
+  END REPEAT;
+  CLOSE  datas;
+END
+//
 ```
 
-调用存储过程：Call  sp_name;
+调用存储过程
+
+```mysql
+call  sp_name;
+# 存储过程的调用一般是在事件中进行
+```
+
+#### 函数
+
+//待完成
 
 #### 事件 
 
-//这个部分要好好搞搞
+类似于linux的crontab的事件调度器（event-scheduler），可定期执行某一个命令或者sql语句,通常的应用场景是通过事件来调用存储过程。
 
 查看事件是否开启：
 
@@ -457,7 +492,7 @@ SHOW PROCESSLIST;
 
 > 如果看到event_scheduler为on或者PROCESSLIST中显示有event_scheduler的信息说明就已经开启了事件。如果显示为off或者在PROCESSLIST中查看不到event_scheduler的信息，那么就说明事件没有开启，我们需要开启它。
 
-开启事件
+##### 开启事件
 
 ```
 SET GLOBAL event_scheduler = ON;
@@ -474,7 +509,56 @@ event_scheduler=ON
 mysqld ... --event_scheduler=ON
 ```
 
+##### 事件语法
 
+创建
+
+```mysql
+CREATE
+    [DEFINER = { user | CURRENT_USER }]
+    EVENT
+    [IF NOT EXISTS]
+    event_name
+    ON SCHEDULE schedule
+    [ON COMPLETION [NOT] PRESERVE]
+    [ENABLE | DISABLE | DISABLE ON SLAVE]
+    [COMMENT 'comment']
+    DO event_body;
+
+schedule:
+    AT timestamp [+ INTERVAL interval] ...
+     | EVERY interval
+    [STARTS timestamp [+ INTERVAL interval] ...]
+    [ENDS timestamp [+ INTERVAL interval] ...]
+
+interval:
+  quantity {YEAR | QUARTER | MONTH | DAY | HOUR | MINUTE |WEEK | SECOND | YEAR_MONTH | DAY_HOUR |
+			DAY_MINUTE |DAY_SECOND | HOUR_MINUTE |HOUR_SECOND | MINUTE_SECOND}
+```
+
+> 参数详细说明：
+>
+> DEFINER: 定义事件执行的时候检查权限的用户。
+>
+> ON SCHEDULE schedule: 定义执行的时间和时间间隔。
+>
+> ON COMPLETION [NOT] PRESERVE: 定义事件是一次执行还是永久执行，默认为一次执行，即NOT PRESERVE。
+>
+> ENABLE | DISABLE | DISABLE ON SLAVE: 定义事件创建以后是开启还是关闭，以及在从上关闭。如果是从服务器自动同步主上的创建事件的语句的话，会自动加上DISABLE ON SLAVE。
+>
+> COMMENT 'comment': 定义事件的注释。
+
+更改
+
+```mysql
+alter ...
+```
+
+删除
+
+```mysql
+DROP EVENT [IF EXISTS] event_name
+```
 
 
 
