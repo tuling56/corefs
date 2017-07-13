@@ -114,6 +114,8 @@ if  echo "aha"|grep "x" &>/dev/null ;then echo "find";else echo "no find";fi
 
 ##### 数组
 
+###### 普通数组
+
 读取
 
 ```shell
@@ -156,6 +158,80 @@ echo ${a[@]:0:3}  # 结果为 1 2 3
 参考：
 
 [Linux Shell数组建立及使用技巧](https://mp.weixin.qq.com/s?__biz=MzAxODI5ODMwOA==&mid=2666540837&idx=1&sn=f74069270e46c66e9a8bf398e2bc5393&chksm=80dceb8eb7ab6298f57e78a07a217ef8784bb505a800177e0fbdf8c01a0cea645e94becb99cb&scene=0&key=6f6e2130da6015f10fb0174028d998ccfa947b568766e6506a0a2b36dc0d0a6b4553dbb0851e1ab32b6ed2a9179a6294b6b35f43ddda6d17aee9c38b6578f4f1d091b004cdc4dd3723396390ccacdb87&ascene=0&uin=MjQxMzQ2MjU0Mg%3D%3D&devicetype=iMac+MacBookPro12%2C1+OSX+OSX+10.12.4+build(16E195)&version=12010310&pass_ticket=iRlWFNF8bDqkSyuDbwzP7HxW3MoqbC2TNA7mipckDMJx2QkUizxvlkIKyBJb0LkY&winzoom=1&nettype=WIFI&fontScale=100)
+
+###### 关联数组
+
+创建
+
+```shell
+# 方法1：(先声明)
+declare -A garray
+garray["jim"]=158  
+garray["amy"]=168
+# 方法2：(直接使用内嵌“索引-值”列表法：)
+array=(["jim"]=158 ["amy"]=168)  
+```
+
+遍历
+
+```shell
+# 以key的方式遍历
+for key in ${!garray[*]};do  
+    echo "key:"$key
+    echo "value:"${garray[$key]}
+done
+
+# 以value的方式遍历
+for value in ${garray[*]};do  
+    echo "value:"${value}
+done
+```
+
+删除
+
+```shell
+# 清空数组元素
+# 但是这样清空后，garray中仍有“fe”这个key，只是其对应的值被清空了 
+unset garray[“fe”]
+
+# 清空数组
+# 但是这样清空后，array的key是没有了，但是整个garray也不能再用了，不再是关联数组，需要重新声明使用：
+unset garray
+```
+
+判断key是否在关联数组中
+
+```shell
+function isinkey(){  
+    for key in ${!count_result[*]};do  
+      if [ "$1" = "$key" ];then  
+        return 1  
+      fi  
+    done  
+	return 0  
+} 
+```
+
+数组参数
+
+```shell
+function f1(){  
+  declare -a array  
+  array[0]="h1"  
+  array[1]="h2"  
+  arr=`echo "${array[*]}"`  
+  local val="h1"  
+  f2 $val $arr  
+}  
+function f2(){  
+  local arr2=`echo "$2"`  
+  for value in ${arr2[*]};do  
+     echo "value: $value"  
+  done  
+} 
+```
+
+> 尚存在问题没有解决，只能传递数组的第一个值
 
 ##### 运算符
 
@@ -464,6 +540,20 @@ awk '{getline j<"b";for(i=1;i<=NF;i++){$i>j?$i=$i-j:$i=j-$i}}1' a|column -t
 
 [sed](http://man.linuxde.net/sed)是一种流编辑器，它是文本处理中非常中的工具，能够完美的配合正则表达式使用，功能不同凡响。处理时，把当前处理的行存储在临时缓冲区中，称为“模式空间”（pattern space），接着用sed命令处理缓冲区中的内容，处理完成后，把缓冲区的内容送往屏幕。接着处理下一行，这样不断重复，直到文件末尾。文件内容并没有 改变，除非你使用重定向存储输出。Sed主要用来自动编辑一个或多个文件；简化对文件的反复操作；编写转换程序等。
 
+sed的处理流程如下：
+
+```
+sed维护着两个数据缓冲区：一个活动的模版空间(pattern space)，另一个辅助的保留空间(hold space)，初始都是空的，没有数据。
+1、sed从输入中读取一行文本，去掉行尾可能的换行符(\n)后放到模版空间里；
+2、用指定的执行脚本中的命令依次来处理模版空间里数据，直到脚本结束；
+3、向模版空间中的数据尾添加上换行符(没有进行去换行符操作就不添加)，显示输出(选项-n将阻止输出) 模版空间中的数据后清空模版空间；
+4、sed再读取下一行文本重复上面处理过程。
+5、上面的4步处理过程称为一个sed处理循环。而sed就是重复这循环直到遇到退出命令或文件处理完毕。
+注意：保留空间中的数据是保持不变的，除非有命令改变它。
+```
+
+
+
 #### 基础
 
 sed多条指令执行
@@ -615,6 +705,19 @@ grep和sed结合使用
 sed -i 's/oldstr/newstr/g' `grep oldstr -rl odlstr $datadir`
 ```
 
+### find
+
+#### 基础
+
+```shell
+#  搜索但跳出指定目录
+#（注意-prune后面的-o不能缺少），另外需要说明的是跳出的是目录内部的内容，但目录本身还是会被包含进去的
+find . -path "./sk" -prune -o -name "*.txt" -print
+
+```
+
+
+
 #### 应用
 
 //待完善
@@ -624,6 +727,8 @@ sed -i 's/oldstr/newstr/g' `grep oldstr -rl odlstr $datadir`
 - **bash部分**
 
 [linux参数太长的换行问题](http://blog.csdn.net/feng27156/article/details/39057773)
+
+[shell关联数组](http://blog.csdn.net/mm_bit/article/details/48417157)
 
 - **awk部分**
 
@@ -649,7 +754,9 @@ sed -i 's/oldstr/newstr/g' `grep oldstr -rl odlstr $datadir`
 
 [sed简明教程](http://coolshell.cn/articles/9104.html?hmsr=toutiao.io&utm_medium=toutiao.io&utm_source=toutiao.io)
 
-[Linuxsed命令](http://man.linuxde.net/sed)
+[sed命令](http://man.linuxde.net/sed)
+
+[sed处理流程概述（推荐）](http://blog.csdn.net/yiqingnian28/article/details/23133043)
 
 - grep部分
 
