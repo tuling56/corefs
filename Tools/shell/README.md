@@ -252,11 +252,11 @@ function f2(){
 
 ###### 布尔运算符
 
-| 运算符  | 说明                                | 举例                                  |
-| ---- | --------------------------------- | ----------------------------------- |
-| !    | 非运算，表达式为 true 则返回 false，否则返回 true | [ ! false ] 返回 true。                |
-| -o   | 或运算，有一个表达式为 true 则返回 true。        | [ $a -lt 20 -o $b -gt 100 ] 返回 true |
-| -a   | 与运算，两个表达式都为 true 才返回 true         | [ $a -lt 20 -a $b -gt 100 ] 返回      |
+| 运算符  | 说明                                | 举例                                   |
+| ---- | --------------------------------- | ------------------------------------ |
+| !    | 非运算，表达式为 true 则返回 false，否则返回 true | [ ! false ] 返回 true。                 |
+| -o   | 或运算，有一个表达式为 true 则返回 true。        | [ $a -lt 20 -o \$b -gt 100 ] 返回 true |
+| -a   | 与运算，两个表达式都为 true 才返回 true         | [ $a -lt 20 -a \$b -gt 100 ] 返回      |
 
 ###### 字符串运算符
 
@@ -270,6 +270,10 @@ str	检测字符串是否为空，不为空返回 true。		[ $a ] 返回 true。
 > 注意字符串运算符的等判断和数字的等判断的区别
 
 ###### 文件测试运算符
+
+##### 函数
+
+函数的返回值通过`$?`获得只能是整数，不接受其它类型的返回值，可以通过修改变量的方式实现返回其它类型的值。另外函数可以不显示的使用return,此时函数的返回值是函数的退出状态，0代表成功退出，非0代表函数执行过程中有异常。
 
 #### 应用
 
@@ -288,11 +292,24 @@ rename  .sql  .txt *.sql  //好像不能递归目录,其中最后一个是要修
 # find+xargs+sed
 ```
 
+##### 百分比显示
+
+```shell
+ # 方法1：使用bc
+ r_o_ratio="`echo "scale=2;${remain_i}*100/${odl_i}"|bc`%"
+ # 方法2：使用awk（注意此语句中的BEGIN不能省略）
+ r_o_ratio=$(awk -v a=12 -v b=260 'BEGIN{printf("%4.2f%%",a*100/b);}')
+ # 方法2.1(注意通过管道传递过来的数据不能在begin中使用，可以在前面加上END)
+ echo "12 260" | awk '{printf("%4.2f%%",$1*100/$2);}'
+```
+
 参考：
 
 [Shell脚本批量重命名文件后缀的3种实现](http://www.jb51.net/article/55255.htm)
 
 [Shell重命名（智慧大碰撞）](http://www.oschina.net/question/75009_111550)
+
+[使用awk进行数字计算](http://www.mamicode.com/info-detail-1187091.html)
 
 ### awk
 
@@ -305,8 +322,8 @@ awk 'BEGIN{ print "start" } pattern{ commands } END{ print "end" }' file
 其中模式pattern可以是以下任意一个：
 
 - /正则表达式/：使用通配符的扩展集。
--  关系表达式：使用运算符进行操作，可以是字符串或数字的比较测试。
--  模式匹配表达式：用运算符\~（匹配）和\~!（不匹配）。 
+- 关系表达式：使用运算符进行操作，可以是字符串或数字的比较测试。
+- 模式匹配表达式：用运算符\~（匹配）和\~!（不匹配）。 
 - BEGIN语句块、pattern语句块、END语句块：参见awk的工作原理
 
 #### 基础
@@ -333,7 +350,23 @@ FNR：awk当前读取的记录数，其变量值小于等于NR（比如当读取
 模式是用来对行进行筛选的,常见的模式筛选规则有以下：
 ```
 
-##### 循环
+传递变量
+
+```shell
+# 向awk命令行程序传递变量
+1.  awk '{print a, b}' a=111 b=222 yourfile
+注意, 变量位置要在 file 名之前, 否则就不能调用，还有, 于 BEGIN{}中是不能调用这些的variable. 要用之后所讲的第二种方法才可解决.
+
+2.  awk –v a=111 –v b=222 '{print a,b}' yourfile
+注意, 对每一个变量加一个 –v 作传递.
+
+3.  awk '{print "'"$LOGNAME"'"}' yourfile
+如果想调用environment variable, 要用以上的方式调用, 方法是:"'"$LOGNAME"'"
+```
+
+##### awk语句
+
+###### 循环
 
 ```shell
 # while,for循环语句
@@ -353,7 +386,9 @@ next语句从输入文件中读取一行，然后从头开始执行awk脚本
 exit语句用于结束awk程序，但不会略过END块。退出状态为0代表成功，非零值表示出错。
 ```
 
-##### 向awk脚本传参
+##### awk脚本
+
+###### awk脚本传参
 
 ```shell
 #!/bin/bash
@@ -367,11 +402,9 @@ awk -f stat.awk	"para1=value1" "para2=value2" inputfile
 BEGIN{
     a=0;
 }
-
 {
     a++;   
 }
-
 END{
     print para1"\t"a;
 }
@@ -381,7 +414,7 @@ END{
 
 [shell中调用awk脚本传递参数问题](http://www.2cto.com/os/201507/412860.html)
 
-##### awk脚本
+###### awk脚本
 
 ```shell
 #!/usr/bin/awk -f
@@ -484,7 +517,11 @@ awk '{v=int($1/500);dur[v]++;}END{for(i in dur) print i*500"\t"i*500"~"(i+1)*500
 awk '{if(1<=$1&& $1<2) dur[1,2]++;else if (2<=$1 && $1<5) dur[2,5]++;else if( 5<=$1 && $1<10) dur[5,10]++; else if(10<=$1 && $1<50) dur[10,50]++;else if(50<=$1) dur[50,"+"]++; else print "nodur"}END{split(i,idx,SUBSEP);	print "["idx[1]"~"idx[2]")\t"dur[i]"\t"dur[i]*100/NR"%"|"sort -t'~' -n -k1.2";}'  view_num
 ```
 
+awk实现行转列
 
+```shell
+# 利用awk的数组来实现
+```
 
 ##### awk多维数组统计
 
