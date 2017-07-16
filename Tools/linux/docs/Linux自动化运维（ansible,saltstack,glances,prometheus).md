@@ -773,24 +773,36 @@ cd netdata
 
 > 注意安装过程的修改项,可查看有道云笔记的记录
 
-至此Netdata就安装完了，Netdata安装完后，本身就启动了（或者使用 `/usr/sbin/netdata`启动,使用`killall netdata`关闭）。
+至此Netdata就安装完了
+
+#### 启动和关闭
+
+自启动
 
 ```
-netdata被配置成服务并开机启动，可以使用service命令进行控制：
-service netdata restart
-service netdata stop
+Netdata安装完后，被配置成自动启动了systemctl enable netdata,如需要关闭开机启动
+systemctl disable netdata
 ```
 
+手动启动
 
+```
+开启: /usr/sbin/netdata 或者 service netdata restart
+关闭：killall netdata 或者 service netdata stop
+```
 
-直接用浏览器访问：`http://127.0.0.1:19999 `即可进入主界面。(19999是软件默认的端口，在配置文件中配置)
-
-### 配置
+#### 配置
 
 ``` shell
 vim /etc/netdata/netdata.conf
 # 更详细的配置参考等待以后发现
 ```
+
+### 访问
+
+直接用浏览器访问：`http://127.0.0.1:19999 `即可进入主界面。(19999是软件默认的端口，在配置文件中配置)
+
+> 更多的安装信息请参考有道云笔记中的`Fedroa下源码编译安装netdata`文章
 
 ## linfo
 
