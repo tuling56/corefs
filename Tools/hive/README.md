@@ -4,6 +4,36 @@
 
 ### 基础
 
+#### 数据类型
+
+string
+
+```mysql
+# 字符串分割(返回数组)
+split('xxx_we2_23','_')  
+```
+
+array
+
+```mysql
+# 求array的长度
+size(arrya)
+# # 如何将计算的数据直接在本行内使用呢
+select split("wew_w23_ew0","_") inner ji,select size(split("wew_w23_ew0",'_')) as cnt
+```
+
+map
+
+```
+
+```
+
+struct
+
+```mysql
+
+```
+
 #### 命令行
 
 ```shell
