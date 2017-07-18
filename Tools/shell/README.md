@@ -346,8 +346,18 @@ FNR：awk当前读取的记录数，其变量值小于等于NR（比如当读取
 
 模式
 
-```
-模式是用来对行进行筛选的,常见的模式筛选规则有以下：
+```shell
+# 模式是用来对行进行筛选的,常见的模式筛选规则举例：
+
+# 正则表达式-----输出以字符T开头的行  
+result=`awk '/^T/ { print }' scores.txt` 
+
+# 混合模式（输出以K开头的行，同时第2列分数大于80分的行）
+result=`awk '/^K/ && $2 > 80 { print }' scores.txt`
+result=`awk '$2~/^K/ && $2 > 80 { print }' scores.txt`
+
+# 区间模式（以Nancy开头的行为起始，第2列等于92分的行为终止，输出之间的连续的行。注意：当满足patter1或者pattern2的行不只一行的时候，会自动选择第一个符合要求的行。）
+result=`awk '/^Nancy/, $2==92 { print }' scores.txt` 
 ```
 
 传递变量
@@ -363,6 +373,28 @@ FNR：awk当前读取的记录数，其变量值小于等于NR（比如当读取
 3.  awk '{print "'"$LOGNAME"'"}' yourfile
 如果想调用environment variable, 要用以上的方式调用, 方法是:"'"$LOGNAME"'"
 ```
+
+##### awk运算符
+
+逻辑运算符`||`和`&&`
+
+```shell
+awk 'BEGIN{a=1;b=2;print (a>5 && b<=2),(a>5 || b<=2);}'
+```
+
+赋值运算符`= += -= *= /= %= ^= **=`
+
+```
+
+```
+
+算术运算符
+
+```
+
+```
+
+正则运算符`~ ~!	匹配正则表达式和不匹配正则表达式`
 
 ##### awk语句
 
@@ -810,6 +842,8 @@ find . -path "./sk" -prune -o -name "*.txt" -print
 [awk运算符介绍](http://blog.csdn.net/gaoming655/article/details/7390207)
 
 [awk中的输入和输出重定向](http://blog.chinaunix.net/uid-10540984-id-356795.html)（推荐）
+
+[awk的模式匹配(推荐)](http://blog.csdn.net/puqutogether/article/details/45865631)
 
 - **sed部分**
 
