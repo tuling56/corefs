@@ -192,6 +192,18 @@ alter table table_name change old_field_name new_field_name field_type;
 alter table table_name drop field_name;
 ```
 
+修改字段值
+
+```mysql
+UPDATE [LOW_PRIORITY] [IGNORE] table_reference
+    SET col_name1={expr1|DEFAULT} [, col_name2={expr2|DEFAULT}] ...
+    [WHERE where_condition]
+    [ORDER BY ...]
+    [LIMIT row_count]
+
+UPDATE tbl SET col1 = col1 + 1, col2 = col1;
+```
+
 **参考**
 
 http://c.biancheng.net/cpp/html/1456.html
@@ -321,6 +333,24 @@ echo "alter table media_relation_search_pc rename media_relation_search_pc_old_$
 
 # 方法3
 cat /data/rsync_data/kk_sql/videos.sql |$mysql video
+```
+
+#### 插入技巧
+
+```mysql
+# 一次性插入多个值
+INSERT into task_request(proposer,enddate) values ("鲁丽",'20170611'),("张一",'20170322'),("王二",'20170101');
+
+# 从tb1中选出两列插入到tb2中
+INSERT into tb2(proposer,enddate) select xx,yy from tb1;
+```
+
+#### 信息筛选
+
+查询某个字段匹配的的表和所在的数据库
+
+```mysql
+SELECT TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME from information_schema.`COLUMNS` where COLUMN_NAME like '%isover%';
 ```
 
 #### restful接口
