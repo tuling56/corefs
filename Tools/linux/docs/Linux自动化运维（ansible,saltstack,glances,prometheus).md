@@ -672,6 +672,8 @@ You can put your own `glances.conf` file in the following locations:
 | ---------------- | ---------------------------------------- |
 | `*BSD`           | ~/.config/glances, /usr/local/etc/glances |
 
+> 注：本机使用的是~/.config/glances/这个目录
+
 使用模式
 
 ```shell
