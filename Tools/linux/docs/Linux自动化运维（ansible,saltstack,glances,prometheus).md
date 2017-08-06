@@ -622,7 +622,9 @@ yum install ganglia rrdtool ganglia-gmetad ganglia-gmond ganglia-web
 
 nmon可定时间隔采集数据然后生成报告，在本地使用nmon_analyser工具进行查看和分析
 
-缺点是没有网络访问，不能实时方便的查看
+缺点是没有网络访问，不能实时方便的查看.
+
+独特的数据格式，只能在excel里自动绘图和查看
 
 ## glances
 
@@ -655,6 +657,8 @@ ERROR -- Scandir not found. Please use Python 3.5+ or install the scandir lib
 pip install PyStache
 pip install scandir   #folder插件要用
 ```
+
+> glances依赖psutil,bottle,jinja
 
 配置文件
 
@@ -867,6 +871,8 @@ cp sample.config.inc.php config.inc.php
 [glances官方文档](https://github.com/nicolargo/glances)
 
 [使用资源监控工具glances(推荐)](https://www.ibm.com/developerworks/cn/linux/1304_caoyq_glances/)
+
+[系统监控glances以及其中用到的python](http://www.toutiao.com/a6358639873155219714/)
 
 ## netdata部分
 
