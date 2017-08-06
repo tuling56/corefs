@@ -110,6 +110,57 @@ outputformat
 
 > 不嵌套，只使用最基本的，无关联
 
+##### case when ..  then  .. else  .. end as .. 
+
+两种用法
+
+```mysql
+# 方式1
+case fruit
+  when 'apple' then 'the owner is apple'
+  when 'orange' then 'the owner is orange'
+  else 'it is another fruit'
+end
+
+# 方式2
+case 
+  when fruit = 'apple' then 'the owner is apple'
+  when fruit = 'orange' then 'the owner is orange'
+  else 'it is another fruit'
+end
+```
+
+例子：
+
+```mysql
+select fu5[2],
+(case
+when(fu2[1]=0) then '0'
+when(fu2[1]>0 and fu2[1]<=10) then '1'
+when(fu2[1]>10 and fu2[1]<=20) then '2'
+when(fu2[1]>20 and fu2[1]<=60) then '6'
+when(fu2[1]>60 and fu2[1]<=300) then '300'
+when(fu2[1]>300 and fu2[1]<=7200) then '7200'
+else '-1'
+end) as section,
+fu6
+from xmpplaydur where size(fu5)!=0 and fu5[0]>=1023
+```
+
+##### coalesce
+
+COALESCE( value1,value2,... )
+
+The COALESCE function returns the fist not NULL value from the list of values. If all the values in the list are NULL, then it returns NULL.
+
+```mysql
+select COALESCE(NULL,1,"ww") from test.dual;
+```
+
+> 如何返回数组中的第一个非NULL元素，配合collect_list使用？
+
+
+
 #### 子查询
 
 ```mysql
@@ -121,6 +172,8 @@ select a.mt,count(*) as cnt from (select from_unixtime(finsert_time,'yyyyMMdd HH
 ```mysql
 # 正则匹配
 select  'abc'  regexp '^[a-z]*$'   from test.dual;
+select  'http://v.xunlei.com'  regexp 'http://v.xunlei.com/?$'   from test.dual; //true
+
 
 # 正则抽取（注意此处不能使用\d和\w等类似的字符）
 select regexp_extract('http://xxx/details/0/40.shtml','http://xxx/details/([0-9]{1,})/([0-9]{1,})\.shtml',1) from test.dual; # 返回40
@@ -128,6 +181,12 @@ select regexp_extract('http://xxx/details/0/40.shtml','http://xxx/details/([0-9]
 
 # 正则替换
 select regexp_replace('foobar','oo|ba','') from test.dual; # 返回fr
+```
+
+一个使用正则的聚合例子：
+
+```mysql
+select substr(fu6,1,1) as tsize,if((lower(fu7) regexp "geforce") ,'yes','no'),count(*) from xmp_odl.xmpcloud2 where ds='20170618' and fu3='2341' and fu2 in (3,4,5) group by substr(fu6,1,1),if(( lower(fu7) regexp "geforce"),'yes','no') order by tsize;
 ```
 
 #### url解析
@@ -183,6 +242,8 @@ select parse_url('http://facebook.com/path/p1.php?query=1', 'USERINFO') from dua
 
 ####  连接
 
+例1
+
 ```mysql
 insert overwrite table download_union.register_web_all partition(dt='$dt',stat_source='tel') 
 select utmp.mac, utmp.userdetails, utmp.createdtime, utmp.productflag 
@@ -199,6 +260,12 @@ from (
 # 解读：
 # 其中utmp表是t1表和t2表关联的结果（t1表和t2进行左连接，连接条件是两个表的mac地址相等，且t2的mac地址为空）
 # 其中t1表结果来自dbl.tb1，t2表结果来自db2.tb2
+```
+
+例2：
+
+```mysql
+select case when (fu6>=0 and fu6<1024) then '[0,1)' when (fu6>=1024 and fu6<2048) then '[1,3)' when (fu6>=2048 and fu5<3072) then '[2,3)' when (fu6>=3072 and fu6<4096) then '[3,4)' when fu6>=4096 then '[4,)' else 'error' end as 'dur',if((lower(fu7) regexp "geforce") ,'yes','no'),count(*) from xmp_odl.xmpcloud2 where ds='20170618' and fu3='2341' and fu2 in (3,4,5) group by substr(fu6,1,1),if(( lower(fu7) regexp "geforce"),'yes','no') order by tsize;
 ```
 
 
