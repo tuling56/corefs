@@ -4,9 +4,49 @@
 
 ### 基础知识
 
-----
-
 #### 文件目录
+
+##### 文件
+
+文件的时间
+
+```shell
+###各类时间说明
+#1、访问时间，读一次这个文件的内容，这个时间就会更新。比如对这个文件使用more命令。ls、stat命令都不会修改文件的访问时间。
+#2、修改时间，对文件内容修改一次，这个时间就会更新。比如：vi后保存文件。ls -l列出的时间就是这个时间。
+#3、状态改变时间。通过chmod命令更改一次文件属性，这个时间就会更新。查看文件的详细的状态、准确的修改时间等，可以通过stat命令 文件名。
+```
+
+获取文件的（修改）时间，并比较文件的新旧
+
+```shell
+src=$1
+dst=$2
+
+src_mt=`stat $src |grep ^Modify | awk '{split($3,arr,".");print $2,arr[1]}'`
+dst_mt=`stat $dst |grep ^Modify | awk '{split($3,arr,".");print $2,arr[1]}'`
+
+src_mts=`date -d"$src_mt" +%s`
+dst_mts=`date -d"$dst_mt" +%s`
+
+if [ $src_mts -gt $dst_mts ];then
+{
+	echo "[$src][$src_mt] > [$dst][$dst_mt]"
+	rsync.exe  -avP $src $dst
+}
+elif [ $src_mts -lt $dst_mts ];then
+{
+	echo "[$dst][$dst_mt] > [$src][$src_mt]"
+	rsync.exe  -avP $dst $src
+}
+else
+{
+	echo "[$dst][$dst_mt] = [$src][$src_mt]"
+}
+fi
+```
+
+##### 目录
 
 一次性创建多级目录
 
@@ -113,6 +153,175 @@ tar命令和格式.tar.gz和.tar.bz2
 
 -  [linux系统的7种运行级别](http://blog.chinaunix.net/uid-22746363-id-383989.html) 
 
+### 技能积累
+
+#### 日期时间
+
+##### date
+
+```shell
+# 获得当前时间戳
+date +%s 可以得到UNIX的时间戳;
+
+#shell将时间字符串与时间戳互转：
+date -d "2010-10-18 00:00:00" +%s 输出形如：1287331200
+
+#时间戳转换为字符串可以这样做：
+date -d @1287331200 "+%Y-%m-%d" 输出形如：2010-10-18
+```
+
+#### 网络
+
+##### curl
+
+```shell
+curl -XPOST 'http://localhost:9200/indexdb/fulltext/_mapping' -d '
+{                                                                 
+    "fulltext": {                                                 
+       "_all": {                                                  
+      "analyzer": "ik"                                            
+     },                                                           
+     "properties": {                                              
+      "content": {                                                
+	"type" : "string",                                            
+	"boost" : 8.0,                                                
+	"term_vector" : "with_positions_offsets",                     
+	"analyzer" : "ik",                                            
+	"include_in_all" : true                                       
+      }                                                           
+    }                                                             
+  }                                                               
+}'                                                                
+
+```
+
+##### wget
+
+需要下载某个目录下面的所有文件。命令如下
+
+```shell
+wget -c -r -np -k -L -p www.mhcf.net/test/
+在下载时。有用到外部域名的图片或连接。如果需要同时下载就要用-H参数。
+wget -np -nH -r –span-hosts www.mhcf.net/test/
+
+-c 断点续传
+-r 递归下载，下载指定网页某一目录下（包括子目录）的所有文件
+-nd 递归下载时不创建一层一层的目录，把所有的文件下载到当前目录
+-np 递归下载时不搜索上层目录，如wget -c -r www.mhcf.net/test/
+没有加参数-np，就会同时下载path的上一级目录pub下的其它文件
+-k 将绝对链接转为相对链接，下载整个站点后脱机浏览网页，最好加上这个参数
+-L 递归时不进入其它主机，如wget -c -r www.mhcf.net/test/
+```
+
+#### 文件传输
+
+##### rsync
+
+rsync（remote synchronize）是一个远程数据同步工具，可通过 LAN/WAN 快速同步多台主机之间的文件。也可以使用 rsync 同步本地硬盘中的不同目录。rsync 是用于替代 rcp 的一个工具，rsync 使用所谓的 rsync算法 进行数据同步，这种算法只传送两个文件的不同部分，而不是每次都整份传送，因此速度相当快。
+
+在使用 rsync 进行远程同步时，可以使用两种方式：远程 Shell 方式（建议使用 ssh，用户验证由 ssh 负责）和 C/S 方式（即客户连接远程 rsync 服务器，用户验证由 rsync 服务器负责）。
+
+| 源地址（分为目录的方式和数据库的方式）                    | 目的地址                                     | 备注                                      |
+| -------------------------------------- | ---------------------------------------- | :-------------------------------------- |
+| rsync  -av -P    root1@xxx:/data/xxx*  | /data/pgv_stat/                          | shell 方式，主机名与资源之间使用单个冒号“:”作为分隔符         |
+| rsync  -av -P    tw07012:data/xmp*     | data/pgv_stat/                           | shell 方式， 若本地登录用户与远程主机上的用户一致，可以省略 USER@ |
+| rsync  -av -P    xmp@tw07562::pgv_stat | /data/pgv_stat/   --password-file=/etc/rsync.pass.xmp | rsync服务器的方式                             |
+
+> 注释：如执行命令的用户名和ssh远程连接到服务器的用户名相同，则可以省略用户名
+
+###### 命令格式
+
+```
+Rsync的命令格式可以为以下六种：
+　　rsync [OPTION]... SRC DEST				（本地文件复制方式）
+　　rsync [OPTION]... SRC [USER@]HOST:DEST    （ssh方式远程上传模式）
+　　rsync [OPTION]... [USER@]HOST:SRC DEST    （ssh方式远程拉取模式）【远程机器到本地】
+　　
+　　rsync [OPTION]... [USER@]HOST::SRC DEST   （rsync服务器的方式，拷贝文件到本地）
+　　rsync [OPTION]... SRC [USER@]HOST::DEST   （rysnc服务的方式，将本地文件拷贝到远程服务器）
+　　rsync [OPTION]... rsync://[USER@]HOST[:PORT]/SRC [DEST]   （rysnc列远程机的文件列表，不常见）
+
+对应于以上六种命令格式，rsync有六种不同的工作模式：
+　　1)拷贝本地文件。当SRC和DES路径信息都不包含有单个冒号":"分隔符时就启动这种工作模式。
+　　如：rsync -a /data /backup
+　　
+　　2)使用一个远程shell程序(如rsh、ssh)来实现将本地机器的内容拷贝到远程机器。当DST路径地址包含单个冒号":"分隔符时启动该模式。
+　　如：rsync -avz *.c foo:src
+　　
+　　3)使用一个远程shell程序(如rsh、ssh)来实现将远程机器的内容拷贝到本地机器。当SRC地址路径包含单个冒号":"分隔符时启动该模式。
+　　如：rsync -avz foo:src/bar /data
+　　
+　　4)从远程rsync服务器中拷贝文件到本地机。当SRC路径信息包含"::"分隔符时启动该模式。
+　　如：rsync -av root@172.16.78.192::www /databack
+　　
+　　5)从本地机器拷贝文件到远程rsync服务器中。当DST路径信息包含"::"分隔符时启动该模式。
+　　如：rsync -av /databack root@172.16.78.192::www
+　　
+　　6)列远程机的文件列表。这类似于rsync传输，不过只要在命令中省略掉本地机信息即可。
+　　如：rsync -v rsync://172.16.78.192/www
+```
+
+目录包含和排除
+
+```shell
+rsync  -avz -P  --include-from=./inputlist_from_snh48.txt  --exclude=/*
+
+#其中红include-from和exclude-from可以单独使用
+#--include-from 指定目录下的部分目录的方法：
+rsync -aSz  --include-from=/home/include.txt --exclude=/* /home/mnt/data/upload/f/ 
+
+#--exclude-from 排除目录下的部分目录的方法
+rsync  -aSz  --exclude-from=/home/exclude.txt /home/mnt/ user@server1:/mnt/data
+```
+
+技巧
+
+```shell
+# 在使用ssh的方式时候指定ssh的端口（https://segmentfault.com/q/1010000002405966）
+rsync.exe -e 'ssh -p 122' -avP dst.txt yjm@localhost:/tmp
+
+# 在使用ssh的是指定密钥（避免和原先用来登录用户密钥混合）（http://blog.csdn.net/fuguoq1984/article/details/32331941）
+rsync -e "ssh -i /usr/rsync_id_dsa" /tmp/testfile csdn@remotehost:/tmp/ 
+```
+
+问题：
+
+> 问题1:It is required that your private key files are NOT accessible by others.
+>
+> > chmod  600  id_rsa
+
+##### Fabric、paramito、watchdog
+
+Fabric
+
+> Fabric是基于Python实现的ssh命令行工具，简化了ssh的应用程序部署及系统管理任务，它为系统提供了基础的操作组件，可以实现本地或远程Shell命令，包括文件上传、下载、脚本执行及完整执行日志输出等功能。
+
+paramiko
+
+> ssh操作库
+
+watchdog
+
+> 用于监控本地文件状态
+
+基于Fabric的文件自动同步工具
+
+![](http://p1.pstatp.com/large/31d30002e98f69b6957f)
+
+#### 包管理
+
+##### rpm
+
+```shell
+rpm -ivh
+rpm -qa
+# 卸载rpm包
+首先通过  rpm -q <关键字> 可以查询到rpm包的名字
+然后 调用 rpm -e <包的名字> 删除特定rpm包
+如果遇到依赖，无法删除，使用 rpm -e --nodeps <包的名字> 不检查依赖，直接删除rpm包
+如果恰好有多个包叫同样的名字，使用 rpm -e --allmatches --nodeps <包的名字> 删除所有相同名字的包， 并忽略依赖
+```
+
 ### 环境配置
 
 #### JDK环境
@@ -157,104 +366,15 @@ export PATH=$JAVA_HOME/bin:$PATH
 
 [Linux下安装Sun JDK（删除Open JDK）](http://www.toutiao.com/i6416458864656384514/)
 
-### 系统监控
-
-#### glances
-
-glances支持web访问，数据格式的导出是csv和==html==，方便和其它的应用做交互
-
-> glances依赖psutil,bottle,jinja
-
-#### nmon
-
-独特的数据格式，只能在excel里自动绘图和查看
-
-####   参考
-
-- [系统监控glances以及其中用到的python](http://www.toutiao.com/a6358639873155219714/)
-- [glances官方手册](https://github.com/nicolargo/glances)
-- [监控Linux系统性能的工具--nmon](http://www.toutiao.com/a6357668867875668226/)
-
-
 ### 软件使用
-
----
-
-#### wget
-
-需要下载某个目录下面的所有文件。命令如下
-
-```shell
-wget -c -r -np -k -L -p www.mhcf.net/test/
-在下载时。有用到外部域名的图片或连接。如果需要同时下载就要用-H参数。
-wget -np -nH -r –span-hosts www.mhcf.net/test/
-
--c 断点续传
--r 递归下载，下载指定网页某一目录下（包括子目录）的所有文件
--nd 递归下载时不创建一层一层的目录，把所有的文件下载到当前目录
--np 递归下载时不搜索上层目录，如wget -c -r www.mhcf.net/test/
-没有加参数-np，就会同时下载path的上一级目录pub下的其它文件
--k 将绝对链接转为相对链接，下载整个站点后脱机浏览网页，最好加上这个参数
--L 递归时不进入其它主机，如wget -c -r www.mhcf.net/test/
-```
-
-
-
-#### rsync	   								
-
-| 源地址（分为目录的方式和数据库的方式）                      | 目的地址                                     | 备注     |
-| ---------------------------------------- | ---------------------------------------- | ------ |
-| rsync  -av -P    root1@tw07012.sandai.net:/data/mysql/data/pgv_stat/* | /usr/local/mysql/data/pgv_stat/          | 目录的方式  |
-| rsync  -av -P    tw07012.sandai.net:/data/mysql/data/pgv_stat/xmp* | /usr/local/mysql5/data/pgv_stat/         |        |
-| rsync  -av -P    xmp@tw07562.sandai.net::pgv_stat_yingyin | /usr/local/mysql5_new/data/pgv_stat_yingyin/   --password-file=/etc/rsync.pass.xmp | 数据库的方式 |
-
-> 注释：如执行命令的用户名和ssh远程连接到服务器的用户名相同，则可以省略用户名
-
-用例详解
-
-```
-Rsync的命令格式可以为以下六种：
-　　rsync [OPTION]... SRC DEST				（本地文件复制方式）
-　　rsync [OPTION]... SRC [USER@]HOST:DEST    （ssh方式远程上传模式）
-　　rsync [OPTION]... [USER@]HOST:SRC DEST    （ssh方式远程拉取模式）【远程机器到本地】
-　　
-　　rsync [OPTION]... [USER@]HOST::SRC DEST   （rsync服务器的方式，拷贝文件到本地）
-　　rsync [OPTION]... SRC [USER@]HOST::DEST   （rysnc服务的方式，将本地文件拷贝到远程服务器）
-　　rsync [OPTION]... rsync://[USER@]HOST[:PORT]/SRC [DEST]   （rysnc列远程机的文件列表，不常见）
-
-对应于以上六种命令格式，rsync有六种不同的工作模式：
-　　1)拷贝本地文件。当SRC和DES路径信息都不包含有单个冒号":"分隔符时就启动这种工作模式。
-　　如：rsync -a /data /backup
-　　
-　　2)使用一个远程shell程序(如rsh、ssh)来实现将本地机器的内容拷贝到远程机器。当DST路径地址包含单个冒号":"分隔符时启动该模式。
-　　如：rsync -avz *.c foo:src
-　　
-　　3)使用一个远程shell程序(如rsh、ssh)来实现将远程机器的内容拷贝到本地机器。当SRC地址路径包含单个冒号":"分隔符时启动该模式。
-　　如：rsync -avz foo:src/bar /data
-　　
-　　4)从远程rsync服务器中拷贝文件到本地机。当SRC路径信息包含"::"分隔符时启动该模式。
-　　如：rsync -av root@172.16.78.192::www /databack
-　　
-　　5)从本地机器拷贝文件到远程rsync服务器中。当DST路径信息包含"::"分隔符时启动该模式。
-　　如：rsync -av /databack root@172.16.78.192::www
-　　
-　　6)列远程机的文件列表。这类似于rsync传输，不过只要在命令中省略掉本地机信息即可。
-　　如：rsync -v rsync://172.16.78.192/www
-```
-
-参考：
-
-[使用rsync 的 --delete参数删除目标目录比源目录多余的文件](http://www.linuxidc.com/Linux/2014-03/98835.htm)
-
-[rsync命令参数详解](http://www.jb51.net/article/34869.htm)
 
 #### sendEmail
 
 sendEmail是一个轻量级，命令行的SMTP邮件客户端。如果你需要使用命令行发送邮件，那么sendEmail是非常完美的选择:使用简单并且功能强大
 
-安装
+##### 安装
 
-```
+```shell
 wget http://caspian.dotconf.net/menu/Software/SendEmail/sendEmail-v1.56.tar.gz
 tar -zxvf sendEmail-v1.56.tar.gz
 chmod u+x 
@@ -301,7 +421,7 @@ MAIL_TO="zhangweibing@cc.sandai.net luochuan@cc.sandai.net
 perl sendEmail -s smtp.xxx.com -f xxxx@hostname1 -xu uname@serverhost -xp 111111 -t xxxx@hostname2 -u "email title" -o message-charset=utf8  -m "email body info"  -a "attachment files"
 ```
 
-**详细参考手册**
+##### 详细参考
 
 Synopsis:  sendEmail -f ADDRESS [options]
 
@@ -351,25 +471,11 @@ Synopsis:  sendEmail -f ADDRESS [options]
 
 [如何使用sendEmail发送邮件](http://www.ttlsa.com/linux/use-sendemail/)
 
-#### rpm
-
-```shell
-rpm -ivh
-rpm -qa
-# 卸载rpm包
-首先通过  rpm -q <关键字> 可以查询到rpm包的名字
-然后 调用 rpm -e <包的名字> 删除特定rpm包
-如果遇到依赖，无法删除，使用 rpm -e --nodeps <包的名字> 不检查依赖，直接删除rpm包
-如果恰好有多个包叫同样的名字，使用 rpm -e --allmatches --nodeps <包的名字> 删除所有相同名字的包， 并忽略依赖
-```
-
 #### ffmpeg
 
-**下载**
+##### 安装
 
 > git clone https://git.ffmpeg.org/ffmpeg.git ffmpeg
-
-**安装**
 
 > 安装依赖项yasm:`yum install yasm`
 >
@@ -380,7 +486,7 @@ rpm -qa
 >
 > - make&make install
 
-**配置**
+##### 配置
 
 > 使用：
 >
@@ -479,3 +585,30 @@ yum install percona-xtrabackup
 ##### 参考
 
 [innobackupex的安装和使用](http://blog.csdn.net/dbanote/article/details/13295727)
+
+
+
+## 参考
+
+### 基础知识
+
+### 技能积累
+
+#### 文件传输
+
+[详解rsync好文（推荐）](http://blog.csdn.net/lianzg/article/details/24817087)
+
+[使用rsync 的 --delete参数删除目标目录比源目录多余的文件](http://www.linuxidc.com/Linux/2014-03/98835.htm)
+
+[rsync命令参数详解](http://www.jb51.net/article/34869.htm)
+
+[使用Fabric模块编写的批量同步文件的python脚本](http://www.toutiao.com/i6449256257931969037/)
+
+[Fabric官方参考](http://docs.fabfile.org/en/latest/index.html#usage-docs)
+
+[基于paramiko和watchdog的文件夹自动同步工具](http://www.cnblogs.com/MikeZhang/p/autoSync20170617.html)
+
+### 环境配置
+
+### 软件使用
+
