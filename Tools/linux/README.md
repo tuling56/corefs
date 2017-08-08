@@ -261,6 +261,8 @@ Rsync的命令格式可以为以下六种：
 　　如：rsync -v rsync://172.16.78.192/www
 ```
 
+###### 参数设置
+
 目录包含和排除
 
 ```shell
@@ -274,7 +276,16 @@ rsync -aSz  --include-from=/home/include.txt --exclude=/* /home/mnt/data/upload/
 rsync  -aSz  --exclude-from=/home/exclude.txt /home/mnt/ user@server1:/mnt/data
 ```
 
-技巧
+删除
+
+> --delete参数删除目标目录比源目录多余的文件
+
+```shell
+# 将dirA的所有文件同步到dirB内，并删除dirB内多余的文件
+rsync -avz --delete  dirA/ dirB/
+```
+
+访问设置
 
 ```shell
 # 在使用ssh的方式时候指定ssh的端口（https://segmentfault.com/q/1010000002405966）
@@ -307,6 +318,19 @@ watchdog
 基于Fabric的文件自动同步工具
 
 ![](http://p1.pstatp.com/large/31d30002e98f69b6957f)
+
+#### 文件监控
+
+##### inotify-tools
+
+```shell
+yum install inotify-tools
+```
+
+inotify-tools安装完成后，会生成inotifywait和inotifywatch两个指令，
+
+- inotifywait用于等待文件或文件集上的一个特定事件，它可以监控任何文件和目录设置，并可以递归监控整个目录树。
+- inotifywatch用于收集被监控的文件系统统计数据，包括每个inotify事件发生多少次等信息
 
 #### 包管理
 
