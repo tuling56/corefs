@@ -174,7 +174,6 @@ select a.mt,count(*) as cnt from (select from_unixtime(finsert_time,'yyyyMMdd HH
 select  'abc'  regexp '^[a-z]*$'   from test.dual;
 select  'http://v.xunlei.com'  regexp 'http://v.xunlei.com/?$'   from test.dual; //true
 
-
 # 正则抽取（注意此处不能使用\d和\w等类似的字符）
 select regexp_extract('http://xxx/details/0/40.shtml','http://xxx/details/([0-9]{1,})/([0-9]{1,})\.shtml',1) from test.dual; # 返回40
 
@@ -186,7 +185,30 @@ select regexp_replace('foobar','oo|ba','') from test.dual; # 返回fr
 一个使用正则的聚合例子：
 
 ```mysql
+# 正则聚合
 select substr(fu6,1,1) as tsize,if((lower(fu7) regexp "geforce") ,'yes','no'),count(*) from xmp_odl.xmpcloud2 where ds='20170618' and fu3='2341' and fu2 in (3,4,5) group by substr(fu6,1,1),if(( lower(fu7) regexp "geforce"),'yes','no') order by tsize;
+
+# 提取
+http://v.xunlei.com/tv/
+http://v.xunlei.com/movie_tuijian/teleplay_tuijian.shtml
+http://list.v.xunlei.com/v,type/5,teleplay/
+select parse_url('http://list.v.xunlei.com/v,type/5,teleplay/','PATH') from test.dual;
+select regexp_extract('http://list.v.xunlei.com/v,type/5,teleplay/','http://list.v.xunlei.com/v,type/5,([a-z]*)/',1) from test.dual; # 返回teleplay
+
+http://v.xunlei.com/zongyi/
+http://v.xunlei.com/movie_tuijian/tv_tuijian.shtml
+http://list.v.xunlei.com/v,type/5,tv/
+
+http://v.xunlei.com/dongman/
+http://v.xunlei.com/movie_tuijian/anime_tuijian.shtml
+http://list.v.xunlei.com/v,type/5,anime/
+
+http://v.xunlei.com/movie/
+http://v.xunlei.com/movie_tuijian/movie_tuijian.shtml
+http://list.v.xunlei.com/v,type/5,movie/
+
+
+
 ```
 
 #### url解析
