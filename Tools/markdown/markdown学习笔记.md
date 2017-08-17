@@ -9,7 +9,7 @@ tags: [markdown,md]
 
 ### 基础学习
 
-彩色字体：
+#### 彩色字体
 
 导出成html格式的时候才生效
 
@@ -20,7 +20,9 @@ tags: [markdown,md]
 
 <font color="#4590a3" size = "6px">文字</font>
 
-### 绘制流程图 Flowchart
+### 流程图
+
+#### 流程图 Flowchart
 
 ```flow
 st=>start: 用户登陆
@@ -33,31 +35,26 @@ cond(yes)->e
 cond(no)->op
 ```
 
-[========]
-​                    
-### 绘制序列图 Sequence Diagram
+​    
+#### 序列图 Sequence Diagram
 
-```seq
-Andrew->China: Says Hello 
-Note right of China: China thinks\nabout it 
-China-->Andrew: How are you? 
-Andrew->>China: I am good thanks!
+```sequence
+Title: Here is a title
+A->B: Normal line
+B-->C: Dashed line
+C->>D: Open arrow
+D-->>A: Dashed open arrow
+Note right of A: A右边的注释\n第二行
+Note left of A: A左边的注释\n第二行
+Note over A: Note over A
+Note over A,C: Note over both A and C
 ```
 
-**目录 (Table of Contents)**
-
-[TOCM]
-
-[TOC]
-
-# Heading 1
-## Heading 2               
+## 标题样式控制
 ### Heading 3
 #### Heading 4
 ##### Heading 5
 ###### Heading 6
-# Heading 1 link [Heading link](https://github.com/pandao/editor.md "Heading link")
-## Heading 2 link [Heading link](https://github.com/pandao/editor.md "Heading link")
 ### Heading 3 link [Heading link](https://github.com/pandao/editor.md "Heading link")
 #### Heading 4 link [Heading link](https://github.com/pandao/editor.md "Heading link") Heading link [Heading link](https://github.com/pandao/editor.md "Heading link")
 ##### Heading 5 link [Heading link](https://github.com/pandao/editor.md "Heading link")
@@ -66,11 +63,7 @@ Andrew->>China: I am good thanks!
 #### 标题（用底线的形式）Heading (underline)
 
 
-This is an H1
-=============
-
-
-This is an H2
+基础样式控制
 -------------
 
 ### 字符效果和横线等
@@ -379,5 +372,3 @@ f(x) = \int_{-\infty}^\infty
 > Print Test: Ctrl + P
 
 [========]
-
-### End
