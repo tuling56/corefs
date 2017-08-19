@@ -4,7 +4,7 @@
 # Author:tuling56
 # State:
 # Created_Time: 2017-05-09 17:12
-# Last modified: 2017-05-13 08:15:12 PM
+# Last modified: 2017-08-15 07:53:25 PM
 #########################################################################
 #!/bin/bash
 
@@ -14,6 +14,58 @@ function showstep()
 {
     local info=$1
     echo -e "\e[1;31mstep:$info\e[0m-->`date +%F\ %T`"
+}
+
+function showstep2()
+{
+    local info=$1
+    echo -e "$info\t"$(date +%Y%m%d_%H:%M:%S)
+}
+
+function ierror()
+{
+    local info=$1
+    echo -e "\e[1;31m$info\e[0m"
+}
+
+function iwarn()
+{
+    local info=$1
+    echo -e "\e[1;33m$info\e[0m"
+}
+
+function isucc()
+{
+    local info=$1
+    echo -e "\e[1;32m$info\e[0m"
+}
+
+function iinfo()
+{
+    local info=$1
+    echo -e "\e[1;34m$info\e[0m"
+}
+
+function ihigh()
+{
+    local info=$1
+    echo -e "\e[1;35m$info\e[0m"
+}
+
+# 计算百分比
+function calcratio()
+{
+    local num=$1
+    local total=$2
+
+	# 方法1
+    #r_o_ratio="`echo "scale=2;${num}*100/${total}"|bc`%"
+ 	# 方法2：使用awk（注意此语句中的BEGIN不能省略）
+ 	#r_o_ratio=$(awk -v a=$num -v b=$total 'BEGIN{printf("%4.2f%%",a*100/b);}')
+ 	# 方法2.1(注意通过管道传递过来的数据不能在begin中使用，可以在前面加上END)
+ 	r_o_ratio=$(echo "$num $total" | awk '{printf("%4.2f%%",$1*100/$2);}')
+	
+	echo ${r_o_ratio}
 }
 
 ######################### 字符串分割 ##########################
