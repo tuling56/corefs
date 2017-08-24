@@ -506,7 +506,18 @@ call  sp_name;
 
 #### 函数
 
-//待完成
+##### 库函数
+
+字符串处理
+
+```mysql
+# 提取url域名
+select substring_index(substring_index('http://wz.cnblogs.com/my/search/?q=cookie','/',3),'/',-1);
+```
+
+##### 自定义函数
+
+//待完善
 
 #### 事件 
 
