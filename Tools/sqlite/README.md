@@ -4,7 +4,7 @@ sqlite是一个功能强大、体积小运算速度快的[嵌入式](http://lib.
 
 ### 基础
 
-#### 安装
+安装
 
 ```shell
 wget -c http://sqlite.org/sqlite-3.6.17.tar.gz
@@ -14,11 +14,11 @@ cd sqlite-3.6.17
 make && make install
 ```
 
-在/usr/local/sqlite下产生lib,include,bin三个文件目录，分别是库文件，头文件和可执行文件
+> 在/usr/local/sqlite下产生lib,include,bin三个文件目录，分别是库文件，头文件和可执行文件
 
-#### 配置
+配置
 
-在用户的家目录创建`.sqliterc`文件，内容如下：
+> 在用户的家目录创建`.sqliterc`文件，内容如下：
 
 ```
 .timer on
@@ -29,9 +29,22 @@ make && make install
 .width 8
 ```
 
-#### 使用
+创建
 
-基础命令
+```sql lite
+# 创建表
+CREATE TABLE database_name.table_name(
+   column1 datatype  PRIMARY KEY(one or more columns),
+   column2 datatype,
+   column3 datatype,
+   .....
+   columnN datatype,
+);
+```
+
+
+
+状态查看
 
 ```sql lite
 .databases             List names and files of attached databases
@@ -55,6 +68,14 @@ select * from sqlite_master where type="table" and name="tablename";
 # 退出
 .exit
 ```
+
+### 进阶
+
+
+
+
+
+### 高级
 
 #### sqlite实现web查询
 
@@ -98,10 +119,6 @@ sandman2ctl 'sqlite+pysqlite:///D:/test.db'
 ```
 
 实现参考：http://sandman2.readthedocs.io/en/latest/quickstart.html
-
-### 高级
-
-高级使用
 
 ## 参考
 
