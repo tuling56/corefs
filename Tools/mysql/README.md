@@ -308,6 +308,16 @@ mysql --default-character-set=utf8  -uroot -proot -Dpgv_stat_yingyin
 >
 > - 在load数据的时候保证文件是utf8编码的
 
+tips:
+
+```python
+# python连接mysql的时候指定编码或者socket
+ conn = MySQLdb.connect(host="localhost", user="xxxx", passwd="xxx",use_unicode=True, charset="utf8",unix_socket='/tmp/mysql_3309.sock')
+
+```
+
+
+
 #### 变量查看
 
 >  查看全局变量
