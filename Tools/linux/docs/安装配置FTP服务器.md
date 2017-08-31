@@ -7,7 +7,7 @@
 #### 服务器端
 
 ```shell
-yum install ftp vsftpd
+yum install vsftpd
 ```
 
 服务配置和启动
@@ -106,6 +106,8 @@ mirror -R localdir remotedir　　// 将本地目录ldir上传到远程目录rdi
 [Centos6.5中安装和配置vsftp教程](http://www.jb51.net/article/47795.htm)
 
 [Centos6.5下快速搭建ftp服务器](http://www.linuxidc.com/Linux/2015-10/123848.htm)
+
+[Centos7中搭建vsftp服务器](http://www.toutiao.com/i6458983660245746190/)
 
 [Ubuntu下安装和配置FTP服务器](https://linux.cn/article-8312-1.html)
 
