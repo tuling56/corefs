@@ -972,7 +972,12 @@ sql="load data local infile '$datapath/db1.odl_put_context_${date}' into table  
 运行插入语句
 
 ```shell
-# 首先将数据导出成可运行的sql语句，然后source xxx.sql,或者mysql -uxxxx -pxxx <xxx.sql
+# 首先将数据导出成可运行的sql语句，然后
+> source xxx.sql
+# 或者
+mysql -uxxxx -pxxx < xxx.sql
+mysql -uxxxx -pxxx --default-character-set=utf8 < xxx.sql
+### 注意使用这种方式的时候，在xxx.sql里最好指定编码，例如使用set names utf8
 ```
 
 ##### 导出
@@ -1006,6 +1011,10 @@ mysqldump -uroot -pmysql -d db1 tb1> e:\tb1.sql
 > fields escaped by '字符'：设置转义字符，只能为单个字符。默认值为“\”。
 > lines starting by '字符串'：设置每行数据开头的字符，可以为单个或多个字符。默认情况下不使用任何字符。
 > lines terminated by '字符串'：设置每行数据结尾的字符，可以为单个或多个字符。默认值是“\n”。
+>
+> 导出中文乱码的解决方式：
+>
+> --default-character-set=gb2312
 
 导出成文件
 
@@ -1080,6 +1089,8 @@ cat xxx.file |redis-cli [--pipe]
 [mysql exists和in的效率比较](http://www.cnblogs.com/meibao/p/4973043.html)
 
 - 备份
+
+[mysql导入导出中文乱码的解决方法](http://www.jb51.net/article/31615.htm)
 
 [学会用各种姿势备份MySQL](http://www.cnblogs.com/liangshaoye/p/5464794.html)
 
