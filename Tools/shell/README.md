@@ -809,7 +809,34 @@ find . -path "./sk" -prune -o -name "*.txt" -print
 
 ```
 
+```shell
+find . -type f -exec echo "{}" \;  # 为输出的文件名加上双引号
+```
 
+文件名中存在空格的时候无法处理，解决方式如下：
+
+```shell
+# 方法1:无法处理名字中包含空格的问题
+function method1()
+{
+        find . -type f -mtime -7 -name *.py
+        sed -i 's/\t/    /g'  $(find . -type f -name "*.py")
+}
+
+
+# 方法2：解决了文件名中包含空格的问题(使用了read的方法)
+function method2()
+{
+        find . -type f -mtime -7 -name "*.py"|while read f;do
+                sed -i 's/\t/    /g'  "$f"    # 注意$f两边的引号不可缺少
+                #echo "$f"
+        done
+}
+
+method2
+
+exit 0
+```
 
 #### 应用
 
