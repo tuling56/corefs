@@ -33,7 +33,27 @@ chkconfig vsftpd on
 
 #### 客户端
 
-注意安装完服务器端的ftp 之后，自带的有客户端的ftp命令，但是原生的lftp客户端比较弱，故采用功能比较强大的lftp客户端。
+注意安装完服务器端的ftp 之后，自带的有客户端的ftp命令，但是原生的ftp客户端比较弱，故采用功能比较强大的lftp客户端。
+
+##### ftp原生客户端
+
+```shell
+# 登录
+$ ftp 127.0.0.1
+连接到 127.0.0.1。
+220 Welcome to Everything ETP/FTP
+530 Not logged on.
+用户(127.0.0.1:(none)): yjm
+331 Password required for yjm
+密码:
+230 Logged on.
+```
+
+
+
+
+
+##### lftp增强客户端
 
 ##### 安装
 
