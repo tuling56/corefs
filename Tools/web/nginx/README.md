@@ -340,7 +340,9 @@ SSL使用证书来创建安全连接，有两种验证模式：
 
 ![nginx开启https](http://p1.pstatp.com/large/159f00042b57b14e3efa)
 
-### nginx开启http_stub_status_module监控其运行状态
+### nginx运行状态监控
+
+需要使用到的模块是http_stub_status_module
 
 #### 安装
 
@@ -378,9 +380,54 @@ Reading: 0 Writing: 1 Waiting: 0
 - **Writing** – nginx reads request body, processes request, or writes response to a client
 - **Waiting** – keep-alive connections, actually it is `active – (reading + writing).`This value depends on [keepalive-timeout](http://wiki.nginx.org/HttpCoreModule#keepalive_timeout). Do not confuse non-zero waiting value for poor performance. It can be ignored. Although, you can force zero waiting by setting `keepalive_timeout 0;`
 
+### nginx开启访问认证
+
+ngx_http_auth_basic_module模块实现让访问着，只有输入正确的用户密码才允许访问web内容。web上的一些内容不想被其他人知道，但是又想让部分人看到。[nginx](http://www.ttlsa.com/nginx/)的http auth模块以及Apache http auth都是很好的解决方案。
+
+```nginx
+server{
+       server_name  www.ttlsa.com ttlsa.com;
+ 
+        index index.html index.php;
+        root /data/site/www.ttlsa.com;       
+ 
+        location /
+        {
+                auth_basic "nginx basic http test for ttlsa.com";
+                auth_basic_user_file /usr/local/nginx/conf/htpasswd; # 此处最好使用绝对路径 
+                autoindex on;
+        }
+}
+```
+
+htppaswd文件的生成：
+
+可以使用htpasswd，或者使用openssl
+
+```shell
+# 方式1：
+htpasswd -c -d /usr/local/nginx/conf/htpasswd username
+> 输入以上命令，回车输入密码，再次回车，输入确认密码 
+
+# 方式2：
+printf "yjm:$(openssl passwd -crypt 123)\n" >>conf/htpasswd
+cat conf/htpasswd 
+#yjm:xyJkVhXGAZ8tM  # 这样就配置了用户名为yjm,密码为123（还要加密）的访问认证
+```
+
+>使用cookie机制，首次访问的时候需要验证
+
+参考：
+
+[nginx实现访问网站或目录密码认证保护](http://blog.csdn.net/babydavic/article/details/8880868)
+
+[nginx用户认证配置（ Basic HTTP authentication）](http://www.ttlsa.com/nginx/nginx-basic-http-authentication/)
+
 ### 参考
 
 [Nginx安装](http://blog.csdn.net/carlos1992/article/details/48194321)
+
+[nginx安全加固](http://www.toutiao.com/i6410241153689453057/)
 
 [nginx_lua_module 模块 以及 echo-nginx-module 模块](http://blog.csdn.net/vboy1010/article/details/7868645)
 
@@ -960,8 +1007,4 @@ make install
 [CentOS系统下，如何安装 nginx_lua_module 模块 以及 echo-nginx-module 模块](http://blog.csdn.net/vboy1010/article/details/7868645)
 
 
-
-##  参考
-
-[nginx安全加固](http://www.toutiao.com/i6410241153689453057/)
 
