@@ -263,17 +263,17 @@ Rsync的命令格式可以为以下六种：
 
 ###### 参数设置
 
-目录包含和排除
+包含和排除
 
 ```shell
-rsync  -avz -P  --include-from=./inputlist_from_snh48.txt  --exclude=/*
-
-#其中红include-from和exclude-from可以单独使用
+## include-from和exclude-from可
 #--include-from 指定目录下的部分目录的方法：
-rsync -aSz  --include-from=/home/include.txt --exclude=/* /home/mnt/data/upload/f/ 
-
+rsync  -avz -P --include-from=/home/include.txt --exclude=/* /home/mnt/data/upload/f/ 
 #--exclude-from 排除目录下的部分目录的方法
 rsync  -aSz  --exclude-from=/home/exclude.txt /home/mnt/ user@server1:/mnt/data
+
+## include和exclude
+
 ```
 
 删除
