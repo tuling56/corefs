@@ -20,25 +20,36 @@ echo $(date +%F\ %T)
 # 管道文件同步
 function pipeline()
 {
-	echo -e "\e[1;35m同步pipelines....\e[0m"
+	iinfo "同步pipelines...."
+	# 本地管道文件同步
 	local src=/cygdrive/e/Code/Git/Python/Projects/xmp/media_lib/lichaotest/lichaotest/pipelines.py
 	local dst=/cygdrive/e/Code/Git/Python/Projects/xmp/media_lib/https_spider/https_spider/pipelines.py
 	cmp_mv_file $src $dst
+
+	# 本地和远程同步
+	rdst_1="/home/yjm/Projects/python/pythondev/Projects/xmp/media_lib/lichaotest/lichaotest/pipelines.py"
+	rdst_2="/home/yjm/Projects/python/pythondev/Projects/xmp/media_lib/https_spider/https_spider/pipelines.py"
+	# rsync.exe -u -e 'ssh -i ~/.ssh/id_rsa -p 122' -avP $src root@localhost:$rdst_1
+	# rsync.exe -u -e 'ssh -i ~/.ssh/id_rsa -p 122' -avP $src root@localhost:$rdst_2
 }
 
 # 本目录下的程序同步到shell库
 function rsync_shell()
 {
 	#rsync.exe -avuP ./*.py  $BASH_WORSPACE
- 	rsync.exe -avuP ./*.sh  $BASH_WORKSPACE
+	rsync.exe -avuP ./*.sh  $BASH_WORKSPACE
 }
 
+# 爬虫同步
+function crawlers()
+{
+	return 0
+}
 
 
 # 主程序入口
 pipeline
 rsync_shell
-
 
 
 exit 0

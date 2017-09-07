@@ -110,14 +110,14 @@ mirror remotedir localdir/
 上传文件夹
 
 ```shell
-mirror -R localdir remotedir　　// 将本地目录ldir上传到远程目录rdir
+mirror -R localdir remotedir　　// 将本地目录localdir上传到远程目录remotedir
 ```
 
 
 
 ### 应用
 
-利用Python实现基于ftp的文件(夹)上传和下载功能，以前已经实现了一个基于sftp的文件(夹)上传和下载服务
+利用Python实现基于ftp的文件(夹)上传和下载功能，以前已经实现了一个基于sftp的文件(夹)上传和下载服务,后面全部实现
 
 
 
