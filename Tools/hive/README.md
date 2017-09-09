@@ -388,6 +388,12 @@ alter table xmp_subproduct_install set SERDEPROPERTIES('field.delim' = '\u0001')
 select from_unixtime(finsert_time,'yyyyMMdd HH:mm:ss') from xmp_odl.xmp_pv where ds='20161206';
 # 日期转时间戳
 select unix_timestamp('20111207 13:01:03','yyyyMMdd HH:mm:ss') from test.dual;
+
+# 统计五分钟的最高值
+select int((hour(ftime)*60+minute(ftime))/5),count(distinct fpeerid) cnt from xmp_odl.t_stat_play where ds='20170908' group by int((hour(ftime)*60+minute(ftime))/5) order by cnt desc;
+
+# 统计小时内的最高值
+select hour(ftime),count(distinct fpeerid) cnt from xmp_odl.t_stat_play where ds='20170708' group by hour(ftime) order by cnt desc;
 ```
 
 #### 字符串
