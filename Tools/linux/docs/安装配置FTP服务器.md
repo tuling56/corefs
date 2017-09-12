@@ -139,3 +139,5 @@ mirror -R localdir remotedir　　// 将本地目录localdir上传到远程目�
 
 [lftp上传和下载文件夹(主要是mirror命令)](http://www.cnblogs.com/leonyoung/archive/2012/04/17/2453804.html)
 
+[lftp命令大全和中文乱码问题解决（推荐）](http://blog.chinaunix.net/uid-24993824-id-470961.html)
+
