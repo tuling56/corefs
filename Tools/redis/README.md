@@ -122,7 +122,9 @@ Redis中没有关系数据库中库表的概念，只有key:value的概念
 
 #### 数据类型
 
-Redis支持五种数据类型：string（字符串），hash（哈希），list（列表），set（集合）及zset(sorted set：有序集合)。
+Redis支持以下五种数据类型：
+
+> string（字符串），hash（哈希），list（列表），set（集合）及zset(sorted set：有序集合)。
 
 ##### String
 
@@ -212,7 +214,7 @@ redis 127.0.0.1:6379> ZRANGEBYSCORE runoob 0 1000
 
 ### 备份
 
-#### 自身备份
+#### 自动备份
 
 数据导入和导出：SAVE和BGSAVE命令
 

@@ -611,7 +611,45 @@ alter ...
 DROP EVENT [IF EXISTS] event_name
 ```
 
+#### 触发器
 
+创建触发器
+
+```mysql
+CREATE TRIGGER trigger_name trigger_time trigger_event ON tbl_name FOR EACH ROW trigger_stmt
+###参数说明：
+# trigger_time是触发程序的动作时间。它可以是 before 或 after，以指明触发程序是在激活它的语句之前或之后触发。
+# trigger_event指明了激活触发程序的语句的类型
+	INSERT：将新行插入表时激活触发程序
+	UPDATE：更改某一行时激活触发程序
+	DELETE：从表中删除某一行时激活触发程序
+#tbl_name：监听的表，必须是永久性的表，不能将触发程序与TEMPORARY表或视图关联起来。
+#trigger_stmt：当触发程序激活时执行的语句。执行多个语句，可使用BEGIN...END复合语句结构
+```
+
+删除触发器
+
+```mysql
+DROP TRIGGER [schema_name.]trigger_name
+可以使用old和new代替旧的和新的数据
+更新操作，更新前是old，更新后是new.
+删除操作，只有old.
+增加操作，只有new.
+```
+
+一个例子：
+
+```mysql
+create TRIGGER up_conter after insert on documents for each row BEGIN
+set new.content=new.title; #注意不要在触发器的操作语句中使用update等操作
+END
+```
+
+参考：
+
+[MySQL触发器简单实例](http://www.cnblogs.com/nicholas_f/archive/2009/09/22/1572050.html)
+
+[already used by statement](https://stackoverflow.com/questions/15300673/mysql-error-cant-update-table-in-stored-function-trigger-because-it-is-already)
 
 ### 应用
 

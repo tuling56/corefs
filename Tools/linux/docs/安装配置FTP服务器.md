@@ -107,10 +107,13 @@ mirror remotedir localdir/
 - localdir必须带/,否则会把remotedir里的内容下载到localdir内，而不是remotedir这个目录
 ```
 
-上传文件夹
+上传文件夹（尤其要注意-R选项）
 
 ```shell
 mirror -R localdir remotedir　　// 将本地目录localdir上传到远程目录remotedir
+# 注意
+- localdir可以带/，也可以不带
+- remotedir必须带/,否则会把localdir里的内容上传到remotedir目录内，而不是remotedir/localdir这个目录
 ```
 
 

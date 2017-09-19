@@ -196,6 +196,18 @@ server{}            # 块定义了虚拟主机
 | $time_iso8601                      | ISO8601标准格式下的本地时间                        |
 | $time_local                        | 记录访问时间与时区                                |
 
+#### 日志配置
+
+错误日志
+
+error_log不能改变，日志文件可以指定任意存放日志的目录，错误日志级别常见的有`debug|info|notice|warn|error|crit|alert|emerg`，级别越高，记录的信息越少，生产场景一般是`warn|error|crit`这三个级别之一，注意不要配置info等较低级别，会带来巨大磁盘I/O消耗。
+
+可放置的标签段为:(这这个暂时找不到放置的位置)
+
+context: main， http， server， location
+
+> 注意错误日志不支持自定义格式，只能使用以上的格式，而access支持自定义格式
+
 ### nginx开启https支持
 
 SSL使用证书来创建安全连接，有两种验证模式：

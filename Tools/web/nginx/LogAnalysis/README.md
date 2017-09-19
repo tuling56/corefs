@@ -22,6 +22,14 @@
 | log_stat.py       | python实现           |      |
 | log_stat.data     | 测试数据               | 测试数据 |
 
+日志格式是标准的日志格式：
+
+```
+
+```
+
+
+
 ### Rsyslog+LogAnayzer+MySQL
 
 #### LogAnalyzer 
