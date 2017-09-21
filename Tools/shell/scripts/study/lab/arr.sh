@@ -25,9 +25,25 @@ function arr2()
 
 }
 
+# 关联数组累加
+function arr3()
+{
+    declare -A anum
+    
+    for item in a a b c d e f g k a c b d;do
+        anum[$item]=$((${anum[$item]}+1));
+    done
+
+    for k in ${!anum[*]};do
+        echo "$k:${anum[$k]}"
+    done
+}
+
+
+
 
 # 测试入口
-arr2
+arr3
 
 
 exit 0

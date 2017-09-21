@@ -203,11 +203,28 @@ done
 ```shell
 # 清空数组元素
 # 但是这样清空后，garray中仍有“fe”这个key，只是其对应的值被清空了 
-unset garray[“fe”]
+unset garray["fe"]
 
 # 清空数组
 # 但是这样清空后，array的key是没有了，但是整个garray也不能再用了，不再是关联数组，需要重新声明使用：
 unset garray
+```
+
+累加
+
+```shell
+# 关联数组累加
+function arr_dict_sum(){
+    declare -A anum
+    
+    for item in a a b c d e f g k a c b d;do
+        anum[$item]=$((${anum[$item]}+1));
+    done
+
+    for k in ${!anum[*]};do
+        echo "$k:${anum[$k]}"
+    done
+}
 ```
 
 判断key是否在关联数组中
@@ -310,6 +327,36 @@ rename  .sql  .txt *.sql  //好像不能递归目录,其中最后一个是要修
 [Shell重命名（智慧大碰撞）](http://www.oschina.net/question/75009_111550)
 
 [使用awk进行数字计算](http://www.mamicode.com/info-detail-1187091.html)
+
+##### 多进程
+
+```shell
+tables=(xmpcloud2 xmpconv xmpconv2 xmptipsex2)
+dbs=(pgv3_split_t1 pgv3_split_t2 pgv3_split_c1 pgv3_split_c2)
+
+declare -A Apdb
+for table in ${tables[@]}; do
+	pids=""
+	for db in ${dbs[@]}; do
+		cmd="do something"
+		$cmd &
+		pids="$pids $!"
+		Apdb[$!]=$db
+	done
+
+	#  wait $pids
+	for p in $pids;do
+		wait $p
+		if [[ "$?" -ne "0" ]];then
+			# do something
+		fi
+	done
+done
+```
+
+> 此处的多进程是处理每个表的多个数据来源的时候采用并发的多进程来处理，没有锁的高级使用
+
+shell的多进程之间没有锁，只有靠wait变相实现
 
 ### awk
 
