@@ -16,8 +16,17 @@ nginx本身是一个http服务器，同时又是一个高性能的反向代理�
 > >
 > > ```
 > > pcre
+> > yum install pcre pcre-devel
+> >
 > > openssl
+> > yum install openssl openssl-devel
+> >
 > > zlib
+> > yum install zlib
+> >
+> > gd
+> > yum install gd gd-devel
+> >
 > >
 > > # 若在安装的时候找不到上述模块，可以用指定源码包的方式，例如：
 > > --with-openssl=<openssl_dir>、--with-pcre=<pcre_dir>、--with-zlib=<zlib_dir> 指定依赖的模块目录。如已安装过，此处的路径为安装目录；若未安装，则此路径为编译安装包路径，Nginx 将执行模块的默认编译安装。
