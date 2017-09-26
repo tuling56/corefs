@@ -273,7 +273,6 @@ rsync  -avz -P --include-from=/home/include.txt --exclude=/* /home/mnt/data/uplo
 rsync  -aSz  --exclude-from=/home/exclude.txt /home/mnt/ user@server1:/mnt/data
 
 ## include和exclude
-
 ```
 
 删除
