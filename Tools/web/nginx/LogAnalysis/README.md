@@ -15,6 +15,8 @@
 
 ### 手动解析
 
+#### 基础版
+
 | 脚本                | 应用                 | 说明   |
 | ----------------- | ------------------ | ---- |
 | log_stat.awk      | awk实现基础版           |      |
@@ -24,9 +26,33 @@
 
 日志格式是标准的日志格式：
 
+```nginx
+$remote_addr - $remote_user [$time_local] "$request" $status $body_bytes_sent "$http_referer" "$http_user_agent"
+```
+
+#### 金矿版
+
+awk金矿版实现,日志中都带有$time_local字段，是典型的基于文件的时间序列数据库。
+
+##### 请求访问分析
+
+- 单位时间内的请求数
+
 ```
 
 ```
+
+##### 流量速率分析
+
+- 网络流量和速率
+
+包含响应时间和页面尺寸等字段，在此基础上计算网络流量和速率,nginx日志中的$body_sent_size指http响应体的大小，如果想看整个响应大小，应该使用\$send_size
+
+```shell
+awk '{url=$7;requests[url]++;bytes[url]+=$10}END{for(url in requests){printf("%sMB %sKB/req %s %s\n",bytes[url]/1024/1024,bytes[url]/requests[url]/1024,requests[url],url)}}' |sort -nr|head -n 15
+```
+
+##### 慢查询分析
 
 
 
@@ -111,7 +137,7 @@ goaccess包含解析和可视化
 
 ```nginx
 # nginx的默认日志格式
-log_format main '$remote_addr - $remote_user [$time_local] "$request" '
+log_format main '$remote_addr - $remote_user [$time_local] "$request"'
                 '$status $body_bytes_sent "$http_referer" '
                 '"$http_user_agent" "$http_x_forwarded_for"';
 server {
@@ -127,15 +153,22 @@ server {
 nginx参数说明：
 
 ```nginx
-$remote_addr - # 访问来源ip 后面的"-" 是个普通字符
-$remote_user # 用户，只有在启用 auth_basic 认证访问的时候才会出现，否则是一个 "-" 字符
-[$time_local] # 日期，时间，时区
-"$request" # 请求地址 注意，这里有双引号
+$remote_addr -     # 访问来源ip 后面的"-" 是个普通字符
+$remote_user       # 用户，只有在启用 auth_basic 认证访问的时候才会出现，否则是一个 "-" 字符
+[$time_local]      # 日期，时间，时区
+"$request" 		   # 请记录请求的URL和HTTP协议，这里有双引号
 $status # 状态码
-$body_bytes_sent # 包发送大小(是服务器返回给客户端的大小)
-"$http_referer" # 引用页 注意，这里有双引号
-"$http_user_agent" # 客户端useragent信息（系统版本、浏览器等） 注意，这里有双引号
+$body_bytes_sent   # 包发送大小(是服务器返回给客户端的大小)，不包括响应头
+"$http_referer"    # 记录从哪个页面链接访问过来的（引用页），有双引号
+"$http_user_agent" # 客户端useragent信息（系统版本、浏览器等），双引号
 "$http_x_forwarded_for" # nginx做反向代理时的客户端地址 注意，这里有双引号
+
+# 扩展参数
+$bytes_sent 		 # 发送给客户端的总字节数。
+$connection 		 # 连接的序列号。
+$connection_requests # 当前通过一个连接获得的请求数量。
+$request_length 	 # 请求的长度（包括请求行，请求头和请求正文）。
+$request_time  		 # 请求处理时间，单位为秒，精度毫秒； 从读入客户端的第一个字节开始，直到把最后一个字符发送给客户端后进行日志写入为止。
 ```
 
 #### goaccess
@@ -146,6 +179,10 @@ goaccess日志格式说明：
 time-format %H:%M:%S
 date-format %d/%b/%Y
 log-format %h %^ %^ [%d:%t %^] "%r" %s %b "%R" "%u" %^
+翻译成nginx日志格式是
+$remote_addr - $remote_user [$time_local] "$request" $status $body_bytes_sent "$http_referer" "$http_user_agent"
+10.0.2.2 - - [25/May/2017:15:45:43 +0800] "GET /demo?data=zhang&name=ilovey HTTP/1.1" 500 29465 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/
+58.0.3029.110 Safari/537.36"
 ```
 
 > 不要忘记日志格式中的双引号，及其他字符，如[]，否则会解析失败,参数说明：
@@ -164,17 +201,11 @@ log-format %h %^ %^ [%d:%t %^] "%r" %s %b "%R" "%u" %^
 > %h host（客户端IP地址，IPv4或IPv6）
 >
 > %r 客户端的请求行。这需要围绕请求的特定分隔符（单引号，双引号等）可解析。否则，请使用特殊格式说明符（如%m，%U，%q和%H）的组合来解析各个字段。
->
 > 注意：使用%r获取完整请求或%m，%U，%q和%H以形成请求，两者不要同时使用。
->
 > %m 请求方式。
->
 > %U 请求的URL路径。
->
 > 注意：如果查询字符串在%U中，则不需要使用%q。但是，如果URL路径不包含任何查询字符串，则可以使用%q，并将查询字符串追加到请求中。
->
 > %q 查询字符串。
->
 > %H 请求协议。
 >
 > %s 服务器发送回客户端的状态码。
@@ -222,3 +253,6 @@ goaccess -f /var/log/nginx/access.log  -o ./access.html
 [goaccess日志分析详解](http://www.toutiao.com/i6460608551814431245/)
 
 [如何挖掘Nginx日志中的金矿（推荐）](http://mp.weixin.qq.com/s/t-ktlzJsrpad1-YRuIakiw)
+
+[ngxtop：在命令行实时监控 Nginx 的神器](http://mp.weixin.qq.com/s/UnIX7UKIjEkKbt7UDxUnxw)
+
