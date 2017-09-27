@@ -324,6 +324,13 @@ tips:
 
 命令行：mysqladmin variables -p，这个操作也就相当于登录时使用命令 show global variables;
 
+#### 函数使用
+
+```sql
+# 日期从20161212转换成2016/12/12,后者的格式能容易被excel处理
+concat_ws('/',substring(date,1,4),substring(date,5,2),substring(date,7,2))
+```
+
 ### 积累
 
 #### 运行方式技巧
