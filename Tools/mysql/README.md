@@ -329,6 +329,13 @@ tips:
 ```sql
 # 日期从20161212转换成2016/12/12,后者的格式能容易被excel处理
 concat_ws('/',substring(date,1,4),substring(date,5,2),substring(date,7,2))
+# 补充：
+## awk法
+echo "20161212"| awk '{print substr($1,1,4)"/"substr($1,5,2)"/"substr($1,7,8)}'
+echo "20161212"| awk '{printf("%s/%s/%s",substr($1,1,4),substr($1,5,2),substr($1,7,8))}'
+## shell法(注意shell循环读入变量的方式)
+a=20161212
+while read line;do echo ${line:0:4}"/"${line:4:2}"/"${line:6:2}; done<<< "${a}"
 ```
 
 ### 积累
@@ -657,6 +664,8 @@ END
 [MySQL触发器简单实例](http://www.cnblogs.com/nicholas_f/archive/2009/09/22/1572050.html)
 
 [already used by statement](https://stackoverflow.com/questions/15300673/mysql-error-cant-update-table-in-stored-function-trigger-because-it-is-already)
+
+[MySQL触发器](http://www.toutiao.com/i6468771136527139341/)
 
 ### 应用
 
