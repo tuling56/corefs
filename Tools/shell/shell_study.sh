@@ -126,6 +126,10 @@ function mloop()
 		echo $count
 		count=$((count+1))  # count=$(($count-1)) 也可以
 	done
+	# while循环读入变量的方式
+	a=20171212
+	while read line;do echo ${line:0:4}"/"${line:4:2}"/"${line:6:2}; done<<< "${a}"
+
 
 	# until 循环
 	count=1
@@ -136,6 +140,7 @@ function mloop()
 		count=$((count+1))
 	done <shet.txt
 	# select 循环
+
 }
 
 # 退出控制
@@ -426,7 +431,7 @@ function tricks()
 	awk '{if($3==00 && $1~/8$/) a[$13"\t"$5"\t"$3"\t"$1]+=1}END{ for(i in a) print i"\t"a[i]}'
 
 	# awk多维数组统计
-	awk '{if (a in arr) {split(arr[a],puv,"\t");pv=puv[1]+$2;uv=puv[2]+$3;} else arr[$1]=$2"\t"$3;}END{ for(a in arr) print a,arr[a]|"sort -rn -k2"}' 
+	awk '{if (a in arr) {split(arr[a],puv,"\t");pv=puv[1]+$2;uv=puv[2]+$3;} else arr[$1]=$2"\t"$3;}END{ for(a in arr) print a,arr[a]|"sort -rn -k2"}'
 
 }
 

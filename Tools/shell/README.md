@@ -375,23 +375,30 @@ awk 'BEGIN{ print "start" } pattern{ commands } END{ print "end" }' file
 
 #### 基础
 
-##### 基本
+##### 变量
 
 内置变量
-
 ```
 NR：表示awk开始执行程序后所读取的数据行数。
 FNR：awk当前读取的记录数，其变量值小于等于NR（比如当读取第二个文件时，FNR是从0开始重新计数，而NR不会）。
 ```
+变量传递
 
-关键语句
+```shell
+# 向awk命令行程序传递变量
+1.  awk '{print a, b}' a=111 b=222 yourfile
+注意, 变量位置要在 file 名之前, 否则就不能调用，还有, 于 BEGIN{}中是不能调用这些的variable. 要用之后所讲的第二种方法才可解决.
 
+2.  awk –v a=111 –v b=222 '{print a,b}' yourfile
+注意, 对每一个变量加一个 –v 作传递.
+
+3.  awk '{print "'"$LOGNAME"'"}' yourfile
+如果想调用environment variable, 要用以上的方式调用, 方法是:"'"$LOGNAME"'"
 ```
-# getline 语句
-实现两个文件的同步读取，当然另一种方法是利用字典实现
-```
 
-模式
+##### 模式和正则
+
+awk本身支持扩展正则，不需要加额外的参数
 
 ```shell
 # 模式是用来对行进行筛选的,常见的模式筛选规则举例：
@@ -405,20 +412,6 @@ result=`awk '$2~/^K/ && $2 > 80 { print }' scores.txt`
 
 # 区间模式（以Nancy开头的行为起始，第2列等于92分的行为终止，输出之间的连续的行。注意：当满足patter1或者pattern2的行不只一行的时候，会自动选择第一个符合要求的行。）
 result=`awk '/^Nancy/, $2==92 { print }' scores.txt` 
-```
-
-传递变量
-
-```shell
-# 向awk命令行程序传递变量
-1.  awk '{print a, b}' a=111 b=222 yourfile
-注意, 变量位置要在 file 名之前, 否则就不能调用，还有, 于 BEGIN{}中是不能调用这些的variable. 要用之后所讲的第二种方法才可解决.
-
-2.  awk –v a=111 –v b=222 '{print a,b}' yourfile
-注意, 对每一个变量加一个 –v 作传递.
-
-3.  awk '{print "'"$LOGNAME"'"}' yourfile
-如果想调用environment variable, 要用以上的方式调用, 方法是:"'"$LOGNAME"'"
 ```
 
 ##### awk运算符
@@ -463,6 +456,12 @@ next语句从输入文件中读取一行，然后从头开始执行awk脚本
 
 # exit语句
 exit语句用于结束awk程序，但不会略过END块。退出状态为0代表成功，非零值表示出错。
+```
+
+```
+getline 语句
+
+实现两个文件的同步读取，当然另一种方法是利用字典实现
 ```
 
 ##### awk脚本
@@ -758,6 +757,10 @@ sed '/hrwang/{s/hrwang/HRWANG/;q;}' datafile  #匹配到hrwang的行处理后就
 
 ##### 正则匹配
 
+sed添加-r才支持扩展正则
+
+
+
 ##### 模式空间
 
 > 流文本编辑器，处理行的时候十分方便。
@@ -844,6 +847,12 @@ grep和sed结合使用
 # 批量替换多个文件中的字符串
 sed -i 's/oldstr/newstr/g' `grep oldstr -rl odlstr $datadir`
 ```
+
+##### 正则
+
+grep加-E支持扩展正则（？+|和（））
+
+
 
 ### find
 
