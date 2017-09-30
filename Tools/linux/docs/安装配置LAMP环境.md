@@ -4,10 +4,12 @@
 
 ### 安装
 
+#### 包安装
+
 httpd、mysql、php
 
 ```shell
-# httpd:
+# httpd
 yum install httpd
 
 # mysql
@@ -22,7 +24,7 @@ yum install php
 
 ```shell
 # apache配置
-/etc/init.d/httpd start 或者service httpd start 或者systemctl start  httpd.service
+/etc/init.d/httpd start 或者service httpd start 或者systemctl start httpd.service
 chkconfig httpd on  # 配置开机启动
 
 # mysql配置
@@ -33,9 +35,9 @@ chkconfig mysqld on
 
 # php配置
 vim /var/www/html/index.php
-> <?php    
-> phpinfo();    
-> ?>    
+<?php    
+	phpinfo();    
+?>    
 ```
 
 测试
@@ -44,6 +46,8 @@ vim /var/www/html/index.php
 # 输入：
 http://localhost/index.php,看看是否出现相关的php和apache信息
 ```
+
+### 源码编译
 
 
 

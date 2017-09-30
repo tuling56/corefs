@@ -4,11 +4,49 @@
 
 ### 基本
 
+#### 安装
+
+先检查已安装版本
+
+```shell
+ rpm -qa | grep mysql
+ rpm -e --nodeps mysql_xxxx
+```
+
+包管理器安装
+
+```shell
+#1.下载mysql的repo源
+$ wget http://repo.mysql.com/mysql-community-release-el7-5.noarch.rpm
+
+#2.安装mysql-community-release-el7-5.noarch.rpm包
+$ sudo rpm -ivh mysql-community-release-el7-5.noarch.rpm
+#安装这个包后，会获得两个mysql的yum repo源：
+#/etc/yum.repos.d/mysql-community.repo
+#/etc/yum.repos.d/mysql-community-source.repo
+
+#3.安装mysql
+$ sudo yum install mysql-server
+```
+
+配置开机启动
+
+```shell
+cp ./support-files/mysql.server /etc/init.d/mysqld
+chmod +x /etc/init.d/mysqld
+chkconfig --add mysqld
+chkconfig mysqld on
+```
+
+
+
 #### 创建
 
 创建新用户并设置密码
 
+```
 create user 'username'@'host' identified by 'password';
+```
 
 授权管理
 
@@ -37,11 +75,18 @@ select * from mysql.user where user='cactiuser' \G;
  set password = password("newpassword");
 # 例子: set password for 'lin'@'%' = password("123456");
 
+# 或者
+ update user set password=password('123456') where user='root';
+
 # 授权的同时修改密码
 GRANT ALL PRIVILEGES ON `db1`.* TO 'root'@'%' IDENTIFIED by '123';
 
 # 授权给已有的用户
 GRANT ALL PRIVILEGES ON `snh48`.* TO 'root'@'%';
+
+# 使用mysqladmin修改密码
+mysqladmin -u root -p password 'root' # 如果原始密码是空，直接回车即可
+
 ```
 
 远程登陆
