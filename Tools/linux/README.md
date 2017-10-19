@@ -347,6 +347,10 @@ rpm -qa
 
 ### 环境配置
 
+#### 环境变量
+
+![设置Linux环境变量的三种方法](pics/设置Linux环境变量的三种方法.jpg)
+
 #### JDK环境
 
 删除openjdk安装sun jdk
