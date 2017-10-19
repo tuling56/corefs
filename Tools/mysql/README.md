@@ -76,7 +76,7 @@ select * from mysql.user where user='cactiuser' \G;
 # 例子: set password for 'lin'@'%' = password("123456");
 
 # 或者
- update user set password=password('123456') where user='root';
+update user set password=password('123456') where user='root';
 
 # 授权的同时修改密码
 GRANT ALL PRIVILEGES ON `db1`.* TO 'root'@'%' IDENTIFIED by '123';
@@ -86,7 +86,6 @@ GRANT ALL PRIVILEGES ON `snh48`.* TO 'root'@'%';
 
 # 使用mysqladmin修改密码
 mysqladmin -u root -p password 'root' # 如果原始密码是空，直接回车即可
-
 ```
 
 远程登陆
@@ -526,13 +525,33 @@ select (DATEDIFF(DATE_ADD(curdate, INTERVAL - DAY(curdate)+ 1 DAY), date_add(cur
 
 用awk如何实现
 
+#### 字符包含问题
+
+判断某个字段是否[包含](http://blog.csdn.net/hechurui/article/details/49278493)某个字符串的方法
+
+```mysql
+# 方法1：
+SELECT * FROM users WHERE emails like "%b@email.com%";
+
+# 方法2：find_in_set(subtr,str)函数是返回str中substr所在的位置索引，str必须以","分割开,若没有返回0。
+SELECT find_in_set('3','13,33,36,39') as test;
+
+# 方法3：locate(substr,str)函数，如果包含，返回>0的数，否则返回0 
+# 例子：判断site表中的url是否包含'http://'子串,如果不包含则拼接在url字符串开头
+update site set url =concat('http://',url) where locate('http://',url)=0;
+```
+
+例子：
+
+```mysql
+select if(b.channel_type is NULL,'其它',b.channel_type),a.channel from channels_data a LEFT JOIN channels_conf b on FIND_IN_SET(a.channel,b.channels)>0;
+```
+
 ### 高级
 
 #### 存储过程
 
 存储过程和函数的区别：
-
-> 
 
 创建存储过程
 
@@ -582,6 +601,20 @@ call  sp_name;
 ```mysql
 # 提取url域名
 select substring_index(substring_index('http://wz.cnblogs.com/my/search/?q=cookie','/',3),'/',-1);
+```
+
+IP地址处理
+
+```mysql
+# int->ip
+select inet_ntoa(3507806248); #209.20.224.40 
+
+# 还存在问题
+select concat_ws('.',cast(3507806248/pow(256,3) as signed),cast((3507806248%pow(256,3))/pow(256,2) as signed),cast(3507806248/pow(256,1) as signed),cast(3507806248/pow(256,0) as signed));
+
+# ip->int
+select 209*pow(256,3)+20*pow(256,2)+224*pow(256,1)+40*pow(256,0); # 3507806248
+select inet_aton('209.20.224.40'); # 3507806248
 ```
 
 ##### 自定义函数
@@ -880,6 +913,21 @@ INSERT INTO tablea (peerid,new_install_date,new_install_source,new_install_versi
 #### 索引
 
 单索引和联合索引
+
+#### 正则
+
+mysql[正则](http://www.cnblogs.com/way_testlife/archive/2010/09/17/1829567.html)和模糊匹配的区别
+
+```mysql
+# 正则判断（匹配返回1，不匹配返回0）
+select 'JetPack 1000'  regexp '^1000';
+```
+
+> 注：
+>
+> - MySQL中的正则表达式匹配不区分大小写。为区分大小写，可使用BINARY关键字。
+>
+>   如：select 'JetPack we2x000'  REGEXP BINARY 'JetPack .000'
 
 #### 子查询
 
