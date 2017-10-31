@@ -1008,9 +1008,14 @@ select * from ecs_goods a where EXISTS(select cat_id from ecs_category b where a
 
 ### 调优
 
+核心优先使用explain一下查问题
+
 #### 索引
 
-如何调优索引的使用
+如何设计索引的使用，索引会引入额外的性能问题，比如插入会稍慢。
+
+- 多列索引的设计及什么情况下索引会失效
+- ​
 
 #### 慢查询
 
@@ -1073,6 +1078,18 @@ mysqldumpslow -s t -t 10 -g “left join” /database/mysql/mysql06_slow.log
 mysqldumpslow -s r -t 20 /mysqldata/mysql/mysql06-slow.log | more
 ```
 
+#### 读写分离
+
+一写多读，写入的数据实时从写库同步到读库，开源代理插件360的atlas
+
+#### 分库
+
+分布式和事务的控制
+
+####  分表
+
+用法和拆分原则要一开始的时候设计好
+
 
 
 ### 备份
@@ -1129,7 +1146,7 @@ mysql -uxxxx -pxxx --default-character-set=utf8 < xxx.sql
 
 ##### 导出
 
-导出可执行的sql语句,可跨平台执行
+- 导出可执行的sql语句,可跨平台执行
 
 ```shell
 #1.导出整个数据库 
@@ -1163,7 +1180,7 @@ mysqldump -uroot -pmysql -d db1 tb1> e:\tb1.sql
 >
 > --default-character-set=gb2312
 
-导出成文件
+- 导出成文件
 
 ```shell
 # 方法1：mysql语句
@@ -1180,13 +1197,13 @@ mysql -h 127.0.0.1 -u root -p XXXX -P3306 -e "select * from table"  > /tmp/test.
 
 #### mysql导入到redis
 
-方法1：
+- 遍历插入法
 
-> 遍历插入法
+```
+//待实现
+```
 
-方法2：
-
-命令行法
+- 命令行法
 
 ```shell
 #创建shell脚本mysql2redis_mission.sh,（在mysql的结果中进行命令行的组合）内容如下：

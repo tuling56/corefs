@@ -15,7 +15,7 @@ cd $dir
 
 echo "`date +%F\ %T: `清除pyc和log文件"
 
-cd /cygdrive/e/Code/Git/Python/Projects/xmp/media_lib/
+cd /cygdrive/e/Code/Git/Python/Projects
 
 function delpyc()
 {

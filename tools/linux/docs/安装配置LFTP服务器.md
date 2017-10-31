@@ -138,6 +138,8 @@ mirror -R localdir remotedir　　// 将本地目录localdir上传到远程目�
 
 [FTP命令详解（含操作实例）](http://blog.csdn.net/indexman/article/details/46387561)
 
+[FTP命令大全](https://www.toutiao.com/a6482879662451065357/)
+
 [Centos启用ftp功能](http://os.51cto.com/art/201408/448630.htm)
 
 [lftp上传和下载文件夹(主要是mirror命令)](http://www.cnblogs.com/leonyoung/archive/2012/04/17/2453804.html)
