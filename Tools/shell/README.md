@@ -112,6 +112,8 @@ if  echo "aha"|grep "x" &>/dev/null ;then echo "find";else echo "no find";fi
 
 [linux shell中做匹配](https://segmentfault.com/q/1010000000504746)
 
+awk中字符串匹配
+
 ##### 数组
 
 ###### 普通数组
@@ -216,7 +218,6 @@ unset garray
 # 关联数组累加
 function arr_dict_sum(){
     declare -A anum
-    
     for item in a a b c d e f g k a c b d;do
         anum[$item]=$((${anum[$item]}+1));
     done
@@ -224,6 +225,29 @@ function arr_dict_sum(){
     for k in ${!anum[*]};do
         echo "$k:${anum[$k]}"
     done
+}
+
+#例子：单词计数
+function words_conut()
+{
+    declare -A cn
+    while read line;do
+        for w in $line;do
+            cn[$w]=$((${cn[$w]}+1))
+        done
+    done < words.txt
+    
+    res=""
+    for wc in ${!cn[*]};do
+        if [ -z $res ];then
+            ct="$wc\t${cn[$wc]}"
+        else
+            ct="\n$wc\t${cn[$wc]}"
+        fi
+        res="$res$ct"
+    done
+
+    echo -e "$res"|sort -k2 -rn
 }
 ```
 

@@ -1,0 +1,4 @@
+If scheme or authority are not specified, Hive will use i
+the scheme and authority from the hadoop configuration variable 
+fs.default.name that specifies the Namenode URI.
+If the path is not absolute, then Hiv

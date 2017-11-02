@@ -18,38 +18,44 @@ echo $(date +%F\ %T)
 #set -e
 
 # 管道文件同步
-function pipeline()
+function rsync_pipeline()
 {
-	iinfo "同步pipelines...."
-	# 本地管道文件同步
+	iinfo "同步本地pipelines...."
 	local src=/cygdrive/e/Code/Git/Python/Projects/xmp/media_lib/lichaotest/lichaotest/pipelines.py
 	local dst=/cygdrive/e/Code/Git/Python/Projects/xmp/media_lib/https_spider/https_spider/pipelines.py
 	cmp_mv_file $src $dst
 
-	# 本地和远程同步
+	iinfo "同步本piplelines到远程...."
 	rdst_1="/home/yjm/Projects/python/pythondev/Projects/xmp/media_lib/lichaotest/lichaotest/pipelines.py"
 	rdst_2="/home/yjm/Projects/python/pythondev/Projects/xmp/media_lib/https_spider/https_spider/pipelines.py"
 	# rsync.exe -u -e 'ssh -i ~/.ssh/id_rsa -p 122' -avP $src root@localhost:$rdst_1
 	# rsync.exe -u -e 'ssh -i ~/.ssh/id_rsa -p 122' -avP $src root@localhost:$rdst_2
 }
 
-# 本目录下的程序同步到shell库
+# 本目录下的程序同步到shell版本管理库
 function rsync_shell()
 {
+	iinfo "同步cygwin的定时脚本到shell版本库"
 	#rsync.exe -avuP ./*.py  $BASH_WORSPACE
 	rsync.exe -avuP ./*.sh  $BASH_WORKSPACE
 }
 
 # 爬虫同步
-function crawlers()
+function rsync_db()
 {
+	MYSQL="mysql -uroot -proot -N"
+	${MYSQL} -e "select * from study.datatype" > hhah
+	
 	return 0
 }
 
 
 # 主程序入口
-pipeline
+# rsync_pipeline
 rsync_shell
+#rsync_db
+
+
 
 
 exit 0

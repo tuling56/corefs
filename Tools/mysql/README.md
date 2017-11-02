@@ -4,7 +4,9 @@
 
 ### 基本
 
-#### 安装
+#### 基础
+
+##### 安装
 
 先检查已安装版本
 
@@ -38,9 +40,7 @@ chkconfig --add mysqld
 chkconfig mysqld on
 ```
 
-
-
-#### 创建
+##### 账号
 
 创建新用户并设置密码
 
@@ -116,106 +116,7 @@ show tables like "xxx%";
 fields=$(echo "desc media_info.${TABLE_NAME};"| ${LOCAL_MYSQL} | grep -v Field | grep -v auto_increment | awk '{print $1}')
 ```
 
-存储引擎
-
-```mysql
-# 修改表的存储引擎
-alter table table_name engine=innodb;
-
-# 关闭InnoDB的存储引擎
-#修改my.ini文件：
-找到default-storage-engine=INNODB 改为default-storage-engine=MYISAM
-找到#skip-innodb 改为skip-innodb
-```
-
-> MyISAM引擎格式的数据可以被文件复制，然后恢复，而InnoDB引擎不可以同步文件使用。
-
-#### 索引
-
-##### 创建和删除
-
->加索引
-
-mysql> alter table 表名 add index 索引名 (字段名1[，字段名2 …]);
-
->加主关键字的索引
-
-mysql> alter table 表名 add primary key (字段名);
-
-例子： mysql> alter table employee add primary key(id);
-
->加唯一限制条件的索引
-
- mysql> alter table 表名 add unique 索引名 (field1,filed2);
-
- 例子： mysql> alter table employee add unique emp_name2(cardnumber);
-
->删除某个索引
-
-mysql> alter table 表名 drop index 索引名;
-
-> 添加约束
-
-```mysql
-# 单列约束
-ALTER TABLE Persons ADD UNIQUE (Id_P);
-# 多列约束
-ALTER TABLE Persons ADD CONSTRAINT uc_PersonID UNIQUE (Id_P,LastName);
-```
-
-> 撤销约束
-
-```mysql
-# unique是索引的一种
-ALTER TABLE Persons DROP INDEX uc_PersonID;
-```
-
-##### 索引和KEY
-
-```mysql
-CREATE TABLE `user_follow` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `userID` varchar(16) NOT NULL DEFAULT '',
-  `starID` varchar(16) NOT NULL DEFAULT '',
-  `status_e` tinyint(4) NOT NULL DEFAULT '0',
-  `follow_t` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `insert_t` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `update_t` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `ts` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `follow` (`userID`,`starID`),
-  KEY `userID` (`userID`),
-  KEY `starID` (`starID`)
-) ENGINE=MyISAM AUTO_INCREMENT=13912 DEFAULT CHARSET=utf8;
-```
-
-注意`PRIMARY KEY`,`UNIQUE KEY`,	`KEY`的区别
-
-**索引和约束**
-
-`UNIQUE KEY`和`PRIMARY KEY`约束均为列或列集合提供了唯一性的保证，`PRIMARY KEY `拥有自动定义的 `UNIQUE` 约束,一个表可以有多个`UNIQUE KEY`约束，但是只能有一个`PRIMARY KEY`约束。
-
-```mysql
-CREATE TABLE Persons(
-    Id_P int NOT NULL,
-    LastName varchar(255) NOT NULL,
-    FirstName varchar(255),
-    Address varchar(255),
-    City varchar(255),
-    UNIQUE (Id_P)
-);
-
-CREATE TABLE Persons(
-    Id_P int NOT NULL,
-    LastName varchar(255) NOT NULL,
-    FirstName varchar(255),
-    Address varchar(255),
-    City varchar(255),
-    CONSTRAINT uc_PersonID UNIQUE (Id_P,LastName)
-)
-```
-
-#### 字段
+##### 字段
 
 增加字段
 
@@ -252,7 +153,7 @@ UPDATE tbl SET col1 = col1 + 1, col2 = col1;
 
 http://c.biancheng.net/cpp/html/1456.html
 
-#### 编码
+##### 编码
 
 查看字符数据库的字符集
 
@@ -357,18 +258,169 @@ tips:
 ```python
 # python连接mysql的时候指定编码或者socket
  conn = MySQLdb.connect(host="localhost", user="xxxx", passwd="xxx",use_unicode=True, charset="utf8",unix_socket='/tmp/mysql_3309.sock')
-
 ```
 
+##### 变量
 
+查看全局变量
 
-#### 变量查看
-
->  查看全局变量
-
+```shell
 命令行：mysqladmin variables -p，这个操作也就相当于登录时使用命令 show global variables;
+# 若查看某种类型的变量
+show global variables like "%_time";
+```
 
-#### 函数使用
+修改变量
+
+```
+set global long_query_time=2;
+```
+
+#### 索引
+
+##### 创建和删除
+
+>加索引
+
+mysql> alter table 表名 add index 索引名 (字段名1[，字段名2 …]);
+
+>加主关键字的索引
+
+mysql> alter table 表名 add primary key (字段名);
+
+例子： mysql> alter table employee add primary key(id);
+
+>加唯一限制条件的索引
+
+ mysql> alter table 表名 add unique 索引名 (field1,filed2);
+
+ 例子： mysql> alter table employee add unique emp_name2(cardnumber);
+
+>删除某个索引
+
+mysql> alter table 表名 drop index 索引名;
+
+> 添加约束
+
+```mysql
+# 单列约束
+ALTER TABLE Persons ADD UNIQUE (Id_P);
+# 多列约束
+ALTER TABLE Persons ADD CONSTRAINT uc_PersonID UNIQUE (Id_P,LastName);
+```
+
+> 撤销约束
+
+```mysql
+# unique是索引的一种
+ALTER TABLE Persons DROP INDEX uc_PersonID;
+```
+
+##### 索引和KEY
+
+```mysql
+CREATE TABLE `user_follow` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `userID` varchar(16) NOT NULL DEFAULT '',
+  `starID` varchar(16) NOT NULL DEFAULT '',
+  `status_e` tinyint(4) NOT NULL DEFAULT '0',
+  `follow_t` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `insert_t` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `update_t` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `ts` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `follow` (`userID`,`starID`),
+  KEY `userID` (`userID`),
+  KEY `starID` (`starID`)
+) ENGINE=MyISAM AUTO_INCREMENT=13912 DEFAULT CHARSET=utf8;
+```
+
+注意`PRIMARY KEY`,`UNIQUE KEY`,	`KEY`的区别
+
+**索引和约束**
+
+`UNIQUE KEY`和`PRIMARY KEY`约束均为列或列集合提供了唯一性的保证，`PRIMARY KEY `拥有自动定义的 `UNIQUE` 约束,一个表可以有多个`UNIQUE KEY`约束，但是只能有一个`PRIMARY KEY`约束。
+
+```mysql
+CREATE TABLE Persons(
+    Id_P int NOT NULL,
+    LastName varchar(255) NOT NULL,
+    FirstName varchar(255),
+    Address varchar(255),
+    City varchar(255),
+    UNIQUE (Id_P)
+);
+
+CREATE TABLE Persons(
+    Id_P int NOT NULL,
+    LastName varchar(255) NOT NULL,
+    FirstName varchar(255),
+    Address varchar(255),
+    City varchar(255),
+    CONSTRAINT uc_PersonID UNIQUE (Id_P,LastName)
+)
+```
+
+#### 引擎
+
+存储引擎
+
+```mysql
+# 修改表的存储引擎
+alter table table_name engine=innodb;
+
+# 关闭InnoDB的存储引擎
+#修改my.ini文件：
+找到default-storage-engine=INNODB 改为default-storage-engine=MYISAM
+找到#skip-innodb 改为skip-innodb
+```
+
+> MyISAM引擎格式的数据可以被文件复制，然后恢复，而InnoDB引擎不可以同步文件使用。
+
+##### CSV
+
+```
+CSV（Comma-Separated Values逗号分隔值）
+   使用该引擎的MySQL数据库表会在MySQL安装目录data文件夹中的和该表所在数据库名相同的目录中生成一个.CSV文件（所以，它可以将CSV类型的文件当做表进行处理），这种文件是一种普通文本文件，每个数据行占用一个文本行。该种类型的存储引擎不支持索引，即使用该种类型的表没有主键列；另外也不允许表中的字段为null。
+```
+
+#####  MEMORY
+
+也称为HEAP
+
+```
+        该存储引擎通过在内存中创建临时表来存储数据。每个基于该存储引擎的表实际对应一个磁盘文件，该文件的文件名和表名是相同的，类型为.frm。该磁盘文件只存储表的结构，而其数据存储在内存中，所以使用该种引擎的表拥有极高的插入、更新和查询效率。这种存储引擎默认使用哈希（HASH）索引，其速度比使用B-+Tree型要快，但也可以使用B树型索引。由于这种存储引擎所存储的数据保存在内存中，所以其保存的数据具有不稳定性，比如如果mysqld进程发生异常、重启或计算机关机等等都会造成这些数据的消失，所以这种存储引擎中的表的生命周期很短，一般只使用一次。
+```
+
+##### InnoDB
+
+##### MyISAM
+
+###### InnoDB和MyISAM的区别
+
+| 区别点                            | **MyISAM**                               | **InnoDB**                               |
+| ------------------------------ | ---------------------------------------- | ---------------------------------------- |
+| **构成上**                        | 每个MyISAM在磁盘上存储成三个文件。第一个文件的名字以表的名字开始，扩展名指出文件类型。  .frm文件存储表定义。  数据文件的扩展名为.MYD (MYData)。  索引文件的扩展名是.MYI (MYIndex)。 | 基于磁盘的资源是InnoDB表空间数据文件和它的日志文件，InnoDB 表的大小只受限于操作系统文件的大小，一般为 2GB |
+| 事务处理上                          | MyISAM类型的表强调的是性能，其执行数度比InnoDB类型更快，但是不提供事务支持 | InnoDB提供事务支持事务，外部键等高级数据库功能               |
+| SELECT ,UPDATE,INSERT，Delete操作 | 如果执行大量的SELECT，MyISAM是更好的选择               | **1.**如果你的数据执行大量的**INSERT****或****UPDATE**，出于性能方面的考虑，应该使用InnoDB表  **2.DELETE   FROM table**时，InnoDB不会重新建立表，而是一行一行的删除。  **3.LOAD   TABLE FROM MASTER**操作对InnoDB是不起作用的，解决方法是首先把InnoDB表改成MyISAM表，导入数据后再改成InnoDB表，但是对于使用的额外的InnoDB特性（例如外键）的表不适用 |
+| 对AUTO_INCREMENT的操作             | 每表一个AUTO_INCREMEN列的内部处理。  **MyISAM****为****INSERT****和****UPDATE****操作自动更新这一列**。这使得AUTO_INCREMENT列更快（至少10%）。在序列顶的值被删除之后就不能再利用。(当AUTO_INCREMENT列被定义为多列索引的最后一列，可以出现重使用从序列顶部删除的值的情况）。  AUTO_INCREMENT值可用ALTER TABLE或myisamch来重置  对于AUTO_INCREMENT类型的字段，InnoDB中必须包含只有该字段的索引，但是在MyISAM表中，可以和其他字段一起建立联合索引  更好和更快的auto_increment处理 | 如果你为一个表指定AUTO_INCREMENT列，在数据词典里的InnoDB表句柄包含一个名为自动增长计数器的计数器，它被用在为该列赋新值。  自动增长计数器仅被存储在主内存中，而不是存在磁盘上  关于该计算器的算法实现，请参考  **AUTO_INCREMENT****列在****InnoDB****里如何工作** |
+| **表的具体行数**                     | select count(*) from table,MyISAM只要简单的读出保存好的行数，注意的是，当count(*)语句包含   where条件时，两种表的操作是一样的 | InnoDB 中不保存表的具体行数，也就是说，执行select count(*) from table时，InnoDB要扫描一遍整个表来计算有多少行 |
+| **锁**                          | 表锁                                       | 提供行锁(locking on row level)，提供与 Oracle 类型一致的不加锁读取(non-locking read in   SELECTs)，另外，InnoDB表的行锁也不是绝对的，如果在执行一个SQL语句时MySQL不能确定要扫描的范围，InnoDB表同样会锁全表，例如update table set num=1 where name like “%aaa%” |
+
+##### FEDERATED
+
+主要用于将不同的数据库服务器上的数据组合起来
+
+```shell
+# 开启引擎支持
+在windows下只需要在mysql的配置文件 my.ini 最末尾加上一句federated 
+```
+
+参考：[MySQL中的各种引擎的区别](http://blog.csdn.net/gaohuanjie/article/details/50944782)
+
+#### 函数
+
+字符串函数
 
 ```sql
 # 日期从20161212转换成2016/12/12,后者的格式能容易被excel处理
@@ -382,170 +434,7 @@ a=20161212
 while read line;do echo ${line:0:4}"/"${line:4:2}"/"${line:6:2}; done<<< "${a}"
 ```
 
-### 积累
 
-#### 运行方式技巧
-
-```shell
-# 方法1
-${MYSQL10} < xmp_version_active.sql
-#其中MYSQL10是:`/usr/bin/mysql -uroot -phive -N`
-
-# 方法2
-MYSQL="/usr/bin/mysql -uxxxx -pxxxx -hxxxx -Pxxxx"
-sql="select movieid,pageurl,posterurl from poster_to_down where image_type='poster' and ts >='${time_start}'"
-echo "${sql}" | ${MYSQL} media_info |sed '1d' > ${file}
-
-Local_MYSQL="/usr/bin/mysql -uxxxxx -pxxxx -hxxxxx media_info"
-echo "alter table media_relation_search_pc rename media_relation_search_pc_old_$(date +'%Y%m%d');" | $Local_MYSQL
-
-# 方法3
-cat /data/rsync_data/kk_sql/videos.sql |$mysql video
-```
-
-#### 插入技巧
-
-```mysql
-# 一次性插入多个值
-INSERT into task_request(proposer,enddate) values ("鲁丽",'20170611'),("张一",'20170322'),("王二",'20170101');
-
-# 从tb1中选出两列插入到tb2中
-INSERT into tb2(proposer,enddate) select xx,yy from tb1;
-```
-
-#### 信息筛选
-
-查询某个字段匹配的的表和所在的数据库
-
-```mysql
-SELECT TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME from information_schema.`COLUMNS` where COLUMN_NAME like '%isover%';
-```
-
-#### restful接口
-
-```shell
-pip install sandman2
-sandman2ctl 'mysql+mysqldb://root:root@localhost/pgv_stat_yingyin'
-* Running on http://0.0.0.0:5000/
-```
-
-其中mysql的链接方式可以有[以下几种](http://docs.sqlalchemy.org/en/latest/core/engines.html#mysql)：
-
-```python
-# default
-engine = create_engine('mysql://scott:tiger@localhost/foo')
-
-# mysql-python
-engine = create_engine('mysql+mysqldb://scott:tiger@localhost/foo')
-
-# MySQL-connector-python
-engine = create_engine('mysql+mysqlconnector://scott:tiger@localhost/foo')
-
-# OurSQL
-engine = create_engine('mysql+oursql://scott:tiger@localhost/foo')
-```
-
-sandman2ctl的配置有以下：
-
-```
-optional arguments:
-  -h, --help            show this help message and exit
-  -d, --debug           Turn on debug logging
-  -p PORT, --port PORT  Port for service to listen on
-  -l, --local-only      Only provide service on localhost (will not be
-                        accessible from other machines)
-  -r, --read-only       Make all database resources read-only (i.e. only the
-                        HTTP GET method is supported)
-  -s SCHEMA, --schema SCHEMA
-                        Use this named schema instead of default
-```
-
-> 问题是中午的查询结果是unicode显示，命令行配置jq才能正常显示，而web访问还没有查到显示中文的方式
-
-#### 选取结果添加行号
-
-```mysql
-# 方法1 
-set @mycnt=0;
-select (@mycnt := @mycnt + 1) as ROWNUM , vv from task1_tbl order by vv;
-
-# 方法2
-# #将查询结果写入到某个拥有auto_increment字段的临时表中再做查询
-
-# 方法3
-# #用Python等脚本语言对查询结果进行二次组装
-```
-
-#### 近段时间数据修复
-
-```mysql
-# 用上周同期的数据浮动修复本周的数据
-delete from db2.tb1 where date>=20160818 and date<=20160821;
-insert into db2.tb1 select
-	date_format(date_add(date, interval 7 day),'%Y%m%d'),
-	channel,
-	version,
-	install_begin + round(install_begin / 100),
-	install_end + round(install_end / 100),
-	uninstall+round(uninstall/100)
-from
-	db2.tb1
-where
-	date >= '20160811' and date <= '20160814';
-
-# 用除了修复日期外其它近段时间的数据平均修复
-delete from db2.tb1 where date='20170313';
-insert into db2.tb1 select
-	'20170313',
-	channel,
-	version,
-	avg(install_begin),
-	avg(install_end),
-from
-	db2.tb1
-where
-	date='20170309'  and  date<='20170315' and date!='20170313';
-```
-
-#### 选取指定日期
-
-```mysql
-select (DATEDIFF(DATE_ADD(curdate, INTERVAL - DAY(curdate)+ 1 DAY), date_add(curdate- DAY(curdate)+ 1, INTERVAL -1 MONTH)))  as '上月总天数', DATE_ADD(curdate,interval -day(curdate)+1 day) as '当月第一天', date_add(curdate-day(curdate)+1,interval -1 month ) as '上月第一天';
-```
-
-> 这段还没有完全调通
-
-#### GroupSelect问题
-
-问题描述：先分组，然后在从分组中选取某些值，比如topN
-
-```mysql
-//待补充
-```
-
-用awk如何实现
-
-#### 字符包含问题
-
-判断某个字段是否[包含](http://blog.csdn.net/hechurui/article/details/49278493)某个字符串的方法
-
-```mysql
-# 方法1：
-SELECT * FROM users WHERE emails like "%b@email.com%";
-
-# 方法2：find_in_set(subtr,str)函数是返回str中substr所在的位置索引，str必须以","分割开,若没有返回0。
-SELECT find_in_set('3','13,33,36,39') as test;
-
-# 方法3：locate(substr,str)函数，如果包含，返回>0的数，否则返回0 
-# 例子：判断site表中的url是否包含'http://'子串,如果不包含则拼接在url字符串开头
-update site set url =concat('http://',url) where locate('http://',url)=0;
-```
-
-例子：
-
-```mysql
-select if(b.channel_type is NULL,'其它',b.channel_type),a.channel from channels_data a LEFT JOIN channels_conf b on FIND_IN_SET(a.channel,b.channels)>0;
-```
 
 ### 高级
 
@@ -723,10 +612,10 @@ CREATE TRIGGER trigger_name trigger_time trigger_event ON tbl_name FOR EACH ROW 
 
 ```mysql
 DROP TRIGGER [schema_name.]trigger_name
-可以使用old和new代替旧的和新的数据
-更新操作，更新前是old，更新后是new.
-删除操作，只有old.
-增加操作，只有new.
+#可以使用old和new代替旧的和新的数据
+#更新操作，更新前是old，更新后是new.
+#删除操作，只有old.
+#增加操作，只有new.
 ```
 
 一个例子：
@@ -744,6 +633,290 @@ END
 [already used by statement](https://stackoverflow.com/questions/15300673/mysql-error-cant-update-table-in-stored-function-trigger-because-it-is-already)
 
 [MySQL触发器](http://www.toutiao.com/i6468771136527139341/)
+
+### 查询
+
+#### 索引
+
+单索引和联合索引
+
+#### 正则
+
+mysql[正则](http://www.cnblogs.com/way_testlife/archive/2010/09/17/1829567.html)和模糊匹配的区别
+
+```mysql
+# 正则判断（匹配返回1，不匹配返回0）
+select 'JetPack 1000'  regexp '^1000';
+```
+
+> 注：
+>
+> - MySQL中的正则表达式匹配不区分大小写。为区分大小写，可使用BINARY关键字。
+>
+>   如：select 'JetPack we2x000'  REGEXP BINARY 'JetPack .000'
+
+#### 子查询
+
+#### 连接
+
+##### join
+
+###### inner join
+
+```mysql
+#SELECT Persons.LastName, Persons.FirstName, Orders.OrderNo
+#FROM Persons
+#INNER JOIN Orders
+#ON Persons.Id_P = Orders.Id_P
+#ORDER BY Persons.LastName;
+
+# 该语句等效于
+SELECT
+	Persons.LastName,
+	Persons.FirstName,
+	Orders.OrderNo
+FROM
+	Persons,
+	Orders
+WHERE
+	Persons.Id_P = Orders.Id_P
+```
+
+###### left join
+
+```mysql
+SELECT
+	Persons.LastName,
+	Persons.FirstName,
+	Orders.OrderNo
+FROM
+	Persons
+LEFT JOIN Orders ON Persons.Id_P = Orders.Id_P
+WHERE persons.LastName like 'C%'
+ORDER BY
+	Persons.LastName 
+```
+
+###### right join
+
+```mysql
+SELECT
+	Persons.LastName,
+	Persons.FirstName,
+	Orders.OrderNo
+FROM
+	Persons
+RIGHT JOIN Orders ON Persons.Id_P = Orders.Id_P
+ORDER BY
+	Persons.LastName
+```
+
+###### union(all)
+
+```mysql
+# 请注意，UNION 内部的 SELECT 语句必须拥有相同数量的列。列也必须拥有相似的数据类型。同时，每条 SELECT 语句中的列的顺序必须相同。
+# 注释：默认地，UNION 操作符选取不同的值。如果允许重复的值，请使用 UNION ALL。
+SELECT	* from	persons
+UNION All
+SELECT	* from	persons;
+```
+
+##### exists和in
+
+```mysql
+#这条语句适用于a表比b表大的情况
+select * from ecs_goods a where cat_id in(select cat_id from ecs_category);
+
+#这条语句适用于b表比a表大的情况
+select * from ecs_goods a where EXISTS(select cat_id from ecs_category b where a.cat_id = b.cat_id);
+```
+
+### 积累
+
+#### 运行方式技巧
+
+```shell
+# 方法1
+${MYSQL10} < xmp_version_active.sql
+#其中MYSQL10是:`/usr/bin/mysql -uroot -phive -N`
+
+# 方法2
+MYSQL="/usr/bin/mysql -uxxxx -pxxxx -hxxxx -Pxxxx"
+sql="select movieid,pageurl,posterurl from poster_to_down where image_type='poster' and ts >='${time_start}'"
+echo "${sql}" | ${MYSQL} media_info |sed '1d' > ${file}
+
+Local_MYSQL="/usr/bin/mysql -uxxxxx -pxxxx -hxxxxx media_info"
+echo "alter table media_relation_search_pc rename media_relation_search_pc_old_$(date +'%Y%m%d');" | $Local_MYSQL
+
+# 方法3
+cat /data/rsync_data/kk_sql/videos.sql |$mysql video
+```
+
+#### 插入技巧
+
+```mysql
+# 一次性插入多个值
+INSERT into task_request(proposer,enddate) values ("鲁丽",'20170611'),("张一",'20170322'),("王二",'20170101');
+
+# 从tb1中选出两列插入到tb2中
+INSERT into tb2(proposer,enddate) select xx,yy from tb1;
+```
+
+#### 信息筛选
+
+查询某个字段匹配的的表和所在的数据库
+
+```mysql
+SELECT TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME from information_schema.`COLUMNS` where COLUMN_NAME like '%isover%';
+```
+
+#### restful接口
+
+```shell
+pip install sandman2
+sandman2ctl 'mysql+mysqldb://root:root@localhost/pgv_stat_yingyin'
+* Running on http://0.0.0.0:5000/
+```
+
+其中mysql的链接方式可以有[以下几种](http://docs.sqlalchemy.org/en/latest/core/engines.html#mysql)：
+
+```python
+# default
+engine = create_engine('mysql://scott:tiger@localhost/foo')
+
+# mysql-python
+engine = create_engine('mysql+mysqldb://scott:tiger@localhost/foo')
+
+# MySQL-connector-python
+engine = create_engine('mysql+mysqlconnector://scott:tiger@localhost/foo')
+
+# OurSQL
+engine = create_engine('mysql+oursql://scott:tiger@localhost/foo')
+```
+
+sandman2ctl的配置有以下：
+
+```
+optional arguments:
+  -h, --help            show this help message and exit
+  -d, --debug           Turn on debug logging
+  -p PORT, --port PORT  Port for service to listen on
+  -l, --local-only      Only provide service on localhost (will not be
+                        accessible from other machines)
+  -r, --read-only       Make all database resources read-only (i.e. only the
+                        HTTP GET method is supported)
+  -s SCHEMA, --schema SCHEMA
+                        Use this named schema instead of default
+```
+
+> 问题是中午的查询结果是unicode显示，命令行配置jq才能正常显示，而web访问还没有查到显示中文的方式
+
+#### 选取结果添加行号
+
+```mysql
+# 方法1 
+set @mycnt=0;
+select (@mycnt := @mycnt + 1) as ROWNUM , vv from task1_tbl order by vv;
+
+# 方法2
+# #将查询结果写入到某个拥有auto_increment字段的临时表中再做查询
+
+# 方法3
+# #用Python等脚本语言对查询结果进行二次组装
+```
+
+#### 近段时间数据修复
+
+```mysql
+# 用上周同期的数据浮动修复本周的数据
+delete from db2.tb1 where date>=20160818 and date<=20160821;
+insert into db2.tb1 select
+	date_format(date_add(date, interval 7 day),'%Y%m%d'),
+	channel,
+	version,
+	install_begin + round(install_begin / 100),
+	install_end + round(install_end / 100),
+	uninstall+round(uninstall/100)
+from
+	db2.tb1
+where
+	date >= '20160811' and date <= '20160814';
+
+# 用除了修复日期外其它近段时间的数据平均修复
+delete from db2.tb1 where date='20170313';
+insert into db2.tb1 select
+	'20170313',
+	channel,
+	version,
+	avg(install_begin),
+	avg(install_end),
+from
+	db2.tb1
+where
+	date='20170309'  and  date<='20170315' and date!='20170313';
+```
+
+#### 选取指定日期
+
+```mysql
+select (DATEDIFF(DATE_ADD(curdate, INTERVAL - DAY(curdate)+ 1 DAY), date_add(curdate- DAY(curdate)+ 1, INTERVAL -1 MONTH)))  as '上月总天数', DATE_ADD(curdate,interval -day(curdate)+1 day) as '当月第一天', date_add(curdate-day(curdate)+1,interval -1 month ) as '上月第一天';
+```
+
+> 这段还没有完全调通
+
+#### 字符包含问题
+
+判断某个字段是否[包含](http://blog.csdn.net/hechurui/article/details/49278493)某个字符串的方法
+
+```mysql
+# 方法1：
+SELECT * FROM users WHERE emails like "%b@email.com%";
+
+# 方法2：find_in_set(subtr,str)函数是返回str中substr所在的位置索引，str必须以","分割开,若没有返回0。
+SELECT find_in_set('3','13,33,36,39') as test;
+
+# 方法3：locate(substr,str)函数，如果包含，返回>0的数，否则返回0 
+# 例子：判断site表中的url是否包含'http://'子串,如果不包含则拼接在url字符串开头
+update site set url =concat('http://',url) where locate('http://',url)=0;
+```
+
+例子：
+
+```mysql
+select if(b.channel_type is NULL,'其它',b.channel_type),a.channel from channels_data a LEFT JOIN channels_conf b on FIND_IN_SET(a.channel,b.channels)>0;
+```
+
+#### 跨库Join问题
+
+- 字段冗余设计
+- 表复制和同步到一个库中
+- 链接表
+
+> 链接表的使用要求FEDERATED 的打开，默认是关闭的
+
+```mysql
+# 链接表的创建
+CREATE TABLE `link_tbl` (
+`uninstalldate`  varchar(10)  NOT NULL DEFAULT '' ,
+`newinstalldate`  varchar(10)  NOT NULL DEFAULT '' ,
+`coverinstalldate`  varchar(10)  NOT NULL DEFAULT '' 
+)
+ENGINE=FEDERATED
+DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci
+ROW_FORMAT=COMPACT
+CONNECTION='mysql://root:root@localhost:3306/task/xmp_uninstall'  
+COMMENT='task.xmp_uninstall－链接表[3306]';
+```
+
+链接表的注意事项：
+
+1.本地的表结构必须与远程的完全一样
+
+2.远程数据库目前仅限MySQL（其它主流数据库暂不支持）
+
+3.不支持事务
+
+4.不支持表结构修改
 
 ### 应用
 
@@ -803,7 +976,7 @@ from sales group by 年;
 
 #### 列转行
 
-有两种实现方式:`序列化表`和`union`
+有两种实现方式:`序列化表`和`union all` 
 
 ```mysql
 # 利用序列化表的方式实现列转行
@@ -830,15 +1003,15 @@ SELECT user_name,'skills2',skills3 from nameskills_col ORDER BY user_name;
 
 #### 同一属性多值过滤
 
+选出同时具有fei和bianhua能力的人
+
 ```mysql
 # 方法一
-#选出同时具有fei和bianhua能力的人
 SELECT DISTINCT a.name AS 'feibianren' from nameskills a 
 JOIN  nameskills b on a.name=b.name and b.skills='fei'
 join  nameskills c on a.name=c.`name` and c.skills='bianhua';
 
 # 方法二：
-# 同一属性多值过滤问题
 SELECT
 	a.`name`,
 	b.skills as bskill
@@ -908,103 +1081,56 @@ UPDATE field1='value1', field2='value2', field3='value3', ...
 INSERT INTO tablea (peerid,new_install_date,new_install_source,new_install_version,new_install_type,insert_date,insert_source,insert_version,insert_type) VALUES("%s","%s","%s","%s","%s","%s","%s","%s","%s") ON DUPLICATE KEY UPDATE new_install_type="%s"' 
 ```
 
-### 查询
-
-#### 索引
-
-单索引和联合索引
-
-#### 正则
-
-mysql[正则](http://www.cnblogs.com/way_testlife/archive/2010/09/17/1829567.html)和模糊匹配的区别
+#### 删除重复数据
 
 ```mysql
-# 正则判断（匹配返回1，不匹配返回0）
-select 'JetPack 1000'  regexp '^1000';
+# 待补充
 ```
 
-> 注：
->
-> - MySQL中的正则表达式匹配不区分大小写。为区分大小写，可使用BINARY关键字。
->
->   如：select 'JetPack we2x000'  REGEXP BINARY 'JetPack .000'
+#### GroupTopN
 
-#### 子查询
-
-#### 连接
-
-##### join
-
-###### inner join
+问题描述：先分组，然后在从分组中选取前N个值，比如topN
 
 ```mysql
-#SELECT Persons.LastName, Persons.FirstName, Orders.OrderNo
-#FROM Persons
-#INNER JOIN Orders
-#ON Persons.Id_P = Orders.Id_P
-#ORDER BY Persons.LastName;
-
-# 该语句等效于
+# 例子1：(遍历所有记录，取每条记录与当前记录做比较，只有当同一版本不超过3个比当前高时，这个才是前三名)。
 SELECT
-	Persons.LastName,
-	Persons.FirstName,
-	Orders.OrderNo
+	*
 FROM
-	Persons,
-	Orders
+	study.row2col_tbl AS e
 WHERE
-	Persons.Id_P = Orders.Id_P
-```
+	(
+		SELECT
+			count(DISTINCT(e1.cnt))
+		FROM
+			study.row2col_tbl AS e1
+		WHERE
+			e1.date = e.date and e1.xl_version=e.xl_version
+		AND e1.cnt > e.cnt) < 2
+ ORDER BY e.date;
 
-###### left join
-
-```mysql
+# 例子2:连接其它表
 SELECT
-	Persons.LastName,
-	Persons.FirstName,
-	Orders.OrderNo
+	b.department_name AS Department,
+	a.name AS Employee,
+	a.salary AS Salary
 FROM
-	Persons
-LEFT JOIN Orders ON Persons.Id_P = Orders.Id_P
-WHERE persons.LastName like 'C%'
+	study.employes AS a
+INNER JOIN study.department AS b ON a.department_id = b.id
+WHERE
+	(
+		SELECT
+			count(DISTINCT(a1.salary))
+		FROM
+			study.employes AS a1
+		WHERE
+			a1.department_id = a.department_id
+		AND a1.salary > a.salary
+	) < 3
 ORDER BY
-	Persons.LastName 
-
+	b.department_name DESC,a.salary DESC;
 ```
 
-###### right join
-
-```mysql
-SELECT
-	Persons.LastName,
-	Persons.FirstName,
-	Orders.OrderNo
-FROM
-	Persons
-RIGHT JOIN Orders ON Persons.Id_P = Orders.Id_P
-ORDER BY
-	Persons.LastName
-```
-
-###### union(all)
-
-```mysql
-# 请注意，UNION 内部的 SELECT 语句必须拥有相同数量的列。列也必须拥有相似的数据类型。同时，每条 SELECT 语句中的列的顺序必须相同。
-# 注释：默认地，UNION 操作符选取不同的值。如果允许重复的值，请使用 UNION ALL。
-SELECT	* from	persons
-UNION All
-SELECT	* from	persons;
-```
-
-##### exists和in
-
-```mysql
-#这条语句适用于a表比b表大的情况
-select * from ecs_goods a where cat_id in(select cat_id from ecs_category);
-
-#这条语句适用于b表比a表大的情况
-select * from ecs_goods a where EXISTS(select cat_id from ecs_category b where a.cat_id = b.cat_id);
-```
+> 用awk如何实现
 
 ### 调优
 
@@ -1178,7 +1304,7 @@ mysqldump -uroot -pmysql -d db1 tb1> e:\tb1.sql
 >
 > 导出中文乱码的解决方式：
 >
-> --default-character-set=gb2312
+> >  --default-character-set=gb2312
 
 - 导出成文件
 
@@ -1224,6 +1350,8 @@ cat xxx.file |redis-cli [--pipe]
 
 ## 参考
 
+- 基础
+
 [SQL的存储过程和函数](http://www.toutiao.com/a6391569028531831041/)
 
 [MyCli:支持自动补全和语法高亮的MySQL客户端](http://hao.jobbole.com/mycli-mysql/)
@@ -1241,6 +1369,12 @@ cat xxx.file |redis-cli [--pipe]
 [MySQL存储过程的动态行转列](http://www.tuicool.com/articles/FNRVJvb)
 
 [重温SQL:行转列，列转行](http://mp.weixin.qq.com/s/pd4sEFa9oq0Lw5aaagmsxw)
+
+[慕课网:MySQL行列互转](http://www.imooc.com/learn/427)
+
+[跨库Join解决方法](http://blog.csdn.net/u011277123/article/details/54374780)
+
+[GroupTopN问题解决](http://blog.csdn.net/wzy_1988/article/details/52871636)
 
 - 调优部分
 
