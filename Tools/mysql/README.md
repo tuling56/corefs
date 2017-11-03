@@ -1376,6 +1376,8 @@ cat xxx.file |redis-cli [--pipe]
 
 [GroupTopN问题解决](http://blog.csdn.net/wzy_1988/article/details/52871636)
 
+[MySQL分组取TopN](http://www.jb51.net/article/31590.htm)
+
 - 调优部分
 
 [MySQL慢查询日志的使用](http://www.cnblogs.com/kerrycode/p/5593204.html)

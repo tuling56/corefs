@@ -128,3 +128,5 @@ php -m
 [LAMP整套系统编译安装](http://php.net/manual/zh/install.unix.apache2.php)
 
 [编译apache2.4出现的问题](http://www.503e.net/archives/1212)
+
+[编译安装](http://www.cnblogs.com/alexqdh/archive/2012/11/20/2776017.html)
