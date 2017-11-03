@@ -140,6 +140,31 @@ server{}            # 块定义了虚拟主机
 
 >  nginx的配置和参数优化比较复杂，需要不断的根据实际使用进行调整。
 
+##### 自动列出目录
+
+```nginx
+autoindex on;
+autoindex_exact_size off;
+autoindex_localtime on;
+charset utf-8,gbk;
+```
+
+> 在Nginx下默认是不允许列出整个目录的。如需此功能，
+>
+> 先打开nginx.conf文件，在location server 或 http段中加入autoindex on;
+>
+> 另外两个参数最好也加上去:
+>
+> autoindex_exact_size off;
+> 默认为on，显示出文件的确切大小，单位是bytes。改为off后，显示出文件的大概大小，单位是kB或者MB或者GB
+>
+> autoindex_localtime on;
+> 默认为off，显示的文件时间为GMT时间。注意:改为on后，显示的文件时间为文件的服务器时间
+>
+> 但是如果有中文目录的话会出现乱码问题，所以还需要在下面添加这一句：
+>
+> charset utf-8,gbk;
+
 #### location的匹配规则
 
 | 模式                  | 含义                                       |
