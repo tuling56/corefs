@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 '''
-    Fun:最长连续子序列
+    Fun:最长连续子串(此处连续的定义为数字连续）
     Ref:
-    State：
+    State：存在问题
     Date:2017/4/26
     Author:tuling56
 '''
@@ -14,7 +14,7 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 
 
-def fun():
+def maxcon_substring():
     inputl = [1, 2, 4, 5, 7, 9, 12, 13, 14]
     startpos = 0
     endpos = 0
@@ -56,4 +56,4 @@ def fun():
 
 # 测试入口
 if __name__ == "__main__":
-    fun()
+    maxcon_substring()

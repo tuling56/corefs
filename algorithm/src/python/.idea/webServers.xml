@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="016547d8-2615-42d0-861c-4061fe9227b7" name="ALecs" url="http://47.95.195.31">
+        <fileTransfer host="47.95.195.31" port="22" privateKey="$USER_HOME$/.ssh/id_rsa" rootFolder="/home/yjm/Documents/code/algorithm/python" accessType="SFTP" keyPair="true">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" />
+          </advancedOptions>
+          <option name="port" value="22" />
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
