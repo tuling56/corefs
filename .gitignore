@@ -1,10 +1,15 @@
 data/
 dev/
+.idea/
+trash/
+
 
 *.pyc
 *.log
 *.csv
 *.xls
 *.xlsx
+*.tar.gz
+*.zip
 
 

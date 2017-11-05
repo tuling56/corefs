@@ -964,9 +964,54 @@ exit 0
 
 
 
-## 效率工具
+## 工具积累
+
+### 文件传输
 
 文件自动备份
+
+### 文件转换
+
+#### 转置
+
+行转列，实现方法如下：
+
+标准shell
+
+```shell
+headrow=($(head -1 $inputf))
+colnum=${#headrow[*]}
+for c in $(seq 1 $colnum);do
+    if [ "$inseq" = "\t" ];then
+        #cut -f$c $inputf |paste -d"$outseq" -s
+        cut -f$c $inputf |tr '\n' ' '
+    else
+        #cut -d"$inseq" -f$c $inputf |paste -d"$outseq" -s
+        cut -d"$inseq" -f$c $inputf |tr '\n' ' '
+  	fi
+done
+```
+
+> 存在的问题是内存超出限制（处理超长列的时候）
+
+awk实现
+
+```shell
+awk '{i=1;
+	  while(i<=NF){
+          col="col"i;
+          a[col]=a[col]" "$i;
+          i=i+1;
+		}
+	 }
+	 END{
+		for(v in a){
+			print substr(a[v],2);
+		}
+	}' $inputf
+```
+
+
 
 ### 参考
 
