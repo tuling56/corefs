@@ -96,7 +96,7 @@ tips:如何将一个应用程序做成一个[^服务]：
 
 [ nginx开机自动启动脚本](http://blog.csdn.net/gebitan505/article/details/17606735)
 
-> 注意直接用下载好的脚本，里面配置以下内容
+> 注意直接用下载好的脚本`docs/nginx.service`，开头配置如下：
 >
 > ```
 > # chkconfig: - 85 15
@@ -112,6 +112,71 @@ tips:如何将一个应用程序做成一个[^服务]：
 > 然后直接使用：`chkconfig --add nginx` 即可，其它的不需要任何操作
 >
 > > 简便方式：将该目录下的准备好的nginx文件直接拷贝到`/etc/init.d/`目录下，然后执行`chmod u+x nginx && chkconfig --add nginx`
+>
+> 附:完整版的nginx.service配置
+>
+> ```shell
+> #!/bin/sh
+> # chkconfig: - 85 15
+> # description: nginx is a World Wide Web server. It is used to serve
+>
+> # Default-Start:     2 3 4 5
+> # Default-Stop:      0 1 6
+> # Short-Description: starts the nginx web server
+>
+> PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+> DESC="nginx daemon"
+> NAME=nginx
+> DAEMON=/usr/local/nginx/sbin/$NAME
+> CONFIGFILE=/usr/local/nginx/conf/$NAME.conf
+> PIDFILE=/usr/local/nginx/logs/$NAME.pid
+> SCRIPTNAME=/etc/init.d/$NAME
+>
+> set -e
+> [ -x "$DAEMON" ] || exit 0
+>
+> do_start() {
+>  $DAEMON -c $CONFIGFILE || echo -n "nginx already running"
+> }
+>
+> do_stop() {
+>  kill -INT `cat $PIDFILE` || echo -n "nginx not running"
+> }
+>
+> do_reload() {
+>  kill -HUP `cat $PIDFILE` || echo -n "nginx can't reload"
+> }
+>
+> case "$1" in
+>  start)
+>  echo -n "Starting $DESC: $NAME"
+>  do_start
+>  echo "."
+>  ;;
+>  stop)
+>  echo -n "Stopping $DESC: $NAME"
+>  do_stop
+>  echo "."
+>  ;;
+>  reload|graceful)
+>  echo -n "Reloading $DESC configuration..."
+>  do_reload
+>  echo "."
+>  ;;
+>  restart)
+>  echo -n "Restarting $DESC: $NAME"
+>  do_stop
+>  do_start
+>  echo "."
+>  ;;
+>  *)
+>  echo "Usage: $SCRIPTNAME {start|stop|reload|restart}" >&2
+>  exit 3
+>  ;;
+> esac
+>
+> exit 0
+> ```
 
 ### nginx配置文件
 

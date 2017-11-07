@@ -1,20 +1,10 @@
-## 算法应用-Python实现
+## 算法与应用
 
 [TOC]
 
-## 算法
 
-### 最长连续子序列
 
-问题：
-
-比如[1 2 4 5 6  9 12 13 16],规定两个相邻的数的差值为1则为连续，则该序列的最长子序列为[4 5 6],最长子序列的长度为3
-
-实现：
-
-``` python
-
-```
+## 数据结构
 
 ### trie树
 
@@ -53,18 +43,42 @@ c++实现
 
 ```
 
+## 算法应用
+
+### 子串
+
+#### 最长连续子串
+
+问题：
+
+```
+比如[1 2 4 5 6  9 12 13 16],规定两个相邻的数的差值为1则为连续，则该序列的最长子序列为[4 5 6],最长子序列的长度为3
+```
+
+实现：
+
+```
+
+```
+
+### 子序列
 
 
-#### 参考
 
-[小白详解trie树](https://segmentfault.com/a/1190000008877595)
+### 待验证
 
-## 应用
-
-
-
-
-
-
+- 合并两个有序数组并求合并之后的第k大的元素
 
 ## 参考
+
+- 公共
+
+[LeetCode题解解题报告(推荐)](http://bookshadow.com/leetcode/)
+
+[LeetCode题解Gitbook(cpp)](https://siddontang.gitbooks.io/leetcode-solution/content/)
+
+[LeetCode题解专栏(Python)](http://blog.csdn.net/column/details/leetcode-with-python.html)
+
+- 数据结构
+
+[小白详解trie树](https://segmentfault.com/a/1190000008877595)
