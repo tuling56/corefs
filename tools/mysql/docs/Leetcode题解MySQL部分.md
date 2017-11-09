@@ -128,21 +128,75 @@ select a.ID from Weather a where a.ID=1 and a.Temperature>(select Temperature fr
 
 连接表求比率
 
+方法1：存在的问题没有满足条件的时候无返回
+
 ```mysql
+# 乘客取消率问题
+SELECT
+	b.Day,round(b.ccnt / d.tcnt, 2)
+FROM
+	(
+		SELECT
+			a.Request_at as Day,
+			count(*) AS ccnt
+		FROM
+			Trips a
+		WHERE
+			a.Client_Id IN (
+				SELECT
+					Users_Id
+				FROM
+					Users
+				WHERE
+					Role = 'client'
+				AND Banned = 'No'
+			)
+		AND	a.Status = 'cancelled_by_client'
+		AND a.Request_at >= '2013-10-01'
+		AND a.Request_at <= '2013-10-03'
+        group by a.Request_at
+	) b
+INNER JOIN (
+	SELECT
+		c.Request_at as Day,
+		count(*) AS tcnt
+	FROM
+		Trips c
+	WHERE
+		c.Client_Id IN (
+			SELECT
+				Users_Id
+			FROM
+				Users
+			WHERE
+				Role = 'client'
+			AND Banned = 'No'
+		)
+	AND c.Request_at >= '2013-10-01'
+	AND c.Request_at <= '2013-10-03'
+    group by c.Request_at
+) d
+on b.Day=d.Day;
+```
 
-#
-select round(c.ccnt/d.tcnt,2) from (
-  select count(*) as ccnt from Trips a where a.Client_Id in (select Users_Id from Users where Role='client' and Banned='No') where a.Status='cancelled_by_client' and a.Request_at>='2013-10-01' and a.Request_at<='2013-10-03'
-)c
-inner join
-(
-select count(*) as tcnt from Trips a where a.Client_Id in (select Users_Id from Users where Role='client' and Banned='No') and a.Request_at>='2013-10-01' and a.Request_at<='2013-10-03')d;
+方法2：
 
+```mysql
+select 
+t.Request_at Day, 
+round(sum(case when t.Status like 'cancelled_%' then 1 else 0 end)/count(*),2) Rate
+from Trips t 
+inner join Users u 
+on t.Client_Id = u.Users_Id and u.Banned='No'
+where t.Request_at between '2013-10-01' and '2013-10-03'
+group by t.Request_at
 ```
 
 ####  [Consecutive Numbers](https://leetcode.com/problems/consecutive-numbers/description/)
 
-连续子序列问题
+连续子串问题，求最少多少次连续的数字
+
+方法1:(有问题)
 
 ```mysql
 select id from stadium a where a.num=(select num from stadium a1 where a1.id=a.id+1)
@@ -150,11 +204,27 @@ union
 select id from stadium a where a.num=(select num from stadium a1 where a1.id=a.id-1)
 ```
 
+方法2：
+
+```mysql
+SELECT DISTINCT
+	l1.Num
+FROM
+	stadium l1,
+	stadium l2,
+	stadium l3
+WHERE
+	l1.Id = l2.Id - 1
+AND l2.Id = l3.Id - 1
+AND l1.Num = l2.Num
+AND l2.Num = l3.Num
+```
+
+> 扩展：处理n连续问题
 
 
 
-
-霍夫曼交通问题
+#### 霍夫曼交通问题
 
 ```mysql
 select (select a.* from stadium a inner join stadium b on b.id=a.id+1 and a.people>100 and b.people>100);
