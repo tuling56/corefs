@@ -772,6 +772,8 @@ SELECT TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME from information_schema.`COLUMNS` whe
 
 #### restful接口
 
+##### sandman2
+
 ```shell
 pip install sandman2
 sandman2ctl 'mysql+mysqldb://root:root@localhost/pgv_stat_yingyin'
@@ -810,6 +812,10 @@ optional arguments:
 ```
 
 > 问题是中午的查询结果是unicode显示，命令行配置jq才能正常显示，而web访问还没有查到显示中文的方式
+
+##### [xmysql](http://blog.csdn.net/dev_csdn/article/details/78480522)
+
+为mysql书宽恕成rest api
 
 #### 选取结果添加行号
 
@@ -1321,7 +1327,23 @@ mysql -h 127.0.0.1 -u root -p XXXX -P3306 -e "select * from table"  > /tmp/test.
 # 若不想显示列名，加—N参数即可
 ```
 
-#### mysql导入到redis
+tips:导出某些表的表结构
+
+```shell
+tbls=($(echo "show tables;"| mysql -uroot -proot -Dsnh48))
+for tbl in ${tbls[@]:1};do
+	#mysqldump -uroot -proot -d study $tbl> ${tbl}.sql 
+	echo "mysqldump -uroot -proot -d snh48 $tbl> ${tbl}.sql "
+done
+```
+
+#### 同步
+
+##### mysql之间同步
+
+
+
+##### mysql导入到redis
 
 - 遍历插入法
 
@@ -1332,9 +1354,9 @@ mysql -h 127.0.0.1 -u root -p XXXX -P3306 -e "select * from table"  > /tmp/test.
 - 命令行法
 
 ```shell
-#创建shell脚本mysql2redis_mission.sh,（在mysql的结果中进行命令行的组合）内容如下：
+# 方法1：创建shell脚本mysql2redis_mission.sh,（在mysql的结果中进行命令行的组合）内容如下：
 mysql db_name --skip-column-names --raw < mission.sql | redis-cli [--pipe]
-#进化方法
+# 进化方法
 mysql -uroot -proot -N <redis_pipe.sql |redis-cli
 
 # 例如
@@ -1342,7 +1364,7 @@ mysql -uroot -proot -N <redis_pipe.sql |redis-cli
 #　或者（能得到返回结果）
 (echo -en "set key3 vale3\r\n get key2\r\n") |nc localhost 6379
 
-# 直接将文件内容输入到流
+# 方法2：直接将文件内容输入到流
 cat xxx.file |redis-cli [--pipe]
 ```
 
@@ -1378,6 +1400,10 @@ cat xxx.file |redis-cli [--pipe]
 
 [MySQL分组取TopN](http://www.jb51.net/article/31590.htm)
 
+- 积累
+
+[根据MySQL表格自动生成restfull接口](https://segmentfault.com/q/1010000008335958)
+
 - 调优部分
 
 [MySQL慢查询日志的使用](http://www.cnblogs.com/kerrycode/p/5593204.html)
@@ -1397,3 +1423,8 @@ cat xxx.file |redis-cli [--pipe]
 [数据库频道:MySQL大表备份策略](http://database.51cto.com/art/201011/234560.htm)
 
 [Xtrabackup热备份MySQL](http://www.tuicool.com/articles/MJzEFnE)
+
+[不同mysql之间数据同步](http://blog.csdn.net/ityouknow/article/details/52710655)
+
+[主从服务器之间数据同步](http://blog.csdn.net/alangmei/article/details/21075055)
+
