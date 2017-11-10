@@ -438,11 +438,16 @@ while read line;do echo ${line:0:4}"/"${line:4:2}"/"${line:6:2}; done<<< "${a}"
 
 ### 高级
 
-#### 存储过程
-
 存储过程和函数的区别：
 
-创建存储过程
+- 函数中表名和列名都不能是变量
+- PREPARE语句只能用于5.0版本以上的存储过程里，不能用在函数或者触发器里
+- 调用方法不一样
+- 存储过程常用在事件和触发器中
+
+#### 存储过程
+
+##### 创建
 
 ```mysql
 CREATE PROCEDURE sp_name([IN|OUT|INOUT] param_name type) [characteristics] routine_body
@@ -474,7 +479,7 @@ END
 //
 ```
 
-调用存储过程
+##### 调用
 
 ```mysql
 call  sp_name;
@@ -508,7 +513,38 @@ select inet_aton('209.20.224.40'); # 3507806248
 
 ##### 自定义函数
 
-//待完善
+- Nth Highest
+
+```mysql
+CREATE FUNCTION getNthHighestSalary(N INT) RETURNS INT
+  BEGIN
+	set N=N-1;
+  RETURN (
+      # Write your MySQL query statement below.
+      SELECT IFNULL((SELECT DISTINCT Salary FROM Employee ORDER BY Salary DESC LIMIT N,1), NULL)  
+    );
+END
+```
+
+- 阶乘
+
+```mysql
+CREATE FUNCTION factorial(n INT) RETURNS INT
+BEGIN
+	-- 阶乘
+	DECLARE i INT DEFAULT 1;
+	DECLARE result INT DEFAULT 0;
+	
+	WHILE i<=n DO
+		SET result=result*i;
+		SET i=i+1;
+	END WHILE;
+	
+	RETURN result;
+END
+```
+
+
 
 #### 事件 
 
@@ -1140,20 +1176,36 @@ ORDER BY
 
 ### 调优
 
-核心优先使用explain一下查问题
+#### 性能监控
 
-#### 索引
+- explain命令
 
-如何设计索引的使用，索引会引入额外的性能问题，比如插入会稍慢。
+核心优先使用explain一下查问题,对explain基础知识的理解
+
+```
+explain format=json select avg(k) from sbtest1 where id between 1000 and 2000 \G
+```
+
+注意查询开销`query_cost`
+
+#### 优化配置
+
+
+
+#### 具体方法
+
+##### 索引
+
+索引通过减少查询必须扫描的数据库中的数据量来提高查询效率，如何设计索引的使用，索引会引入额外的性能问题，比如插入会稍慢。
 
 - 多列索引的设计及什么情况下索引会失效
 - ​
 
-#### 慢查询
+##### 慢查询
 
 慢查询日志将日志记录写入文件，也将日志记录写入数据库表。
 
-##### 配置
+###### 配置
 
 ```mysql
 # 查询慢日志是否开启及文件存储位置
@@ -1178,7 +1230,7 @@ show variables like 'log_slow_admin_statements';
 show global status like '%Slow_queries%';
 ```
 
-##### 分析
+###### 分析
 
 mysqldumpslow分析工具提供对慢日志查询的分析
 
@@ -1210,15 +1262,15 @@ mysqldumpslow -s t -t 10 -g “left join” /database/mysql/mysql06_slow.log
 mysqldumpslow -s r -t 20 /mysqldata/mysql/mysql06-slow.log | more
 ```
 
-#### 读写分离
+##### 读写分离
 
 一写多读，写入的数据实时从写库同步到读库，开源代理插件360的atlas
 
-#### 分库
+##### 分库
 
 分布式和事务的控制
 
-####  分表
+#####  分表
 
 用法和拆分原则要一开始的时候设计好
 
@@ -1235,9 +1287,15 @@ mysqldumpslow -s r -t 20 /mysqldata/mysql/mysql06-slow.log | more
 | lvm2快照     | 快    | 快    | 一般、支持几乎热备、速度快       | 一般   | 中小型数据量的备份 |      |
 | xtrabackup | 较快   | 较快   | 实现innodb热备、对存储引擎有要求 | 强大   | 较大规模的备份   |      |
 
-#### 备份
+#### 复制
 
-只复制数据
+只复制表结构
+
+```mysql
+create table xx_bak like xxx;
+```
+
+复制表结构和数据（不复制索引）
 
 ```mysql
 create table if not exists xx_bak select * from xxx;
@@ -1247,8 +1305,8 @@ create table if not exists xx_bak select * from xxx;
 若要完整的复制表，使用下面的方式：
 
 ```mysql
-CREATE TABLE 复制表 LIKE 表;
-INSERT INTO 复制表 SELECT * FROM 表
+create table 复制表 like 表;
+insert into 复制表 select * from 表
 ```
 
 #### 导入和导出 
@@ -1405,6 +1463,8 @@ cat xxx.file |redis-cli [--pipe]
 [根据MySQL表格自动生成restfull接口](https://segmentfault.com/q/1010000008335958)
 
 - 调优部分
+
+[MySQL性能监控](https://www.percona.com/doc/percona-monitoring-and-management/deploy/index.html)
 
 [MySQL慢查询日志的使用](http://www.cnblogs.com/kerrycode/p/5593204.html)
 

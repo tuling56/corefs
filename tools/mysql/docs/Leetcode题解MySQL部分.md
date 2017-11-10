@@ -104,6 +104,16 @@ ORDER BY
 	b.department_name DESC,a.salary DESC;
 ```
 
+#### [Nth Highest Salay](https://leetcode.com/problems/nth-highest-salary/description/)
+
+分组N大和不分组N大
+
+##### 不分组N大
+
+```mysql
+
+```
+
 #### [Rising Temperature](https://leetcode.com/problems/rising-temperature/description/)
 
 相邻行之间的比较
