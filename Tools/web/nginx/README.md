@@ -324,13 +324,13 @@ SSL使用证书来创建安全连接，有两种验证模式：
 
 创建自签名证书需要安装openssl，使用以下步骤：[参考](http://www.liaoxuefeng.com/article/0014189023237367e8d42829de24b6eaf893ca47df4fb5e000)
 
-1. 创建Key；
+1. 创建Key(密钥口令可选)；
 2. 创建签名请求；
 3. 将Key的口令移除；
 4. 用Key签名证书。
 
 ```
-# 这个还是存在问题的，不同的机器访问不了
+# 这个还是存在问题的，不同的机器访问不了，只能本机访问
 ```
 
 #### https配置方法
@@ -339,39 +339,55 @@ SSL使用证书来创建安全连接，有两种验证模式：
 
 > 证书有服务器端证书和客户端证书
 
-​	服务器端证书
+服务器端证书
 
 > step1:创建服务器私钥（==.key文件==，带密钥口令）
 >
-> > openssl genrsa -des3 -out server.key 1024
+> ```shell
+> openssl genrsa -des3 -out https-server.key 1024
+>
+> # 会提示输入密钥口令：
+> #Enter pass phrase for https-server.key:
+> #Verifying - Enter pass phrase for https-server.key:
+> ```
 >
 > step2:创建签名证书请求(==.csr文件==)
 >
-> > openssl req -new -key server.key -out server.csr
+> ```shell
+> openssl req -new -key https-server.key -out https-server.csr
 >
-> ​	在加载ssl支持的nginx，并使用上述私钥时除去必须的口令
+> # 会提示输入上一步输入的密钥口令
+> ```
 >
-> > cp server.key server.key.org
-> >
-> > openssl rsa -in server.key.org -out server.key
+>  ```shell
+> # 在加载ssl支持的nginx，并使用上述私钥时除去必须的口令
+> cp https-server.key  https-server.key.org
+> openssl rsa -in https-server.key.org -out https-server.key
+>  ```
 >
-> step3:自签署证书（创建CA证书),==.crt文件==
+> step3:自签署证书（创建CA证书==.crt文件==)
 >
-> >  openssl x509 -req -days 365 -in server.csr -signkey server.key -out server.crt
-> >
+>  ```shell
+> openssl x509 -req -days 365 -in https-server.csr -signkey https-server.key -out https-server.crt
+>  ```
+>
 > > 另一种方式：
 > >
-> > openssl req -new -x509 -days365 -key server.key -out server.crt
+> > ```shell
+> > openssl req -new -x509 -days365 -key https-server.key -out https-server.crt
+> > ```
 >
 > step4:将证书导出成浏览器支持的.p12格式
 >
-> > openssl pkcs12 -export -clcerts -in server.key -inkey server.key -out server.p12
+>  ```shell
+>  openssl pkcs12 -export -clcerts -in https-server.key -inkey https-server.key -out https-server.p12
+>  ```
 >
 > 总结：
 >
-> 共三个文件:server.key,server.csr,sever.crt,最后将这三个文件放到默认的nginx/conf目录下
+> 共三个文件:server.key, server.csr, sever.crt,最后将这三个文件放到默认的nginx/conf/ssl目录下
 
-​	客户端证书
+客户端证书
 
 > 客户端证书如何配置？
 
@@ -414,8 +430,8 @@ SSL使用证书来创建安全连接，有两种验证模式：
 >
 > Country Name (2 letter code) [XX]:cn
 > State or Province Name (full name) []:guangdong
-> Locality Name (eg, city) [Default City]:
-> Organization Name (eg, company) [Default Company Ltd]:
+> Locality Name (eg, city) [Default City]:shenzhen
+> Organization Name (eg, company) [Default Company Ltd]:xnot
 > Organizational Unit Name (eg, section) []:xmpx
 > Common Name (eg, your name or your server's hostname) []:yjm
 > Email Address []:126@126.com
@@ -1125,3 +1141,6 @@ make install
 
 
 
+## 参考
+
+//大参考体系
