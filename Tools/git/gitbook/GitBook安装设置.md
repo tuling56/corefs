@@ -68,7 +68,7 @@ gitbook-cli是gitbook的命令行，可以方便的管理多个gitbook版本
 
 若使用GitBook官方，可以在设置中找到协作这，进行添加。对于绑定GitHub repo的GitBook项目，其协作方式和普通的项目没有差异，插件 [edit-link](https://github.com/rtCamp/gitbook-plugin-edit-link)可以在每个页面生成指向 GitHub repo 相应文件的链接，十分方便！但需要版本库支持web编辑的方式，若搭建本地的，要自己实现。
 
-###  功能扩展
+###  扩展
 
 #### 评论互动
 
@@ -133,9 +133,7 @@ gitbook-cli是gitbook的命令行，可以方便的管理多个gitbook版本
 }
 ```
 
-### 导出和发布
-
-#### 导出
+### 导出
 
 支持html、epub、mobi和pdf等格式的数据，需要配合calibre使用。
 
@@ -147,13 +145,33 @@ gitbook-cli是gitbook的命令行，可以方便的管理多个gitbook版本
 
 类似的转换方式还有`pandoc xx.md -o xx.pdf|epub|mobi`
 
-#### 发布
+### 发布
 
-##### 官网发布
+#### 官网发布
 
-使用gitbook editor可以轻松发布，但只能发布到gitbook官网，要自己构建发布系统，若是https协议的也可发布，先在本地创建gitbook,然后git init->git add->git commit等系列操作后，添加远程的https仓库，即可实现推送
+gitbook editor只支持https协议
 
-##### 自建发布
+使用`gitbook editor`可以轻松发布，但只能发布到gitbook官网，要自己构建发布系统，若是https协议的也可发布，先在本地创建gitbook,然后git init->git add->git commit等系列操作后，添加远程的https仓库，即可实现推送
+
+##### https协议访问
+
+HTTP 或 HTTPS 协议的优美之处在于架设的简便性。基本上， 只需要把 ==Git 的纯仓库文件放在 HTTP 的文件根目录下==，配置一个特定的 `post-update` 挂钩（hook），就搞定了（Git 挂钩的细节见第七章）。从此，每个能访问 Git 仓库所在服务器上的 web 服务的人都可以进行克隆操作。
+
+遇到的问题：
+
+```shell
+$ git clone http://gitweb.me/go_web.git
+Cloning into 'go_web'...
+fatal: repository 'http://gitweb.me/go_web.git/' not found
+
+# 解决方法是切换到go_web.git目录下，然后执行，git update-server-info 
+```
+
+![找不到版本库的问题](http://hi.csdn.net/attachment/201010/27/0_1288160338ifZu.gif)
+
+
+
+#### 自建发布
 
 方法1：
 
@@ -238,9 +256,9 @@ server {
  }
 ```
 
-###### 自建发布（合集）
+##### 自建发布（合集）
 
-将多本书籍进行集中管理，git上配置的推送钩子不用修改(只需要改变下每本书籍的钩子地址即可)
+将多本书籍进行集中管理，git上配置的推送钩子`post-receive`不用修改(只需要改变下每本书籍的钩子地址即可)
 
 ```shell
 [root@local122 hooks]# cat post-receive 
@@ -334,6 +352,64 @@ git clone https://127.0.0.1/home/yjm/Documents/gitrepo/gitbook.git
 
 [利用Nginx搭建HTTP访问的Git服务器](http://www.tuicool.com/articles/bAZvEz3)
 
+### 测试
+
+#### pure仓库
+
+git仓库配置在阿里云上,sample仓库是裸仓库，没有工作区，建立方式如下：
+
+```shell
+git init --bare sample.git
+```
+
+- git clone http://47.95.195.31/gitrepo/sample.git
+
+```shell
+#存在的问题是可以clone但无法提交,提示错误：
+fatal: git-http-push failed
+```
+
+- git clone https://47.95.195.31/gitrepo/sample.git
+
+```shell
+#存在的问题是可以clone但无法提交，提示错误：
+fatal: git-http-push failed
+```
+
+- git clone root@47.95.195.31:/usr/local/nginx/site/gitrepo/sample.git
+
+```shell
+# 可以clone也可以提交，但是找不到工作区是啥回事
+```
+
+#### nopure仓库
+
+nopure仓库的建立方式如下:
+
+```shell
+git init sample_nopure.git
+```
+
+- git clone http://47.95.195.31/gitrepo/sample_nopure_.git  sample_nopure_http
+
+```shell
+#存在的问题是可以clone但无法提交
+```
+
+- git clone https://47.95.195.31/gitrepo/sample_nopure_.git   sample_nopure_https
+
+```shell
+#存在的问题是可以clone但无法提交
+```
+
+- git clone root@47.95.195.31:/usr/local/nginx/site/gitrepo/sample_nopure.git  sample_nopure_ssh 
+
+```shell
+# 可以正常克隆
+```
+
+
+
 ## 参考
 
 - Disqus插件
@@ -355,3 +431,8 @@ git clone https://127.0.0.1/home/yjm/Documents/gitrepo/gitbook.git
   [解决导出的文件中文乱码问题](http://www.tuicool.com/articles/nQNZ3yJ)
 
   [Linux安装新字体](http://www.cnblogs.com/MonkeyF/archive/2013/05/13/3076466.html)
+
+- 发布
+
+  [git配置本地、ssh、git协议和http协议传输（推荐）](http://blog.csdn.net/jixiuffff/article/details/5969174)
+
