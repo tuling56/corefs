@@ -515,7 +515,7 @@ Reading: 0 Writing: 1 Waiting: 0
 
 ### nginx开启访问认证
 
-ngx_http_auth_basic_module模块实现让访问着，只有输入正确的用户密码才允许访问web内容。web上的一些内容不想被其他人知道，但是又想让部分人看到。[nginx](http://www.ttlsa.com/nginx/)的http auth模块以及Apache http auth都是很好的解决方案。
+ngx_http_auth_basic_module模块实现访问认证，只有输入正确的用户密码才允许访问web内容。web上的一些内容不想被其他人知道，但是又想让部分人看到。[nginx](http://www.ttlsa.com/nginx/)的http auth模块以及Apache http auth都是很好的解决方案。
 
 ```nginx
 server{
@@ -535,7 +535,7 @@ server{
 
 htppaswd文件的生成：
 
-可以使用htpasswd，或者使用openssl
+可以使用htpasswd，或者使用openssl:
 
 ```shell
 # 方式1：

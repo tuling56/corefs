@@ -12,13 +12,13 @@
 
 > 测试：npm -v
 
-#### **安装gitbook-cli**
+#### 安装gitbook-cli
 
 > npm install -g gitbook-cli
 
 gitbook-cli是gitbook的命令行，可以方便的管理多个gitbook版本
 
-#### **安装gitbook**
+#### 安装gitbook
 
 > gitbook -v 
 
@@ -34,7 +34,7 @@ gitbook-cli是gitbook的命令行，可以方便的管理多个gitbook版本
 
 #### 创建
 
-1. 编写书籍大纲的SUMMARY.md文件和书籍说明的README.md文档
+1. 编写书籍大纲的SUMMARY.md文件和书籍说明的README.md文档（SUMMARY.md参考本目录下）
 
 ```markdown
 * [简介](README.md)
@@ -47,17 +47,17 @@ gitbook-cli是gitbook的命令行，可以方便的管理多个gitbook版本
 * [结束](end/README.md)
 ```
 
-2. 执行gitbook init 
+2. 执行`gitbook init` 
 
-该步骤会自动创建书籍的目录和对应的章节文档
+   该步骤会自动创建书籍的目录和对应的章节文档
 
-3. gitbook build 生成书籍
+3.  生成书籍`gitbook build`
 
-该步骤会在书籍目录生成_book文件夹，里面是书籍的静态html网页
+   该步骤会在书籍目录生成_book文件夹，里面是书籍的静态html网页
 
-4. gitbook serve 网页浏览
+4. 网页浏览`gitbook serve `
 
-该步骤会启动自带的web服务器，可以通过http://localhost:4000 通过网页查看书籍
+   该步骤会启动自带的web服务器(似乎不可以自定义端口)，可以通过http://localhost:4000 通过网页查看书籍
 
 #### 方式选择
 
@@ -66,7 +66,7 @@ gitbook-cli是gitbook的命令行，可以方便的管理多个gitbook版本
 
 #### 多人协作
 
-若使用GitBook官方，可以在设置中找到协作这，进行添加。对于绑定GitHub repo的GitBook项目，其协作方式和普通的项目没有差异，插件 [edit-link](https://github.com/rtCamp/gitbook-plugin-edit-link)可以在每个页面生成指向 GitHub repo 相应文件的链接，十分方便！但需要版本库支持web编辑的方式，若搭建本地的，要自己实现。
+​	若使用GitBook官方，可以在设置中找到协作这，进行添加。对于绑定GitHub repo的GitBook项目，其协作方式和普通的项目没有差异，插件 [edit-link](https://github.com/rtCamp/gitbook-plugin-edit-link)可以在每个页面生成指向 GitHub repo 相应文件的链接，十分方便！但需要版本库支持web编辑的方式，若搭建本地的，要自己实现。
 
 ###  扩展
 
@@ -78,7 +78,7 @@ gitbook-cli是gitbook的命令行，可以方便的管理多个gitbook版本
 
 #### 插件配置
 
-书籍根目录下的book.json文件
+在书籍根目录下建立以下内容的`book.json`文件
 
 ```json
 {
@@ -129,17 +129,18 @@ gitbook-cli是gitbook的命令行，可以方便的管理多个gitbook版本
             "all": null
         }
     }
-
 }
 ```
+
+> 相关的插件会在生成书籍的时候自动安装
 
 ### 导出
 
 支持html、epub、mobi和pdf等格式的数据，需要配合calibre使用。
 
-> pdf、epub、mobi格式导出
+#### pdf、epub、mobi格式导出
 
-在电子书存档目录，如:`E:\xx\gitbook\mybook_test`执行` gitbook pdf|epub|mobi .`或者上一级目录执行
+​	在电子书存档目录，如:`E:\xx\gitbook\mybook_test`执行` gitbook pdf|epub|mobi .`或者上一级目录执行
 
 ``gitbook pdf|epub|mobi ./mybook_test`
 
@@ -169,17 +170,40 @@ fatal: repository 'http://gitweb.me/go_web.git/' not found
 
 ![找不到版本库的问题](http://hi.csdn.net/attachment/201010/27/0_1288160338ifZu.gif)
 
+###### ssl证书问题
+
+git通过https访问远程仓库，如果服务器的SSL证书未经过第三方机构签署，那么Git就会报错，使用自签署的证书的U临时证书的方式如下：
+
+设置环境变量，忽略ssl证书检查：
+
+```shell
+# 方法1：
+env GIT_SSL_NO_VERIFY=true # 然后
+git clone https://gitweb.me/go_web.git
+
+# 方法2：直接设置git的配置
+git config http.sslVerify false
+```
+
 
 
 #### 自建发布
 
-方法1：
+##### 基础流程
 
-在要发布的机器上，构建gitbook文档，并使用git进行管理，远程机器可以git clone该版本库，但不能git push,所有的修改只能在要发布的机器上进行，修改完文档后重启gitbook服务，重新构建文档
+**方法1：同机**
 
-方法2：
+​	在要发布的机器上，构建gitbook文档，并使用git进行管理（非裸仓库），远程机器可以git clone该版本库，但不能git push,所有的修改只能在发布的机器上进行，修改完文档后重启gitbook服务，重新构建文档
 
-在要发布的机器上构建git版本管理的仓库，配置`post-receive`钩子如下：
+**方法2：跨机协同**
+
+在要发布的机器上构建git版本管理的裸仓库（没有工作区）:
+
+```shell
+git init --bare sample_pure.git
+```
+
+然后配置`post-receive`钩子如下：
 
 ```shell
 vim hooks/post-receive
@@ -256,7 +280,7 @@ server {
  }
 ```
 
-##### 自建发布（合集）
+###### 多本书籍
 
 将多本书籍进行集中管理，git上配置的推送钩子`post-receive`不用修改(只需要改变下每本书籍的钩子地址即可)
 
@@ -322,11 +346,11 @@ drwxr-xr-x. 11 root root 4.0K Jun 12 10:25 git_demo.me
 drwxr-xr-x.  6 root root 4.0K Jun 12 10:23 go_web.me
 ```
 
-##### 结合发布
+#### 结合发布
 
-结合发布是融合了官网发布和自建发布两个方式的优缺点，既利用了官网发布的可视化操作的优势，又利用了自建发布的定制和完全控制的优点。
+​	结合发布是融合了官网发布和自建发布两个方式的优缺点，既利用了官网发布的可视化操作的优势，又利用了自建发布的定制和完全控制的优点。
 
-用GitBook Editor打开自建发布导出的仓库的时候，可以编辑和修改，但是在推送（Publish）的时候，提示Gitbook Editor暂时只支持https协议，而自己在版本库clone的时候使用的是git协议，如何使用https协议访问git仓库？
+​	用GitBook Editor打开自建发布导出的仓库的时候，可以编辑和修改，但是在推送（Publish）的时候，提示Gitbook Editor暂时只支持https协议，而自己在版本库clone的时候使用的是git协议，如何使用https协议访问git仓库？
 
 两者的对比如下：
 
