@@ -9,16 +9,22 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
-    <Filter Include="源文件\Source">
+    <Filter Include="源文件\projects">
       <UniqueIdentifier>{ff5f82b3-4a6c-48ec-a507-8c9215fa4329}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\study">
+      <UniqueIdentifier>{c687ed36-7349-4296-a9ff-d3d2ca3cad7d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\study\hash">
+      <UniqueIdentifier>{1457f5b5-88e5-4059-a321-4185352538a4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
-      <Filter>源文件</Filter>
+      <Filter>源文件\study</Filter>
     </ClCompile>
-    <ClCompile Include="Simulated Annealing.cpp">
-      <Filter>源文件\Source</Filter>
+    <ClCompile Include="src\study\hash\hash_table.cpp">
+      <Filter>源文件\study\hash</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

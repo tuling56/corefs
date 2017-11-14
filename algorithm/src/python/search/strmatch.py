@@ -15,7 +15,7 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 
 
-class StringPatternt(object):
+class StrMatch(object):
     def __init__(self,chr,p):
         self.chr = chr;
         self.p = p;
@@ -138,8 +138,9 @@ class StringPatternt(object):
         return 0;
 
 
+# 测试入口
 if __name__ == "__main__":
-    msp=StringPatternt('rhza','zhan grhzahwrhazwe')
+    msp=StrMatch('rhza','zhan grhzahwrhazwe')
     msp.set_pattern('rhza')
     msp.set_chr('zhangrhzahwrhaz we')
     msp.string_pattern_kmp()

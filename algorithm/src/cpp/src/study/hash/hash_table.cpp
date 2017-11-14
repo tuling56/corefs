@@ -1,4 +1,4 @@
-/* 说明：hash表的使用
+/* 说明：hash表的使用:
  * 参考：http://blog.csdn.net/feixiaoxing/article/details/6885657
  */
 
@@ -79,6 +79,8 @@ bool insert_data_into_hash(HASH_TABLE *phashtbl,int data)
     return true;
 }
 
+
+
 int main()
 {
     HASH_TABLE *hash_tbl=create_hash_tbl();
@@ -92,6 +94,8 @@ int main()
         cout<<"查找到:"<<pnode->data<<endl;
     else
         cout<<"没有查找到:4"<<endl;
+
+	cin.get();
 
     return 0;
 }

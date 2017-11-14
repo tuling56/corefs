@@ -140,7 +140,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Simulated Annealing.cpp" />
+    <ClCompile Include="src\study\hash\hash_table.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="algorithm.h" />

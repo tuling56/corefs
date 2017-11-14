@@ -8,6 +8,7 @@
 '''
 
 import os
+import hues
 import sys
 
 reload(sys)
@@ -104,11 +105,10 @@ class Solution(object):
 
      # 实现索引(子字符串的查找)
 
-    # 字符串索引
-    def strStr(self,haystack,needle):
+    # 字符串索引(查找子字符串是否包含，若有，返回包含位置)
+    def strFind(self,haystack,needle):
         if not needle or not haystack:
             return -1
-
         for k,v in enumerate(haystack):
             try:
                 if needle[k]==v:
@@ -148,7 +148,7 @@ class Solution(object):
         return insertpos
 
     # excel列翻译
-    def excelColTitleNum(self,s):
+    def excelColTitle2Num(self,s):
         '''
         :type s:str
         :rtype: int
@@ -165,6 +165,32 @@ class Solution(object):
             numsum+=numint
         return numsum
 
+    # 范围搜寻(二分查找)
+    def searchInRange(self,inlist,target):
+        if target>inlist[-1] or target<inlist[0]:
+            return -1
+
+        low,high=0,len(inlist)-1  # 以数组的位置下标为索引
+        while True:
+            mpos=(low+high)/2
+            mv=inlist[mpos]
+            if target<mv:
+                high=len(inlist)/2
+            elif target>mv:
+                low=len(inlist)/2
+            else:
+                return mpos
+            hues.info(low,high)
+
+    # 最大矩形面积
+    def maxRectArea(self):
+        pass
+    
+    # 最长子序列（此处是连续上升，需要使用到动态规划的思想）
+    def maxLongSeq(self):
+        pass
+
+
 # 程序入口
 if __name__ == '__main__':
     ms=Solution()
@@ -172,8 +198,9 @@ if __name__ == '__main__':
     #print ms.isPalindrome(121)
     #print ms.roman2int('XI')
     #print ms.longcommprefix(['d','c'])
-    print ms.removeDupilcates([1,1,2,2,3])
+    #print ms.removeDupilcates([1,1,2,2,3])
     #print ms.removeElement([3,2,2,3],3)
     #print ms.strStr("aaabb","baba")
     #print ms.searchInsertPos([1,3,5,6],7)
     #print ms.excelColTitleNum('AAA')
+    print ms.searchInRange([1,3,3,4,5],2)

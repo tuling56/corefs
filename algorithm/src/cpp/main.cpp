@@ -1,8 +1,7 @@
 #include "algorithm.h"
 #include <iostream>
 
-int main()
+int main_test()
 {
-	SimulatedAnnewaling();
 	return 0;
 }
