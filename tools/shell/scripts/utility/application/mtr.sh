@@ -1,13 +1,16 @@
 #########################################################################
-# File Name: mpaste.sh
-# Description:paste命令学习 
+# File Name: mtr.sh
+# Description:行列转置
 # Author:tuling56
 # State:
 # Created_Time: 2017-11-02 13:01
-# Last modified: 2017-11-02 03:15:39 PM
+# Last modified: 2017-11-14 02:32:35 PM
 #########################################################################
 #!/bin/bash
 dir=`dirname $0` && dir=`cd $dir && pwd`
+COMMON_PATH=${COMMON_PATH:-/usr/local/shell/bin/common}
+source $COMMON_PATH/global_fun.sh
+source $COMMON_PATH/global_var.sh
 cd $dir
 
 inputf=$1
@@ -15,10 +18,10 @@ inputf=$1
 inseq="\t"
 outseq="\t"
 
-# 内存超过(列超长)
-function mpaste()
+#纯shell解决方案(内存超过:列超长)
+function mtr_bash()
 {
-
+    iinfo "纯bash解决方案"
     headrow=($(head -1 $inputf))
     colnum=${#headrow[*]}
     for c in $(seq 1 $colnum);do
@@ -32,9 +35,10 @@ function mpaste()
     done
 }
 
-# 输出不对
-function mpaste2()
+#awk解决方案(输出不对)
+function mtr_awk()
 {
+    iinfo "awk解决方案"
     #awk 'BEGIN{while(i<=NF){"col"i="";}}{while(i<=NF){"col"i="col"i" "$i;}}END{while(i<=NF){print "col"i"\n";}}' file.txt
     awk '{i=1;
           while(i<=NF){
@@ -50,14 +54,19 @@ function mpaste2()
         }' $inputf
 }
 
-
-function mpaste3()
+#awk解决方案2
+function mtr_awk2()
 {
 
     return 
 }
 
 
+# 测试入口
+mtr_bash
+mtr_awk
+mtr_awk2
 
-mpaste
+
+exit 0
 

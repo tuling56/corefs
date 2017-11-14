@@ -1,6 +1,6 @@
 #########################################################################
 # File Name: global_fun.sh
-# Description: 
+# Description:shell全局函数
 # Author:tuling56
 # State:
 # Created_Time: 2017-05-09 17:12
@@ -13,6 +13,7 @@
 nt=$(date +%Y%m%d\ %H:%M:%S)
 nt2=$(date +%F\ %T)
 
+# 区别显示
 function istep()
 {
     local info=$1
@@ -67,7 +68,7 @@ function calcratio()
  	#r_o_ratio=$(awk -v a=$num -v b=$total 'BEGIN{printf("%4.2f%%",a*100/b);}')
  	# 方法2.1(注意通过管道传递过来的数据不能在begin中使用，可以在前面加上END)
  	r_o_ratio=$(echo "$num $total" | awk '{printf("%4.2f%%",$1*100/$2);}')
-	
+
 	echo ${r_o_ratio}
 }
 
