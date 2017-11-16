@@ -1,11 +1,11 @@
-##docker
+##docker学习笔记
 [TOC]
 
 ### 基础
 
 #### 概念
 
-Docker底层组成：
+docker底层组成：
 
 - `Namespace`：隔离技术的第一层，确保 Docker 容器内的进程看不到也影响不到 Docker 外部的进程。
 - `Control Groups`：LXC 技术的关键组件，用于进行运行时的资源限制。
@@ -79,5 +79,9 @@ docker pull busybox
 
  ##参考
 
-[docker基础知识汇总](http://www.imooc.com/article/18030)
+- 基础
+
+  [docker基础知识汇总](http://www.imooc.com/article/18030)
+
+  [菜鸟教程docker](http://www.runoob.com/docker/docker-tutorial.html)
 

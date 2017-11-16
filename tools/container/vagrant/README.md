@@ -3,12 +3,14 @@
 
 ### 基础
 
+vagrant主要是开发环境的快速复制
+
 三步使用法：
 
-```
- $ vagrant box add {title} {url}
- $ vagrant init {title}
- $ vagrant up
+```shell
+ vagrant box add {title} {url}
+ vagrant init {title}
+ vagrant up
 ```
 
 #### 安装

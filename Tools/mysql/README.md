@@ -262,19 +262,34 @@ tips:
 
 ##### 变量
 
-查看全局变量
+查看变量
 
-```shell
-命令行：mysqladmin variables -p，这个操作也就相当于登录时使用命令 show global variables;
+```mysql
+# 命令行：mysqladmin variables -p，这个操作也就相当于登录时使用命令 show global variables;
+
 # 若查看某种类型的变量
-show global variables like "%_time";
+show [global] variables like "%_time";
 ```
 
 修改变量
 
-```
+```shell
+# 临时修改
 set global long_query_time=2;
+
+# 永久修改
+在my.cnf的[mysqld]节点下添加
+var_name=var_value
 ```
+
+例子：
+
+```mysql
+# mysql表名大小写的敏感性配置：
+show variables like '%lower_case_table_names%';
+```
+
+
 
 #### 索引
 
@@ -495,6 +510,15 @@ call  sp_name;
 ```mysql
 # 提取url域名
 select substring_index(substring_index('http://wz.cnblogs.com/my/search/?q=cookie','/',3),'/',-1);
+```
+
+类型转换
+
+```mysql
+# 字符串转数字
+SELECT CAST('123' AS SIGNED);
+SELECT CONVERT('123',SIGNED);
+SELECT '123'+0;
 ```
 
 IP地址处理
@@ -786,6 +810,17 @@ echo "alter table media_relation_search_pc rename media_relation_search_pc_old_$
 
 # 方法3
 cat /data/rsync_data/kk_sql/videos.sql |$mysql video
+echo "show tables;"| mysql -uroot -proot -Dsnh48
+```
+
+一次运行多个sql文件
+
+```mysql
+#在文件 batch.sql 中写下多个SQL文件
+source file1.SQL
+source file2.SQL
+source file3.SQL
+#然后运行 source batch.sql
 ```
 
 #### 插入技巧
@@ -1461,6 +1496,8 @@ cat xxx.file |redis-cli [--pipe]
 - 积累
 
 [根据MySQL表格自动生成restfull接口](https://segmentfault.com/q/1010000008335958)
+
+[MySQL知识点积累（推荐）](http://www.cnblogs.com/emanlee/category/95551.html)
 
 - 调优部分
 

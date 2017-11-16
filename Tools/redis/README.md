@@ -43,9 +43,18 @@ redis 127.0.0.1:6379> CONFIG GET *
 redis 127.0.0.1:6379> CONFIG SET CONFIG_SETTING_NAME NEW_CONFIG_VALUE
 ```
 
-#### 开启启动
+#### 启动
 
-创建过程
+##### 客户端
+
+```shell
+[root@local122 init.d]# redis-cli
+127.0.0.1:6379> 
+```
+
+##### 服务器端开机启动
+
+创建启动脚本
 
 ```shell
 # 1.创建启动脚本
@@ -59,7 +68,7 @@ cp redis_init_script /etc/init.d/redis-server
 # 然后执行chkconfig redis-server on
 ```
 
-样例：
+启动脚本样例：
 
 ```shell
 [root@local122 init.d]# cat redis-server 
@@ -114,17 +123,18 @@ esac
 /usr/local/redis/run/redis_6379.pid exists, process is already running or crashed
 ```
 
-
-
 ### 基础
 
-Redis中没有关系数据库中库表的概念，只有key:value的概念
+Redis中没有关系数据库中库表的概念，只有key:value的概念，但支持最多10个数据库，这些库相当于关系数据库中表的概念
 
 #### 数据类型
 
 Redis支持以下五种数据类型：
 
-> string（字符串），hash（哈希），list（列表），set（集合）及zset(sorted set：有序集合)。
+> - string（字符串）
+> - hash（哈希）
+> - list（列表）
+> - set（集合）及zset(sorted set：有序集合)
 
 ##### String
 
@@ -137,7 +147,7 @@ redis 127.0.0.1:6379> GET name
 
 ##### Hash
 
-hash特别适合用于存储对象,和上面的String的区别在于其value是可以自动检索的。
+​	hash特别适合用于存储对象,和上面的String的区别在于其value是可以自动检索的。
 
 ```shell
 127.0.0.1:6379> HMSET user:1 username runoob password runoob points 200
@@ -158,11 +168,15 @@ runoob
 
 ##### 列表
 
-简单的字符串列表，按照插入顺序排序
+​	简单的字符串列表，按照插入顺序排序
+
+```shell
+
+```
 
 ##### 集合
 
-Set是string类型的无序集合，集合是通过hash表实现的，所以添加、删除、查找的复杂度都是O(1)。
+​	集合set是string类型的无序集合，集合是通过hash表实现的，所以添加、删除、查找的复杂度都是O(1)。
 
 ```shell
 redis 127.0.0.1:6379> sadd runoob redis
@@ -184,7 +198,7 @@ redis 127.0.0.1:6379> smembers runoob
 
 ##### 有序集合
 
-zset和set一样，是string类型元素的集合，切不允许重复成员。不同的是每个元素都会关联一个double类型的分数，redis正是通过分数来为集合中的成员进行按从小到大的排序。
+​	zset和set一样，是string类型元素的集合，切不允许重复成员。不同的是每个元素都会关联一个double类型的分数，redis正是通过分数来为集合中的成员进行按从小到大的排序。
 
 ```shell
 redis 127.0.0.1:6379> zadd runoob 0 redis
@@ -204,6 +218,21 @@ redis 127.0.0.1:6379> ZRANGEBYSCORE runoob 0 1000
 
 有序集合按分数（值）筛选，按排名筛选，按域筛选等多种筛选方式的使用；指定成员分数的加减等
 
+#### 查询技巧
+
+查看key
+
+```shell
+# 查看所有的key
+keys *
+# 查看某些类的key(支持通配符)
+key xx*
+```
+
+
+
+### 高级
+
 #### 发布和订阅
 
 不知道有什么用，信息流推送？
@@ -218,7 +247,9 @@ redis 127.0.0.1:6379> ZRANGEBYSCORE runoob 0 1000
 
 数据导入和导出：SAVE和BGSAVE命令
 
-#### 同步数据到MySQL
+#### 数据同步
+
+##### 同步到MySQL
 
 将redis数据导出成文件，然后一次性加载进mysql,关键是如何组织redis中的数据结构到mysql中数据结构的转换
 
@@ -230,7 +261,7 @@ redis 127.0.0.1:6379> ZRANGEBYSCORE runoob 0 1000
 
 #### Lua操作Redis
 
-
+//待补充
 
 ## 参考
 
