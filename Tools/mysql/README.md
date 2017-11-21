@@ -293,6 +293,51 @@ show variables like '%lower_case_table_names%';
 
 #### 索引
 
+索引认知：
+
+1. 索引是按照特定的数据结构把数据表中的数据放在索引文件中，以便于快速查找；
+
+
+2. 索引存在于磁盘中，会占据物理空间。
+
+##### 索引方法
+
+索引文件按照不同的数据结构来存储，数据结构的不同产生了不同的索引类型，常见的[索引类型](https://segmentfault.com/a/1190000010264071)：
+
+###### B-Tree索引
+
+支持范围查找
+
+###### 哈希索引
+
+哈希表的优势与限制:
+
+- 优势:
+  1. 只需比对哈希值，因此速度非常快，性能优势明显；
+- 限制:
+  1. 不支持任何范围查询，比如`where price > 150`，因为是基于哈希计算，支持等值比较。
+  2. 哈希表是无序存储的，因此索引数据无法用于排序。
+  3. 主流存储引擎不支持该类型，比如`MyISAM`和`InnoDB`。哈希索引只有Memory, NDB两种引擎支持。
+
+###### 空间数据索引（R-Tree）
+
+地理数据存储
+
+###### 全文索引
+
+全文索引主要用于海量数据的搜索，只有InnoDB存储引擎支持
+
+**总结**
+
+```
+1. B-Tree索引使用最广泛，主流引擎都支持。
+2. 哈希索引性能高，适用于特殊场合。
+3. R-Tree不常用。
+4. 全文索引适用于海量数据的关键字模糊搜索。
+```
+
+
+
 ##### 创建和删除
 
 >加索引
@@ -375,6 +420,11 @@ CREATE TABLE Persons(
     CONSTRAINT uc_PersonID UNIQUE (Id_P,LastName)
 )
 ```
+
+##### 索引和引擎
+
+- 索引是在存储引擎中实现的
+- 不同的存储引擎对同一类型的索引的具体实现也有差别
 
 #### 引擎
 
@@ -700,9 +750,29 @@ END
 
 单索引和联合索引
 
+##### 索引类型
+
+索引类型是基于索引方法的，有各自的特点 
+
+- 唯一索引
+
+
+- 普通索引
+- 主键索引
+
+区别在于：
+
+```
+主键索引:数据列不允许重复，不允许为NULL.一个表只能有一个主键。
+唯一索引:数据列不允许重复，允许为NULL值，一个表允许多个列创建唯一索引。
+普通索引:基本的索引类型，没有唯一性的限制，允许为NULL值。
+```
+
 #### 正则
 
-mysql[正则](http://www.cnblogs.com/way_testlife/archive/2010/09/17/1829567.html)和模糊匹配的区别
+mysql[正则](http://www.cnblogs.com/way_testlife/archive/2010/09/17/1829567.html)和模糊匹配的区别:
+
+##### 正则
 
 ```mysql
 # 正则判断（匹配返回1，不匹配返回0）
@@ -715,7 +785,56 @@ select 'JetPack 1000'  regexp '^1000';
 >
 >   如：select 'JetPack we2x000'  REGEXP BINARY 'JetPack .000'
 
+##### 模糊匹配
+
+
+
 #### 子查询
+
+子查询是从最内层的查询开始执行的
+
+##### 分类
+
+根据子查询的返回值分：
+
+- 单一值：变量子查询
+- 一行: 行子查询
+- 一列:列子查询
+- 一个表:表子查询
+
+根据子查询的出现位置分：
+
+- where之后:where子查询
+- from之后：from子查询
+
+##### 关键字
+
+###### exists关键字
+
+内层查询语句不返回查询记录，而是返回一个真假值。
+
+```mysql
+select employee_name,gender,email,job_title from employee where exists(select * from employee where employee_name='成龙');
+
+# 返回a表中满足id在b表中条件的记录
+select * from ecs_goods a where EXISTS(select cat_id from ecs_category b where a.cat_id = b.cat_id);
+```
+
+###### any关键字
+
+只要满足内存查询语句返回结果中的任意一个，就可以执行外层查询语句
+
+```mysql
+#这个就是查询所有购买数量大于49的订单的信息！
+select order_id,customer_id,order_number,order_date from `order` where order_id = any(select order_id from order_detail where buy_number>49);
+```
+
+###### all关键字
+
+```mysql
+#所有满足订单的总金额大于单价*10的订单的信息
+select order_id,customer_id,order_number,order_date from `order` where total_money > all(select price*10 from order_detail);
+```
 
 #### 连接
 
@@ -1077,6 +1196,8 @@ SELECT user_name,'skills2',skills2 from nameskills_col
 UNION ALL
 SELECT user_name,'skills2',skills3 from nameskills_col ORDER BY user_name;
 ```
+
+> 这部分还有很多要完善的地方！，进一步扩展的是求一行的最大值和最小值等
 
 #### 同一属性多值过滤
 
@@ -1510,6 +1631,8 @@ cat xxx.file |redis-cli [--pipe]
 [性能调优攻略:SQL语句优化](http://www.toutiao.com/a6391314783630770433/)
 
 [mysql exists和in的效率比较](http://www.cnblogs.com/meibao/p/4973043.html)
+
+[MySQL索引专题(推荐)](https://segmentfault.com/a/1190000010264071)
 
 - 备份
 

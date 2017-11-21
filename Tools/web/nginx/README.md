@@ -8,7 +8,9 @@
 
 nginx本身是一个http服务器，同时又是一个高性能的反向代理服务器，也是一个IMAP/POP3/SMTP代理服务器。
 
-### 安装
+### 基础
+
+#### 安装
 
 > 安装依赖项：
 >
@@ -58,7 +60,7 @@ nginx本身是一个http服务器，同时又是一个高性能的反向代理�
 > nginx -V
 > ```
 
-### 启动关闭和重启
+#### 启动关闭和重启
 
 启动
 
@@ -92,7 +94,7 @@ tips:如何将一个应用程序做成一个[^服务]：
 
 > [如何将一个应用程序做成一个服务](http://www.cnblogs.com/niocai/archive/2012/07/12/2587736.html)（还存在问题，这个是老版本的，新版本的还没解决）
 
-### nginx开启启动
+#### 开机启动
 
 [ nginx开机自动启动脚本](http://blog.csdn.net/gebitan505/article/details/17606735)
 
@@ -178,7 +180,7 @@ tips:如何将一个应用程序做成一个[^服务]：
 > exit 0
 > ```
 
-### nginx配置文件
+### 配置文件
 
 #### **nginx.conf主配置文件**
 
@@ -313,7 +315,7 @@ context: main， http， server， location
 
 > 注意错误日志不支持自定义格式，只能使用以上的格式，而access支持自定义格式
 
-### nginx开启https支持
+### https支持
 
 SSL使用证书来创建安全连接，有两种验证模式：
 
@@ -473,7 +475,7 @@ SSL使用证书来创建安全连接，有两种验证模式：
 
 ![nginx开启https](http://p1.pstatp.com/large/159f00042b57b14e3efa)
 
-### nginx运行状态监控
+### 运行状态监控
 
 需要使用到的模块是http_stub_status_module
 
@@ -513,7 +515,7 @@ Reading: 0 Writing: 1 Waiting: 0
 - **Writing** – nginx reads request body, processes request, or writes response to a client
 - **Waiting** – keep-alive connections, actually it is `active – (reading + writing).`This value depends on [keepalive-timeout](http://wiki.nginx.org/HttpCoreModule#keepalive_timeout). Do not confuse non-zero waiting value for poor performance. It can be ignored. Although, you can force zero waiting by setting `keepalive_timeout 0;`
 
-### nginx开启访问认证
+### 访问认证
 
 ngx_http_auth_basic_module模块实现访问认证，只有输入正确的用户密码才允许访问web内容。web上的一些内容不想被其他人知道，但是又想让部分人看到。[nginx](http://www.ttlsa.com/nginx/)的http auth模块以及Apache http auth都是很好的解决方案。
 
@@ -543,7 +545,7 @@ htpasswd -c -d /usr/local/nginx/conf/htpasswd username
 > 输入以上命令，回车输入密码，再次回车，输入确认密码 
 
 # 方式2：
-printf "yjm:$(openssl passwd -crypt 123)\n" >>conf/htpasswd
+printf "yjm:$(openssl passwd -crypt 123)\n" >> conf/htpasswd
 cat conf/htpasswd 
 #yjm:xyJkVhXGAZ8tM  # 这样就配置了用户名为yjm,密码为123（还要加密）的访问认证
 ```
@@ -586,7 +588,7 @@ cat conf/htpasswd
 
 [开启nginx的状态监控模块](https://easyengine.io/tutorials/nginx/status-page/)
 
-## uwsgi的配置
+## nginx+uwsgi的配置
 
 ---
 
@@ -598,7 +600,9 @@ cat conf/htpasswd
 >
 > > 是一个==web服务器==，实现了<u>WSGI协议、uwsgi协议、http</u>等协议。Nginx中HttpUwsgiModule的作用是与uWSGI服务器进行交换。（注意概念辨析）
 
-### 安装
+### 基础
+
+#### 安装
 
 > ~~sudo yum install uwsgi (这一步非必须，Linux系统一般都自带的安装在/usr/sbin目录下)~~
 >
@@ -615,7 +619,7 @@ cat conf/htpasswd
 > sudo apt-get install uwsgi uwsgi-plugin-python
 > ```
 
-### 启动和关闭
+#### 启动和关闭
 
 启动:
 
@@ -624,6 +628,10 @@ cat conf/htpasswd
 关闭：
 
 >  killall -9 uwsgi
+
+#### uwsgi的处理过程
+
+> 如何将nginx的请求进行处理和返回的？
 
 ### 配置
 
@@ -772,10 +780,6 @@ python $projectroot/manage.py runserver 127.0.0.1:8801  # 此处8801是django自
 > application = get_wsgi_application()  #使用此获取应用
 > ```
 
-### uwsgi的处理过程
-
-> 如何将nginx的请求进行处理和返回的？
-
 ### 参考
 
 [uWSGI搭配Nginx](http://www.nowamagic.net/academy/tag/uwsgi)(现代魔法学院)
@@ -798,11 +802,13 @@ python $projectroot/manage.py runserver 127.0.0.1:8801  # 此处8801是django自
 
 ## nginx+php的配置
 
-### 安装依赖项
+### 基础
+
+#### 安装依赖项
 
 > yum install libxml2  libxml2-devel curl-devel libmcrypt-devel mhash-devel libxslt-devel libjpeg libjpeg-devel libpng libpng-devel freetype freetype-devel
 
-### 下载和安装php
+#### 下载和安装php
 
 > wget http://cn2.php.net/distributions/php-5.6.27.tar.bz2
 >
@@ -822,7 +828,7 @@ python $projectroot/manage.py runserver 127.0.0.1:8801  # 此处8801是django自
 >
 > make install
 
-### 启动和配置php
+#### 启动和配置php
 
 配置
 
@@ -899,6 +905,8 @@ location ~ \.php$ {
 [php配置php-fpm启动参数及配置详解](http://www.jb51.net/article/42716.htm)
 
 [Linux下配置安装PHP环境](http://www.cnblogs.com/lufangtao/archive/2012/12/30/2839679.html)（里面有配置mysql的支持）
+
+[FastCgi 与 PHP-fpm 之间的关系(强烈推荐)](https://segmentfault.com/a/1190000010612829)
 
 ## nginx+web.py的配置
 
@@ -1002,9 +1010,8 @@ Django is very probably the most used Python web framework around. Deploying it 
 
 We suppose the Django project is in `/home/foobar/myproject`:
 
-```
+```shell
 uwsgi --socket 127.0.0.1:3031 --chdir /home/foobar/myproject/ --wsgi-file myproject/wsgi.py --master --processes 4 --threads 2 --stats 127.0.0.1:9191
-
 ```
 
 (with `--chdir` we move to a specific directory). In Django this is required to correctly load modules.
@@ -1025,16 +1032,14 @@ A lot better!
 
 Just run it:
 
-```
+```shell
 uwsgi yourfile.ini
-
 ```
 
 If the file `/home/foobar/myproject/myproject/wsgi.py` (or whatever you have called your project) does not exist, you are very probably using an old (< 1.4) version of Django. In such a case you need a little bit more configuration:
 
 ```
 uwsgi --socket 127.0.0.1:3031 --chdir /home/foobar/myproject/ --pythonpath .. --env DJANGO_SETTINGS_MODULE=myproject.settings --module "django.core.handlers.wsgi:WSGIHandler()" --processes 4 --threads 2 --stats 127.0.0.1:9191
-
 ```
 
 Or, using the .ini file:
@@ -1049,7 +1054,6 @@ module = django.core.handlers.wsgi:WSGIHandler()
 processes = 4
 threads = 2
 stats = 127.0.0.1:9191
-
 ```
 
 Older (< 1.4) Django releases need to set `env`, `module` and the `pythonpath` (`..` allow us to reach the `myproject.settings` module).
