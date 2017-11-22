@@ -95,64 +95,6 @@ mysql -uroot -pxxx -P3316 -h127.0.0.1 -Ddb1
 # 其中-P3316是本机的转发端口（如果不转发的话，直接是远程机器的端口），注意在cmder中输入命令，不要在GitBash中输入，后者正确之后无响应
 ```
 
-修改表名
-
-```mysql
-alter table media_relation_search_pc rename media_relation_search_pc_old_20170627;
-```
-
-查看包含某字段的所有表名和所在的数据库
-
-```mysql
-#TABLE_SCHEMA字段为db的名称（所属的数据库），字段TABLE_NAME为表的名称。
-SELECT TABLE_SCHEMA,TABLE_NAME FROM information_schema.columns WHERE column_name='brand_id';
-show tables like "xxx%";
-```
-
-查看一个表的所有字段
-
-```shell
-# shell的方式（得到的结果是一串由空格分割的字符串，然后再进行遍历即可）
-fields=$(echo "desc media_info.${TABLE_NAME};"| ${LOCAL_MYSQL} | grep -v Field | grep -v auto_increment | awk '{print $1}')
-```
-
-##### 字段
-
-增加字段
-
-```mysql
-alter table table_name add field_name field_type;
-alter table newexample add address varchar(110) after stu_id;
-```
-
-修改原字段名称及类型
-
-```mysql
-alter table table_name change old_field_name new_field_name field_type;
-```
-
-删除字段
-
-```mysql
-alter table table_name drop field_name;
-```
-
-修改字段值
-
-```mysql
-UPDATE [LOW_PRIORITY] [IGNORE] table_reference
-    SET col_name1={expr1|DEFAULT} [, col_name2={expr2|DEFAULT}] ...
-    [WHERE where_condition]
-    [ORDER BY ...]
-    [LIMIT row_count]
-
-UPDATE tbl SET col1 = col1 + 1, col2 = col1;
-```
-
-**参考**
-
-http://c.biancheng.net/cpp/html/1456.html
-
 ##### 编码
 
 查看字符数据库的字符集
@@ -289,7 +231,110 @@ var_name=var_value
 show variables like '%lower_case_table_names%';
 ```
 
+#### 表
 
+#####  类型
+
+共有5种类型的表格：
+
+- MyISAM(默认)
+- Heap(memory)
+- Merge
+- INNODB
+- ISAM
+
+###### MyISAM
+
+###### Heap
+
+内存表的特点：
+
+```shell
+- 内存表不支持事务和AUTO_INCREMENT
+- 内存表不支持BLOB/TEXT列
+- 内存表大小可用　max_heap_table_size　参数来设置
+- 只能使用比较运算符=，<，>，=>，= <
+- 索引不能为NULL
+```
+
+[内存表使用小结](http://blog.csdn.net/adparking/article/details/6388946)
+
+##### 基础
+
+创建表
+
+```mysql
+CREATE TABLE if not exists `row2col_tbl` (
+  `date` varchar(8) DEFAULT NULL,
+  `xl_version` varchar(20) DEFAULT NULL,
+  `stat_flag` varchar(10) DEFAULT NULL,
+  `area` varchar(2) DEFAULT NULL,
+  `cnt` int(11) DEFAULT NULL,
+  `cnt_user` int(11) DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+```
+
+修改表名
+
+```mysql
+alter table media_relation_search_pc rename media_relation_search_pc_old_20170627;
+# 或者
+rename命令格式：rename table 原表名 to 新表名;
+```
+
+查看包含某字段的所有表名和所在的数据库
+
+```mysql
+#TABLE_SCHEMA字段为db的名称（所属的数据库），字段TABLE_NAME为表的名称。
+SELECT TABLE_SCHEMA,TABLE_NAME FROM information_schema.columns WHERE column_name='brand_id';
+show tables like "xxx%";
+```
+
+查看一个表的所有字段
+
+```shell
+# shell的方式（得到的结果是一串由空格分割的字符串，然后再进行遍历即可）
+fields=$(echo "desc media_info.${TABLE_NAME};"| ${LOCAL_MYSQL} | grep -v Field | grep -v auto_increment | awk '{print $1}')
+```
+
+##### 字段
+
+###### 类型
+
+
+
+###### 操作
+
+[增加字段](http://c.biancheng.net/cpp/html/1456.html)
+
+```mysql
+alter table table_name add field_name field_type;
+alter table newexample add address varchar(110) after stu_id;
+```
+
+修改字段
+
+```mysql
+alter table table_name change old_field_name new_field_name field_type;
+```
+
+删除字段
+
+```mysql
+alter table table_name drop field_name;
+```
+
+更新字段
+
+```mysql
+UPDATE [LOW_PRIORITY] [IGNORE] table_reference
+    SET col_name1={expr1|DEFAULT} [, col_name2={expr2|DEFAULT}] ...
+    [WHERE where_condition]
+    [ORDER BY ...]
+    [LIMIT row_count]
+
+UPDATE tbl SET col1 = col1 + 1, col2 = col1;
+```
 
 #### 索引
 
@@ -483,25 +528,13 @@ CSV（Comma-Separated Values逗号分隔值）
 
 参考：[MySQL中的各种引擎的区别](http://blog.csdn.net/gaohuanjie/article/details/50944782)
 
-#### 函数
-
-字符串函数
-
-```sql
-# 日期从20161212转换成2016/12/12,后者的格式能容易被excel处理
-concat_ws('/',substring(date,1,4),substring(date,5,2),substring(date,7,2))
-# 补充：
-## awk法
-echo "20161212"| awk '{print substr($1,1,4)"/"substr($1,5,2)"/"substr($1,7,8)}'
-echo "20161212"| awk '{printf("%s/%s/%s",substr($1,1,4),substr($1,5,2),substr($1,7,8))}'
-## shell法(注意shell循环读入变量的方式)
-a=20161212
-while read line;do echo ${line:0:4}"/"${line:4:2}"/"${line:6:2}; done<<< "${a}"
-```
-
-
-
 ### 高级
+
+#### 锁
+
+//待补充
+
+#### 存储过程
 
 存储过程和函数的区别：
 
@@ -509,8 +542,6 @@ while read line;do echo ${line:0:4}"/"${line:4:2}"/"${line:6:2}; done<<< "${a}"
 - PREPARE语句只能用于5.0版本以上的存储过程里，不能用在函数或者触发器里
 - 调用方法不一样
 - 存储过程常用在事件和触发器中
-
-#### 存储过程
 
 ##### 创建
 
@@ -555,14 +586,37 @@ call  sp_name;
 
 ##### 库函数
 
-字符串处理
+###### 字符串处理
+
+日期字符串转换
 
 ```mysql
-# 提取url域名
-select substring_index(substring_index('http://wz.cnblogs.com/my/search/?q=cookie','/',3),'/',-1);
+## mysql法
+concat_ws('/',substring(date,1,4),substring(date,5,2),substring(date,7,2))
+
+## awk法
+echo "20161212"| awk '{print substr($1,1,4)"/"substr($1,5,2)"/"substr($1,7,8)}'
+echo "20161212"| awk '{printf("%s/%s/%s",substr($1,1,4),substr($1,5,2),substr($1,7,8))}'
+
+## shell法(注意shell循环读入变量的方式)
+a=20161212
+while read line;do echo ${line:0:4}"/"${line:4:2}"/"${line:6:2}; done<<< "${a}"
 ```
 
-类型转换
+> 备注： 日期从20161212转换成2016/12/12,后者的格式能容易被excel处理
+
+trim函数
+
+```mysql
+#trim函数可以过滤指定的字符串： 
+#完整格式：TRIM([{BOTH | LEADING | TRAILING} [remstr] FROM] str) 
+#简化格式：TRIM([remstr FROM] str) 
+# 默认是BOTH和删除两端的空格
+
+SELECT TRIM(TRAILING ',' FROM ',bar,xxyz,'); 
+```
+
+###### 类型转换
 
 ```mysql
 # 字符串转数字
@@ -571,7 +625,7 @@ SELECT CONVERT('123',SIGNED);
 SELECT '123'+0;
 ```
 
-IP地址处理
+###### IP处理
 
 ```mysql
 # int->ip
@@ -583,6 +637,19 @@ select concat_ws('.',cast(3507806248/pow(256,3) as signed),cast((3507806248%pow(
 # ip->int
 select 209*pow(256,3)+20*pow(256,2)+224*pow(256,1)+40*pow(256,0); # 3507806248
 select inet_aton('209.20.224.40'); # 3507806248
+```
+
+###### url处理
+
+```mysql
+# 提取url域名
+select substring_index(substring_index('http://wz.cnblogs.com/my/search/?q=cookie','/',3),'/',-1);
+```
+
+###### 日期处理
+
+```mysql
+# 待补充
 ```
 
 ##### 自定义函数
@@ -704,7 +771,19 @@ DROP EVENT [IF EXISTS] event_name
 
 #### 触发器
 
-创建触发器
+mysq表中允许有以下六种触发器:
+
+- insert
+  - before insert
+  - after insert
+- update
+  - before update
+  - after update
+- delete
+  - before delete 
+  - after delete
+
+##### 创建触发器
 
 ```mysql
 CREATE TRIGGER trigger_name trigger_time trigger_event ON tbl_name FOR EACH ROW trigger_stmt
@@ -718,7 +797,7 @@ CREATE TRIGGER trigger_name trigger_time trigger_event ON tbl_name FOR EACH ROW 
 #trigger_stmt：当触发程序激活时执行的语句。执行多个语句，可使用BEGIN...END复合语句结构
 ```
 
-删除触发器
+##### 删除触发器
 
 ```mysql
 DROP TRIGGER [schema_name.]trigger_name
@@ -1281,8 +1360,15 @@ INSERT INTO tablea (peerid,new_install_date,new_install_source,new_install_versi
 
 #### 删除重复数据
 
+在删除的时候可能会根据某些条件保留其中的一条
+
 ```mysql
-# 待补充
+# 删除重复邮件地址，重复的多条，只保留其中id最小的
+delete from Person 
+where Id not in (select a.Id from (
+  									select min(Id) as Id from Person group by Email
+									)a
+                );
 ```
 
 #### GroupTopN
@@ -1338,15 +1424,15 @@ ORDER BY
 
 核心优先使用explain一下查问题,对explain基础知识的理解
 
-```
+```mysql
 explain format=json select avg(k) from sbtest1 where id between 1000 and 2000 \G
 ```
 
 注意查询开销`query_cost`
 
-#### 优化配置
+#### 配置优化
 
-
+//待补充
 
 #### 具体方法
 
@@ -1355,7 +1441,6 @@ explain format=json select avg(k) from sbtest1 where id between 1000 and 2000 \G
 索引通过减少查询必须扫描的数据库中的数据量来提高查询效率，如何设计索引的使用，索引会引入额外的性能问题，比如插入会稍慢。
 
 - 多列索引的设计及什么情况下索引会失效
-- ​
 
 ##### 慢查询
 
@@ -1619,6 +1704,8 @@ cat xxx.file |redis-cli [--pipe]
 [根据MySQL表格自动生成restfull接口](https://segmentfault.com/q/1010000008335958)
 
 [MySQL知识点积累（推荐）](http://www.cnblogs.com/emanlee/category/95551.html)
+
+[MySQL面试题集锦（推荐）](https://www.toutiao.com/i6488851831869932046/)
 
 - 调优部分
 

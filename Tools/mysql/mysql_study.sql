@@ -1,6 +1,5 @@
 #创建视图
 use School;
-
 CREATE TABLE student (stuno INT ,stuname NVARCHAR(60));
 CREATE TABLE stuinfo (stuno INT ,class NVARCHAR(60),city NVARCHAR(60));
 
@@ -18,19 +17,20 @@ CREATE VIEW stu_class (id , NAME , glass) AS
         student.`stuno` = stuinfo.`stuno`;
 
 
-#创建视图
+#说明
 create view 'viewname' as select colunm from table_name where contion;
-**视图总是显示最新的数据。每当用户查询视图时，数据库引擎通过使用SQL语句来重建数据
-> 视图例子
+-- 视图总是显示最新的数据。每当用户查询视图时，数据库引擎通过使用SQL语句来重建数据
+-- 视图例子
 CREATE VIEW [Products Above Average Price] AS
 SELECT ProductName,UnitPrice
 FROM Products
 WHERE UnitPrice>(SELECT AVG(UnitPrice) FROM Products) #注意这里是如何直接求大于平均值，where子句中不能使用聚合函数
 
-> 更新视图
+# 更新视图
 create or replace 'viewname' as	select [modify]colunm from table_name where contion;
-* 这里只是多了or replace这个关键字,同时可以对列和条件扥改进修改
-> 视图的其它操作
+-- 这里只是多了or replace这个关键字,同时可以对列和条件扥改进修改
+
+# 视图的其它操作
 drop view 'viewname'   //删除视图
 create view v_name as select *,* ;  //创建视图
 alter view v_name(v1,v2) as select *;  //修改视图（相当于直接创建新的视图）

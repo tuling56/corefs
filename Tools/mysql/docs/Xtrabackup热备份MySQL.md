@@ -2,7 +2,7 @@
 
 [TOC]
 
-### 准备
+### 基础
 
 #### 安装Xtrabackup
 
@@ -247,7 +247,7 @@ d.基于全备份和第一次增量备份，恢复第二次增量备份
 
 ## 参考
 
-注:官方文档地址:[https://www.percona.com/doc/percona-xtrabackup/LATEST/index.html](https://www.percona.com/doc/percona-xtrabackup/LATEST/index.html)
+[官方文档](https://www.percona.com/doc/percona-xtrabackup/LATEST/index.html)
 
 [使用xtrabackup同步主从及数据备份](http://www.toutiao.com/i6436511518929453569/)
 
