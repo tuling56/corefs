@@ -420,6 +420,37 @@ FNR：awk当前读取的记录数，其变量值小于等于NR（比如当读取
 如果想调用environment variable, 要用以上的方式调用, 方法是:"'"$LOGNAME"'"
 ```
 
+注释
+
+```shell
+awks='BEGIN{
+            #print "begin:"frow;
+      }
+      {
+              # 列名获取
+              if(NR==1){
+                for(i=1;i<=NF;++i)
+                    headers[i]=$i;
+                next;
+              }
+              
+              # 行头部
+              rowf=$1;
+              for(j=2;j<=frow;j++)
+                 rowf=rowf"\t"$j;
+              #print "rowf:"rowf;
+              
+              for(i=frow+1;i<=NF;++i){
+                printf("%s\t%s\t%s\n",rowf,headers[i],$i);
+              }
+      }
+      END{
+            #print "done"
+      }'
+```
+
+> awk中的注释用`#`号
+
 ##### 模式和正则
 
 awk本身支持扩展正则，不需要加额外的参数
@@ -462,7 +493,7 @@ awk 'BEGIN{a=1;b=2;print (a>5 && b<=2),(a>5 || b<=2);}'
 
 ##### awk语句
 
-###### 循环
+###### [循环和退出](http://blog.sina.com.cn/s/blog_551d7bff0100umkv.html)
 
 ```shell
 # while,for循环语句
@@ -876,8 +907,6 @@ sed -i 's/oldstr/newstr/g' `grep oldstr -rl odlstr $datadir`
 
 grep加-E支持扩展正则（？+|和（））
 
-
-
 ### find
 
 #### 基础
@@ -926,42 +955,45 @@ exit 0
 
 - **bash部分**
 
-[linux参数太长的换行问题](http://blog.csdn.net/feng27156/article/details/39057773)
+  [linux参数太长的换行问题](http://blog.csdn.net/feng27156/article/details/39057773)
 
-[shell关联数组](http://blog.csdn.net/mm_bit/article/details/48417157)
+  [shell关联数组](http://blog.csdn.net/mm_bit/article/details/48417157)
 
 - **awk部分**
 
-[awk手册](http://luy.li/data/awk.html)
+  [awk手册](http://luy.li/data/awk.html)
 
-[awk快速指南](http://man.linuxde.net/awk)(推荐)
+  [awk快速指南](http://man.linuxde.net/awk)(推荐)
 
-[awk学习详细文档](http://www.cnblogs.com/gaoxufei/p/6058584.html)
+  [awk学习详细文档](http://www.cnblogs.com/gaoxufei/p/6058584.html)
 
-[awk处理多维数组](http://blog.csdn.net/ithomer/article/details/8478716)
+  [awk处理多维数组](http://blog.csdn.net/ithomer/article/details/8478716)
 
-[awk常见数组处理技巧](http://www.cnblogs.com/lixiaohui-ambition/archive/2012/12/11/2813419.html)
+  [awk常见数组处理技巧](http://www.cnblogs.com/lixiaohui-ambition/archive/2012/12/11/2813419.html)
 
-[awk 内置变量使用介绍](http://blog.jobbole.com/92494/)
+  [awk 内置变量使用介绍](http://blog.jobbole.com/92494/)
 
-[awk 内置函数详细介绍（实例）](http://blog.jobbole.com/92497/)
+  [awk 内置函数详细介绍（实例）](http://blog.jobbole.com/92497/)
 
-[awk运算符介绍](http://blog.csdn.net/gaoming655/article/details/7390207)
+  [awk运算符介绍](http://blog.csdn.net/gaoming655/article/details/7390207)
 
-[awk中的输入和输出重定向](http://blog.chinaunix.net/uid-10540984-id-356795.html)（推荐）
+  [awk中的输入和输出重定向](http://blog.chinaunix.net/uid-10540984-id-356795.html)（推荐）
 
-[awk的模式匹配(推荐)](http://blog.csdn.net/puqutogether/article/details/45865631)
+  [awk的模式匹配(推荐)](http://blog.csdn.net/puqutogether/article/details/45865631)
+
+  [awk数组操作详细介绍（推荐）](http://www.cnblogs.com/chengmo/archive/2010/10/08/1846190.html)
 
 - **sed部分**
 
-[sed简明教程](http://coolshell.cn/articles/9104.html?hmsr=toutiao.io&utm_medium=toutiao.io&utm_source=toutiao.io)
+  [sed简明教程](http://coolshell.cn/articles/9104.html?hmsr=toutiao.io&utm_medium=toutiao.io&utm_source=toutiao.io)
 
-[sed命令](http://man.linuxde.net/sed)
+  [sed命令](http://man.linuxde.net/sed)
 
-[sed处理流程概述（推荐）](http://blog.csdn.net/yiqingnian28/article/details/23133043)
+  [sed处理流程概述（推荐）](http://blog.csdn.net/yiqingnian28/article/details/23133043)
 
 - grep部分
 
+  //待补充
 
 
 ## 工具积累
