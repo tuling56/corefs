@@ -35,7 +35,7 @@ function rsync_pipeline()
 # [本地]本目录下的程序同步到shell版本管理库
 function rsync_shell()
 {
-	iinfo "同步cygwin的定时脚本到shell版本库"
+	iinfo "[本地-->本地] 同步cygwin的定时脚本到shell版本库"
 	rsync.exe -u -avP ./*.py  "$BASH_WORSPACE/cygwin"
 	rsync.exe -u -avP ./*.sh  "$BASH_WORKSPACE/cygwin"
 }
@@ -43,7 +43,7 @@ function rsync_shell()
 # [本地->远程]数据库同步
 function rsync_db()
 {
-	echo "# [本地->远程]数据库同步....."
+	echo "[本地->远程] 数据库同步....."
 	MYSQL="mysql -uroot -proot -N"
 	ALecsSQL="mysql -h47.995.195.31 -uroot -p123 -Dstudy"
 	ALyosSQL="mysql -hbdm295290494.my3w.com -ubdm295290494  -pyunosa112233 -Dbdm295290494_db"
@@ -64,7 +64,7 @@ function rsync_db()
 # [本地->远程]查询sql同步
 function rsync_query()
 {
-	echo "# [本地->远程]查询sql同步....."
+	echo "[本地->远程] 查询sql同步....."
 	local_sql='/cygdrive/c/Users/xl/Documents/Navicat/MySQL/servers/*'
 	remote_sql='/home/yjm/Projects/mysql/sql'
 
@@ -74,7 +74,7 @@ function rsync_query()
 # [本地->OneDrive]文档图片等同步
 function rsync_docimg()
 {
-	echo "[本地->OneDrive]文档图片等同步...."
+	echo "[本地->OneDrive] 文档图片等同步...."
 	local local_dimg='/cygdrive/c/Users/xl/Downloads/Documents/表情包'
 	local remote_dimg='/cygdrive/e/OneDrive/图片'
 
@@ -84,7 +84,7 @@ function rsync_docimg()
 # [本地->OneDrive]gitbash的配置同步(有问题未解决)
 function rsync_gitbash()
 {
-	echo "[本地->OneDrive]gitbash的配置同步...."
+	echo "[本地->OneDrive] gitbash的配置同步...."
 	local local_conf='"/cygdrive/c/Program Files/Git/etc/bash.bashrc" "/cygdrive/c/Program Files/Git/etc/vimrc"'
 	local remote_conf='"/cygdrive/e/OneDrive - std.uestc.edu.cn/Code/Git/mdotfiles/git/gitbash/"'
 	rsync.exe -avP "$local_conf" "$remote_conf"

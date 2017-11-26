@@ -29,7 +29,7 @@ function method2()
 {
 	find . -type f -mtime -7 -name "*.py"|while read f;do
 		sed -i 's/\t/    /g'  "$f"
-		echo "$f"
+		#echo "$f"
 	done
 }
 

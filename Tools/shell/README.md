@@ -1043,6 +1043,20 @@ awk '{i=1;
 	}' $inputf
 ```
 
+#### tab和空格
+
+tab转空格
+
+```shell
+expand -t4 xxx.txt > yyy.txt
+```
+
+空格转tab
+
+```shell
+unexpand -t4 xxx.txt >yyy.txt
+```
+
 
 
 ### 参考
