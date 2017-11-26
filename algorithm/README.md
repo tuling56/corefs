@@ -18,3 +18,12 @@
   [面试中的排序算法](http://t.cn/RtW9dth)
   [算法学习笔记](http://t.cn/RtW9d5s) 
 
+- 资料
+
+  [leetcode题解索引（推荐）](http://blog.csdn.net/hcbbt/article/details/43966331)
+
+  [leetcode题解详解（推荐）](https://www.tianmaying.com/tutorials/tag/Leetcode)
+
+  [leetcode编程训练（酷壳）](https://coolshell.cn/articles/12052.html)
+
+
