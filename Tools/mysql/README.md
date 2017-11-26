@@ -532,7 +532,42 @@ CSV（Comma-Separated Values逗号分隔值）
 
 #### 锁
 
-//待补充
+引擎和锁类型的对应关系
+
+| 表类型    | （支持的）锁类型 | 死锁   | 备注    |
+| ------ | -------- | ---- | ----- |
+| MyISAM | 表锁       | 不存在  |       |
+| InnoDB | 行锁/表锁    | 存在   | 默认是行锁 |
+| BDB    | 页锁/表锁    | 存在   |       |
+
+加锁
+
+```mysql
+
+```
+
+##### 锁类型
+
+###### 表锁
+
+表锁有两种模式：
+
+- 表共享读锁（ReadLock）
+- 表独占写锁（WriteLock）
+
+MyISAM表的读和写是串行的，即在读操作时不能写操作，写操作时不能读操作。
+
+###### 行锁
+
+//待添加
+
+###### 页锁
+
+//待添加
+
+##### 死锁解决
+
+//待添加
 
 #### 存储过程
 
@@ -1242,12 +1277,14 @@ order by a.date desc;
 ```mysql
 # 实现的sql语句(借鉴意义很广泛)
 select 年, 
-sum(case when 季度=1 then 销售量 else 0 end) as 一季度, 
-sum(case when 季度=2 then 销售量 else 0 end) as 二季度, 
-sum(case when 季度=3 then 销售量 else 0 end) as 三季度, 
-sum(case when 季度=4 then 销售量 else 0 end) as 四季度 
+	sum(case when 季度=1 then 销售量 else 0 end) as 一季度, 
+	sum(case when 季度=2 then 销售量 else 0 end) as 二季度, 
+	sum(case when 季度=3 then 销售量 else 0 end) as 三季度, 
+	sum(case when 季度=4 then 销售量 else 0 end) as 四季度 
 from sales group by 年;
 ```
+
+> 在sql server 2005中有[pivot函数](http://www.studyofnet.com/news/295.html)可以实现同样的功能
 
 #### 列转行
 
@@ -1667,71 +1704,90 @@ mysql -uroot -proot -N <redis_pipe.sql |redis-cli
 cat xxx.file |redis-cli [--pipe]
 ```
 
+### 问题
+
+#### 面试
+
+##### 自增主键
+
+问题描述：
+
+​	一张表，里面有ID自增主键，当insert了17条记录之后，删除了第15,16,17条记录，再把Mysql重启，再insert一条记录，这条记录的ID是18还是15 ？
+
+解决方法：
+
+![自增主键](http://p1.pstatp.com/large/46de00042bde76f17e9a)
+
 
 
 ## 参考
 
 - 基础
 
-[SQL的存储过程和函数](http://www.toutiao.com/a6391569028531831041/)
+  [SQL的存储过程和函数](http://www.toutiao.com/a6391569028531831041/)
 
-[MyCli:支持自动补全和语法高亮的MySQL客户端](http://hao.jobbole.com/mycli-mysql/)
+  [MyCli:支持自动补全和语法高亮的MySQL客户端](http://hao.jobbole.com/mycli-mysql/)
 
-[是否存在根据MySQL表格自动生成restful接口的技术](https://segmentfault.com/q/1010000008335958?_ea=1878275)
+  [是否存在根据MySQL表格自动生成restful接口的技术](https://segmentfault.com/q/1010000008335958?_ea=1878275)
 
-[Linux下修改mysql的root密码](http://www.tuicool.com/articles/yQNZFfr)
+  [Linux下修改mysql的root密码](http://www.tuicool.com/articles/yQNZFfr)
 
-[MySQL字符编码深入详解](http://www.jb51.net/article/29960.htm)
+  [MySQL字符编码深入详解](http://www.jb51.net/article/29960.htm)
 
-- 查询技巧
+- 高级
 
-[MySQL分组后选取指定值问题](http://www.jb51.net/article/31590.htm)
+  [MySQL行级锁、表级锁和页级锁](http://www.jb51.net/article/50047.htm)
 
-[MySQL存储过程的动态行转列](http://www.tuicool.com/articles/FNRVJvb)
 
-[重温SQL:行转列，列转行](http://mp.weixin.qq.com/s/pd4sEFa9oq0Lw5aaagmsxw)
+- 查询
 
-[慕课网:MySQL行列互转](http://www.imooc.com/learn/427)
+  [MySQL分组后选取指定值问题](http://www.jb51.net/article/31590.htm)
 
-[跨库Join解决方法](http://blog.csdn.net/u011277123/article/details/54374780)
+  [MySQL存储过程的动态行转列](http://www.tuicool.com/articles/FNRVJvb)
 
-[GroupTopN问题解决](http://blog.csdn.net/wzy_1988/article/details/52871636)
+  [重温SQL:行转列，列转行](http://mp.weixin.qq.com/s/pd4sEFa9oq0Lw5aaagmsxw)
 
-[MySQL分组取TopN](http://www.jb51.net/article/31590.htm)
+  [慕课网:MySQL行列互转](http://www.imooc.com/learn/427)
+
+  [跨库Join解决方法](http://blog.csdn.net/u011277123/article/details/54374780)
+
+  [GroupTopN问题解决](http://blog.csdn.net/wzy_1988/article/details/52871636)
+
+  [MySQL分组取TopN](http://www.jb51.net/article/31590.htm)
 
 - 积累
 
-[根据MySQL表格自动生成restfull接口](https://segmentfault.com/q/1010000008335958)
+  [根据MySQL表格自动生成restfull接口](https://segmentfault.com/q/1010000008335958)
 
-[MySQL知识点积累（推荐）](http://www.cnblogs.com/emanlee/category/95551.html)
+  [MySQL知识点积累（推荐）](http://www.cnblogs.com/emanlee/category/95551.html)
 
-[MySQL面试题集锦（推荐）](https://www.toutiao.com/i6488851831869932046/)
+  [MySQL面试题集锦（推荐）](https://www.toutiao.com/i6488851831869932046/)
 
 - 调优部分
 
-[MySQL性能监控](https://www.percona.com/doc/percona-monitoring-and-management/deploy/index.html)
+  [MySQL性能监控](https://www.percona.com/doc/percona-monitoring-and-management/deploy/index.html)
 
-[MySQL慢查询日志的使用](http://www.cnblogs.com/kerrycode/p/5593204.html)
+  [MySQL慢查询日志的使用](http://www.cnblogs.com/kerrycode/p/5593204.html)
 
-[MySQL慢查询官方参考](https://dev.mysql.com/doc/refman/5.7/en/slow-query-log.html)
+  [MySQL慢查询官方参考](https://dev.mysql.com/doc/refman/5.7/en/slow-query-log.html)
 
-[性能调优攻略:SQL语句优化](http://www.toutiao.com/a6391314783630770433/)
+  [性能调优攻略:SQL语句优化](http://www.toutiao.com/a6391314783630770433/)
 
-[mysql exists和in的效率比较](http://www.cnblogs.com/meibao/p/4973043.html)
+  [mysql exists和in的效率比较](http://www.cnblogs.com/meibao/p/4973043.html)
 
-[MySQL索引专题(推荐)](https://segmentfault.com/a/1190000010264071)
+  [MySQL索引专题(推荐)](https://segmentfault.com/a/1190000010264071)
 
 - 备份
 
-[mysql导入导出中文乱码的解决方法](http://www.jb51.net/article/31615.htm)
+  [mysql导入导出中文乱码的解决方法](http://www.jb51.net/article/31615.htm)
 
-[学会用各种姿势备份MySQL](http://www.cnblogs.com/liangshaoye/p/5464794.html)
+  [学会用各种姿势备份MySQL](http://www.cnblogs.com/liangshaoye/p/5464794.html)
 
-[数据库频道:MySQL大表备份策略](http://database.51cto.com/art/201011/234560.htm)
+  [数据库频道:MySQL大表备份策略](http://database.51cto.com/art/201011/234560.htm)
 
-[Xtrabackup热备份MySQL](http://www.tuicool.com/articles/MJzEFnE)
+  [Xtrabackup热备份MySQL](http://www.tuicool.com/articles/MJzEFnE)
 
-[不同mysql之间数据同步](http://blog.csdn.net/ityouknow/article/details/52710655)
+  [不同mysql之间数据同步](http://blog.csdn.net/ityouknow/article/details/52710655)
 
-[主从服务器之间数据同步](http://blog.csdn.net/alangmei/article/details/21075055)
+  [主从服务器之间数据同步](http://blog.csdn.net/alangmei/article/details/21075055)
 
