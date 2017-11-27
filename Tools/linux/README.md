@@ -353,7 +353,7 @@ rpm -qa
 
 #### JDK环境
 
-删除openjdk安装sun jdk
+要先删除open jdk，然后再安装sun jdk
 
 ##### 查询是否安装默认jdk
 
@@ -421,19 +421,19 @@ LOG="/tmp/clean.log"
 
 1. perl脚本写的程序，各选项的意义如下
 
-   ```
-   -f  发送者
-   -s  发送者smtp服务器地址
-   -xu 发送服务器的用户名
-   -xp 发送服务器的用户密码
-   -t  接收用户
-   -u  邮件标题
-   -m  邮件内容
-   -o
-       message-file=FILE    将文件内容作为邮件内容进行发送
-   	message-charset=utf8 设置邮件编码
-   -a  附件
-   ```
+```shell
+-f  发送者
+-s  发送者smtp服务器地址
+-xu 发送服务器的用户名
+-xp 发送服务器的用户密码
+-t  接收用户
+-u  邮件标题
+-m  邮件内容
+-o
+      message-file=FILE    将文件内容作为邮件内容进行发送
+      message-charset=utf8 设置邮件编码
+-a  附件
+```
 
 2. 多个收件人
 
@@ -464,33 +464,39 @@ Synopsis:  sendEmail -f ADDRESS [options]
     -s SERVER[:PORT]          smtp mail relay, default is localhost:25
 
   Optional:
-    -a   FILE [FILE ...]      file attachment(s)
-    -cc  ADDRESS [ADDR ...]   cc  email address(es)
-    -bcc ADDRESS [ADDR ...]   bcc email address(es)
-    -xu  USERNAME             username for SMTP authentication
-    -xp  PASSWORD             password for SMTP authentication
+```shell
+-a   FILE [FILE ...]      file attachment(s)
+-cc  ADDRESS [ADDR ...]   cc  email address(es)
+-bcc ADDRESS [ADDR ...]   bcc email address(es)
+-xu  USERNAME             username for SMTP authentication
+-xp  PASSWORD             password for SMTP authentication
+```
 
   Paranormal:
-    -b BINDADDR[:PORT]        local host bind address
-    -l LOGFILE                log to the specified file
-    -v                        verbosity, use multiple times for greater effect
-    -q                        be quiet (i.e. no STDOUT output)
-    -o NAME=VALUE             advanced options, for details try: --help misc
-        -o message-content-type=<auto|text|html>
-        -o message-file=FILE         -o message-format=raw
-        -o message-header=HEADER     -o message-charset=CHARSET
-        -o reply-to=ADDRESS          -o timeout=SECONDS
-        -o username=USERNAME         -o password=PASSWORD
-        -o tls=<auto|yes|no>         -o fqdn=FQDN
+```shell
+-b BINDADDR[:PORT]        local host bind address
+-l LOGFILE                log to the specified file
+-v                        verbosity, use multiple times for greater effect
+-q                        be quiet (i.e. no STDOUT output)
+-o NAME=VALUE             advanced options, for details try: --help misc
+    -o message-content-type=<auto|text|html>
+    -o message-file=FILE         -o message-format=raw
+    -o message-header=HEADER     -o message-charset=CHARSET
+    -o reply-to=ADDRESS          -o timeout=SECONDS
+    -o username=USERNAME         -o password=PASSWORD
+    -o tls=<auto|yes|no>         -o fqdn=FQDN
+```
 
 
   Help:
-    --help                    the helpful overview you're reading now
-    --help addressing         explain addressing and related options
-    --help message            explain message body input and related options
-    --help networking         explain -s, -b, etc
-    --help output             explain logging and other output options
-    --help misc               explain -o options, TLS, SMTP auth, and more
+```shell
+--help                    the helpful overview you're reading now
+--help addressing         explain addressing and related options
+--help message            explain message body input and related options
+--help networking         explain -s, -b, etc
+--help output             explain logging and other output options
+--help misc               explain -o options, TLS, SMTP auth, and more
+```
 
 参考：
 
@@ -618,6 +624,8 @@ yum install percona-xtrabackup
 ## 参考
 
 ### 基础知识
+
+[Linux性能工具集](https://www.toutiao.com/i6492996073429139982/)
 
 ### 技能积累
 
