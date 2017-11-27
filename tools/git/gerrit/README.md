@@ -20,7 +20,7 @@ java -jar gerrit-2.14.2.war init --batch --dev -d /home/yjm/Documents/gerrit/
 
 添加用户
 
-```
+```shell
 touch /home/yjm/Documents/gerrit/passwd
 htpasswd /home/yjm/Documents/gerrit/passwd  [new-user-name]
 ```

@@ -2,30 +2,66 @@
 
 [TOC]
 
-### 基本
+### 基础
 
 #### 配置
 
-用户配置文件
+##### 密钥配置
+
+ssh密钥
 
 ```
+ssh-keygen -t rsa -C “xxx@gmail.com” 
+# 生成私钥id_rsa和公钥id_rsa.pub两个文件,将id_rsa.pub拷贝到网站上
+```
+
+##### 用户配置
+
+```git
 [user]
     name = XXX
-           email = XXX@xunlei.com
-      [alias]
-           pushfull = push origin HEAD:refs/for/master
-           logfull = log --pretty=full
-           logformat = log --pretty=format:'%h %ai : %an , %s'
-           loggraph = log --pretty=format:'%h : %s(%an-%ai)' --graph
-     [color]
-           ui = true
-     [format]
-           pretty = format:%h %ai %an, %s
+    email = XXX@xunlei.com
+[alias]
+    pushfull = push origin HEAD:refs/for/master
+    logfull = log --pretty=full
+    logformat = log --pretty=format:'%h %ai : %an , %s'
+    loggraph = log --pretty=format:'%h : %s(%an-%ai)' --graph
+[color]
+    ui = true
+[format]
+    pretty = format:%h %ai %an, %s
 ```
 
-注：以上配置文件放置每个人的~/.gitconfig
+注：以上配置文件放置每个人的~/.gitconfig，使用`git config --list`查看已有的配置
 
-##### 全局配置
+> **单独配置**
+>
+> 在项目中如果不进行单独配置用户名和邮箱的话，则会使用全局的，正确的做法是针对公司的项目，在项目根目录下单独进行配置：
+>
+> ```shell
+> git config user.name "gitlab's Name"
+> git config user.email "gitlab@xx.com"
+> git config --list
+> ```
+>
+> > 注： git config --list查看当前配置, 在当前项目下面查看的配置是全局配置+当前项目的配置, 使用的时候会优先使用当前项目的配置
+
+[别名配置](http://blog.csdn.net/zhang31jian/article/details/41011313)
+
+```
+# 待补充
+```
+
+日志配置
+
+```R
+图形化：git log --pretty=format:'%h : %s(%an-%ai)' --graph
+原始格式：git log --pretty=full
+定制格式：git log --pretty=format:'%h %ai : %an , %s'
+git log --stat #显示每次提交（commit）中哪些文件被修改了  
+```
+
+账号配置
 
 设置Git的全局user name和email：
 
@@ -36,28 +72,7 @@ git config --global user.email "tuling56@gmail.com"  
 
 > 注意:用户名必须是已注册的用户名，邮箱必须为该用户绑定的邮箱地址
 
-生成ssh密钥过程
-
-```shell
-ssh-keygen -t rsa -C “xxx@gmail.com” 
-# 生成私钥id_rsa和公钥id_rsa.pub两个文件,将id_rsa.pub拷贝到网站上
-```
-
-使用`git config --list`查看已有的配置
-
-##### 单独配置
-
-在项目中如果不进行单独配置用户名和邮箱的话，则会使用全局的，正确的做法是针对公司的项目，在项目根目录下单独进行配置：
-
-```shell
-git config user.name "gitlab's Name"
-git config user.email "gitlab@xx.com"
-git config --list
-```
-
-> 注： git config --list查看当前配置, 在当前项目下面查看的配置是全局配置+当前项目的配置, 使用的时候会优先使用当前项目的配置
-
-#### 基础
+#### 入门
 
 ##### 传输协议
 
@@ -88,8 +103,6 @@ git config --list
 
 ### 高级
 
-
-
 #### 钩子
 
 钩子在运行的时候会调用GIT_DIR这个环境变量，而不是PWD这个
@@ -111,9 +124,9 @@ cd /var/git/web3/etc/puppet
 /usr/bin/git pull
 ```
 
-### 积累
+### 问题
 
-
+//待补充
 
 ## 参考
 
