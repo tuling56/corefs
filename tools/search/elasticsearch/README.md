@@ -1,14 +1,26 @@
-## ES学习笔记
+## ES笔记
 
 [TOC]
 
-### 安装
+### 基础
+
+elasticsearch和mysql的映射关系:E
+
+| Mysql | Elasticsearch | 备注   |
+| ----- | ------------- | ---- |
+| db    | Index索引       |      |
+| table | 文档类型          |      |
+| id    | 一条 记录         |      |
+| field | Json的key      |      |
+
+####  安装
 
 下载
 
+```shell
 https://github.com/medcl/
-
-`git clone git://github.com/medcl/elasticsearch-rtf.git -b master --depth 1`
+git clone git://github.com/medcl/elasticsearch-rtf.git -b master --depth 1
+```
 
 启动
 
@@ -20,9 +32,9 @@ cd elasticsearch/bin
 sudo -u ops ES_JAVA_OPTS="-Xms2024m -Xmx2024m"  ./bin/elasticsearch  -d
 
 # 或者
-# /usr/local/elasticsearch-1.7.2/bin/elasticsearch     # 日志会输出到stdout
-# /usr/local/elasticsearch-1.7.2/bin/elasticsearch -d  # 表示以daemon的方式启动
-# nohup /usr/local/elasticsearch-1.7.2/bin/elasticsearch > /var/log/logstash.log 2>&1 &
+/usr/local/elasticsearch-1.7.2/bin/elasticsearch     # 日志会输出到stdout
+/usr/local/elasticsearch-1.7.2/bin/elasticsearch -d  # 表示以daemon的方式启动
+nohup /usr/local/elasticsearch-1.7.2/bin/elasticsearch > /var/log/logstash.log 2>&1 &
 ```
 
 测试
@@ -52,22 +64,12 @@ curl -XGET/POST 'http://localhost:9200/indexdb/external/_search' -d '
 '
 ```
 
-### 基础
 
-映射关系
+#### 元数据
 
-| Mysql | Elasticsearch |      |
-| ----- | ------------- | ---- |
-| db    | Index索引       |      |
-| table | 文档类型          |      |
-| id    | 一条 记录         |      |
-| field | Json的key      |      |
+身份元数据:
 
-#### 元数据Metadata
-
-身份元数据
-
-```
+```shell
 身份元数据顾名思义就是能够唯一标识Document的，Elasticsearch中主要有四个身份元数据：
 
 1、_index：文档所属的index，这个index相当于关系型数据库中的数据库概念，它是存储和索引关联数据的地方；
@@ -79,7 +81,7 @@ curl -XGET/POST 'http://localhost:9200/indexdb/external/_search' -d '
 4、_id：文档的id，这个可以由Elasticsearch自动生成，也可以在写入Document的时候由程序指定。它与_index和_type组合时，就可以在Elasticsearch中唯一标识一个文档。
 ```
 
-文档元数据
+文档元数据:
 
 ```
 文档源元数据主要有两个：
@@ -88,7 +90,7 @@ curl -XGET/POST 'http://localhost:9200/indexdb/external/_search' -d '
 2、_size：这个字段存储着_source字段中信息的大小，单位是byte；不过这需要我们安装mapper-size插
 ```
 
-索引元数据
+索引元数据:
 
 ```
 1、_all：这个字段索引了所有其他字段的值；
@@ -100,14 +102,14 @@ curl -XGET/POST 'http://localhost:9200/indexdb/external/_search' -d '
 4、_ttl：标识着当前文档存储的时长，超过了这个时长文档将会被标识为delete，之后会被ElasticSearch删除。
 ```
 
-路由元数据
+路由元数据:
 
 ```
 1、_parent：用于创建两个映射的父子之间的关系；
 2、_routing：自定义路由值，可以路由某个文档到具体的分片(shard)。
 ```
 
-其它元数据
+其它元数据:
 
 ```
 _shareds 分片
@@ -126,7 +128,6 @@ http://localhost:9200/iteblog_book_index/book/_search?q=guide
 
 # 查询指定字段中出现guide的文档
 http://localhost:9200/iteblog_book_index/book/_search?q=title:guide
-
 ```
 
 DSL版
@@ -204,14 +205,21 @@ curl -XGET 'http://localhost:9200/iteblog_book_index/book/_search' -d '
 
 ## 参考
 
-[Elasticsearch系列文章](https://www.iteblog.com/archives/tag/elasticsearch)
+- 基础
 
-[Elasticsearch5.0系统服务安装](http://www.07net01.com/2016/11/1728006.html)
+  [Elasticsearch系列文章](https://www.iteblog.com/archives/tag/elasticsearch)
 
-[ELK日志分析系统](http://467754239.blog.51cto.com/4878013/1700828)(其中有redis数据的读取)
+  [Elasticsearch5.0系统服务安装](http://www.07net01.com/2016/11/1728006.html)
 
-[glances数据导入Elasticsearch](https://glances.readthedocs.io/en/stable/gw/elastic.html)
+  [elasticsearch 配置 JDBC数据源 与IK 中文分词插件](http://blog.mreald.com/160)
 
-[Python操作Elasticsearch](http://www.cnblogs.com/yxpblog/p/5141738.html)
+  [head插件安装](http://www.sojson.com/blog/85.html)
 
-[elasticsearch 配置 JDBC数据源 与IK 中文分词插件](http://blog.mreald.com/160)
+- 进阶
+
+  [ELK日志分析系统](http://467754239.blog.51cto.com/4878013/1700828)(其中有redis数据的读取)
+
+  [glances数据导入Elasticsearch](https://glances.readthedocs.io/en/stable/gw/elastic.html)
+
+  [Python操作Elasticsearch](http://www.cnblogs.com/yxpblog/p/5141738.html)
+
