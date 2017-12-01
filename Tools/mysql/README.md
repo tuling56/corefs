@@ -1026,7 +1026,9 @@ select * from ecs_goods a where EXISTS(select cat_id from ecs_category b where a
 
 ### 积累
 
-#### 运行方式技巧
+#### 基础
+
+##### 运行方式技巧
 
 ```shell
 # 方法1
@@ -1056,7 +1058,7 @@ source file3.SQL
 #然后运行 source batch.sql
 ```
 
-#### 插入技巧
+##### 插入技巧
 
 ```mysql
 # 一次性插入多个值
@@ -1066,7 +1068,21 @@ INSERT into task_request(proposer,enddate) values ("鲁丽",'20170611'),("张一
 INSERT into tb2(proposer,enddate) select xx,yy from tb1;
 ```
 
-#### 信息筛选
+##### 自增列
+
+```mysql
+# 建表的时候指定
+# > // id列为无符号整型，该列值不可以为空，并不可以重复，而且id列从100开始自增.
+create table table_1 ( id int unsigned not null primary key auto_increment, 
+                       name varchar(5) not null ) auto_increment = 100;
+
+# 修改自增列的值
+alter table table_1 auto_increment = 2;
+```
+
+只能修改单机的，集群修改[自增列](http://www.jb51.net/article/42883.htm)无效
+
+##### 信息筛选
 
 查询某个字段匹配的的表和所在的数据库
 
