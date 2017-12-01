@@ -1,7 +1,9 @@
-##hexo使用
+##hexo笔记
 [TOC]
 
-### 安装
+### 基础
+
+#### 安装
 
 ```shell
 npm install hexo-cli -g
@@ -31,7 +33,7 @@ hexo help 					# 查看帮助
 hexo version 				# 查看Hexo的版本
 ```
 
-### 使用
+### 进阶
 
 #### 写作
 
@@ -43,9 +45,13 @@ hexo version 				# 查看Hexo的版本
 
  ##参考
 
-[hexo官方参考](https://hexo.io/docs/)
+- 基础
 
-[简书:hexo+github搭建自己的博客](http://www.jianshu.com/p/465830080ea9)
+  [hexo官方参考](https://hexo.io/docs/)
 
-[今日头条:hexo搭建私人博客](http://www.toutiao.com/i6467864285803446798/)
+  [简书:hexo+github搭建自己的博客](http://www.jianshu.com/p/465830080ea9)
+
+  [今日头条:hexo搭建私人博客](http://www.toutiao.com/i6467864285803446798/)
+
+  [今日头条:hexo搭建私人博客2](https://www.toutiao.com/i6493409693451420173/)
 
