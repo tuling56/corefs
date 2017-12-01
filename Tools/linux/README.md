@@ -145,13 +145,55 @@ tar命令和格式.tar.gz和.tar.bz2
 
 ```
 
-参考
+##### 其它
 
-[Linux crontab定时任务管理](http://www.imooc.com/video/10979)
+###### 内核升级
 
-#### 参考
+此处的升级方法仅限于centos派的yum/rpm,64bit。另外可参考自[编译内核](https://blog.janfou.com/technical-documents/10485.html)
 
--  [linux系统的7种运行级别](http://blog.chinaunix.net/uid-22746363-id-383989.html) 
+安装
+
+```shell
+# 查看当前内核
+uname -r
+
+# step1:导入key
+rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org
+
+# step2:升级至当前最稳定内核
+yum install -y http://www.elrepo.org/elrepo-release-7.0-3.el7.elrepo.noarch.rpm  #添加源
+yum --enablerepo=elrepo-kernel install -y kernel-ml  #安装当前最新内核，以后升级内核直接运行这句就可
+
+# step3：升级指定内核
+# 到这个网址选择内核版本http://elrepo.reloumirrors.net/kernel/el7/x86_64/RPMS/，然后使用
+yum install -y  http://elrepo.reloumirrors.net/kernel/el7/x86_64/RPMS/kernel-lt-4.4.101-1.el7.elrepo.x86_64.rpm
+
+# 补充：在centos6上使用以下的命令成功升级内核
+yum install -y  http://elrepo.reloumirrors.net/kernel/el6/x86_64/RPMS/kernel-lt-4.4.101-1.el6.elrepo.x86_64.rpm
+```
+
+> 另一种方法是：
+>
+> ```shell
+> yum -y install kernel
+> 然后使用reboot重启系统
+> ```
+
+配置
+
+```shell
+vim /etc/grub.conf
+# 修改Grub引导顺序,般新安装的内核在第一个位置，所以设置default=0，表示启动新内核
+
+ grub2-mkconfig -o /boot/grub2/grub.cfg   # 重新编译内核启动文件，以后升级完内核也要执行一次
+```
+
+删除旧内核
+
+```shell
+rpm -qa | grep kernel
+yum autoremove kernel-3.10.0-327.13.1.el7.x86_64
+```
 
 ### 技能积累
 
@@ -585,10 +627,6 @@ uuid             	# 用途未知
 	pg_ctl -D /home/yjm/xxx -l logfile start
 ```
 
-##### 参考
-
-[Centos上安装和配置PostgreSQL](http://www.linuxidc.com/Linux/2016-09/135538.htm)
-
 #### percona-xtrabackup
 
 开源的MySQL热备份工具
@@ -615,35 +653,39 @@ yum install percona-xtrabackup
 
 ```
 
-##### 参考
-
-[innobackupex的安装和使用](http://blog.csdn.net/dbanote/article/details/13295727)
-
-
-
 ## 参考
 
-### 基础知识
+- 基础知识
 
-[Linux性能工具集](https://www.toutiao.com/i6492996073429139982/)
+  [Centos/Linux升级系统内核](http://www.linuxidc.com/Linux/2015-02/112961.htm)
 
-### 技能积累
+  [Centos升级系统内核](http://blog.csdn.net/reyleon/article/details/52229293)
 
-#### 文件传输
+  [Linux性能工具集](https://www.toutiao.com/i6492996073429139982/)
 
-[详解rsync好文（推荐）](http://blog.csdn.net/lianzg/article/details/24817087)
+  [Linux crontab定时任务管理](http://www.imooc.com/video/10979)
 
-[使用rsync 的 --delete参数删除目标目录比源目录多余的文件](http://www.linuxidc.com/Linux/2014-03/98835.htm)
+  [linux系统的7种运行级别](http://blog.chinaunix.net/uid-22746363-id-383989.html) 
 
-[rsync命令参数详解](http://www.jb51.net/article/34869.htm)
+- 技能积累
 
-[使用Fabric模块编写的批量同步文件的python脚本](http://www.toutiao.com/i6449256257931969037/)
+  [详解rsync好文（推荐）](http://blog.csdn.net/lianzg/article/details/24817087)
 
-[Fabric官方参考](http://docs.fabfile.org/en/latest/index.html#usage-docs)
+  [使用rsync 的 --delete参数删除目标目录比源目录多余的文件](http://www.linuxidc.com/Linux/2014-03/98835.htm)
 
-[基于paramiko和watchdog的文件夹自动同步工具](http://www.cnblogs.com/MikeZhang/p/autoSync20170617.html)
+  [rsync命令参数详解](http://www.jb51.net/article/34869.htm)
 
-### 环境配置
+  [使用Fabric模块编写的批量同步文件的python脚本](http://www.toutiao.com/i6449256257931969037/)
 
-### 软件使用
+  [Fabric官方参考](http://docs.fabfile.org/en/latest/index.html#usage-docs)
+
+  [基于paramiko和watchdog的文件夹自动同步工具](http://www.cnblogs.com/MikeZhang/p/autoSync20170617.html)
+
+- 环境配置
+
+- 软件使用
+
+  [Centos上安装和配置PostgreSQL](http://www.linuxidc.com/Linux/2016-09/135538.htm)
+
+  [innobackupex的安装和使用](http://blog.csdn.net/dbanote/article/details/13295727)
 
