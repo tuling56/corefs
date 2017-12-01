@@ -20,7 +20,7 @@ rpm -ivh jenkins-2.7.4-1.1.noarch.rpm
 
 基础配置和启动
 
-```
+```shell
 # 修改配置文件
 vim /etc/sysconfig/jenkins
 # 默认端口是8080,此处修改为8086
@@ -30,6 +30,8 @@ Usage: /usr/sbin/rcjenkins {start|stop|status|try-restart|restart|force-reload|r
 
 # 启动
 rcjenkins start
+
+# 更多的开机启动配置可以参考chkconfig --help
 ```
 
 >  然后访问http://localhost:8086，要求输入密码，查看`cat /var/lib/jenkins/secrets/initialAdminPassword`,将其内容粘贴到输入框。
