@@ -13,6 +13,30 @@
 | 3    | Logstash+Elasticsearch+Redis+Kinaba | Logstash+Elasticsearch+Redis+Kinaba |             |
 | 4    | goaccess                            | goaccess日志格式解析配置                    | 成熟解决方案，关注配置 |
 
+高级方案流程图：
+
+```mermaid
+graph TD
+A1[系统日志]-->B[各种各样的日志]
+A2[nginx日志]-->B
+A3[其它]-->B
+
+B-->C1[rsyslog]
+B-->C2[filebeat]
+
+C1-->D(logstash)
+C2-->D
+
+D-->E(ElasticSearch)
+C2--直接-->E
+
+E-->F[Kibana]
+```
+
+
+
+
+
 ### 手动解析
 
 #### 基础版
@@ -58,12 +82,15 @@ awk '{url=$7;requests[url]++;bytes[url]+=$10}END{for(url in requests){printf("%s
 //待补充
 ```
 
-### Rsyslog+LogAnayzer+MySQL
+### Rsyslog+MySQL+LogAnayzer
 
 说明：
 
-- rsyslog  收集系统日志
+- rsyslog 收集系统日志
+- mysql 负责存储收集到日志
 - loganayzer 日志可视化
+
+loganayzer负责读取mysql中的日子数据并可视化
 
 #### Rsyslog
 
@@ -101,6 +128,21 @@ $UDPServerRun 514    #允许514端口接收使用UDP和TCP协议转发过来的�
 //将日志输出到服务器端
 ```
 
+#### MySQL
+
+```shell
+# 创建mysql的日志库，执行以下命令即可
+/usr/share/doc/rsyslog/mysql-createDB.sql 
+
+# 创建mysql的rsyslog用户并授权
+grant all on Syslog.* to rsyslog@localhost identified by '123';
+flush privileges;
+```
+
+> 备注：
+>
+> 导入数据库操作创建了Syslog 库并在该库中创建了两张空表SystemEvents 和SystemEventsProperties。
+
 #### LogAnalyzer
 
 ​	LogAnalyzer 是一款syslog日志和其他网络事件数据的Web前端。它提供了对日志的简单浏览、搜索、基本分析和一些图表报告的功能。数据可以从数据库或一般的 syslog文本文件中获取，所以LogAnalyzer不需要改变现有的记录架构。基于当前的日志数据，它可以处理syslog日志消 息、Windows事件日志记录，支持故障排除，使用户能够快速查找日志数据中看出问题的解决方案。
@@ -118,21 +160,6 @@ $UDPServerRun 514    #允许514端口接收使用UDP和TCP协议转发过来的�
 - 若loganalyzer安装的时候总是提示writeable权限问题，可现在windows本机上配置好，然后上传到linux主机上即可
 - 若loganalyzer统计图片显示php编译[缺失FreeType支持](http://bbs.itxdl.cn/read.php?tid-122207.html)时，重新编译php的时候添加`--with-freetype-dir --enable-gd-native-ttf`参数即可
 
-#### MySQL
-
-```shell
-# 创建mysql的日志库，执行以下命令即可
-/usr/share/doc/rsyslog/mysql-createDB.sql 
-
-# 创建mysql的rsyslog用户并授权
-grant all on Syslog.* to rsyslog@localhost identified by '123';
-flush privileges;
-```
-
-> 备注：
->
-> 导入数据库操作创建了Syslog 库并在该库中创建了两张空表SystemEvents 和SystemEventsProperties。
-
 #### 问题和进度
 
 > 2017年4月3日
@@ -141,14 +168,24 @@ flush privileges;
 
 ### Logstash+Elasticsearch+Redis+Kinaba
 
-说明：
+组成说明：
 
 - Logstash: logstash server端用来搜集日志；
 - Elasticsearch: 存储各类日志；
 - Kibana: web化接口用作查寻和可视化日志；
 - Logstash Forwarder: logstash client端用来通过lumberjack 网络协议发送日志到logstash server
 
+> logstash和Elasticsearch是用Java写的，kibana使用node.js框架。
+
+原理介绍：
+
+​	logstash是一个数据分析软件，主要目的是分析log日志。整一套软件可以当作一个MVC模型，logstash是controller层，Elasticsearch是一个model层，kibana是view层。
+
+​      首先将数据传给logstash，它将数据进行过滤和格式化（转成JSON格式），然后传给Elasticsearch进行存储、建搜索的索引，kibana提供前端的页面再进行搜索和图表可视化，它是调用Elasticsearch的接口返回的数据进行可视化。
+
 #### Logstash
+
+日志文件收集、过滤和存储
 
 ##### 安装
 
@@ -159,16 +196,82 @@ wget -c https://download.elastic.co/logstash/logstash/packages/centos/logstash-2
 rpm -ivh logstash-2.3.2-1.noarch.rpm
 ```
 
-安装插件：
+安装logstash插件：
 
-安装Logstash input、output插件，此案例数据输入是MySQL，输出是ES，so相应的插件应该是logstash-input-jdbc和logstash-output-elasticsearch。
+安装Logstash input、output插件，此案例数据输入是MySQL，输出是ES，所以相应的插件应该是logstash-input-jdbc和logstash-output-elasticsearch。
 
 ```shell
 logstash-plugin install logstash-input-jdbc
 logstash-plugin install logstash-output-elasticsearch
 ```
 
+配置
+
+```shell
+[root@local122 etc]# rpm -qc logstash
+/etc/init.d/logstash  
+/etc/logrotate.d/logstash
+/etc/sysconfig/logstash  # logstash默认配置文件(指明了配置目录)
+
+# 配置文件目录
+cd /etc/logstash/conf.d
+```
+
+> 配置文件示例：
+>
+> ```json
+> [root@elk ~]# cat /etc/logstash/conf.d/01-logstash-initial.conf
+> input {
+>   beats {
+>     port => 5000
+>     type => "logs"
+>     ssl => true
+>     ssl_certificate => "/etc/pki/tls/certs/logstash-forwarder.crt"
+>     ssl_key => "/etc/pki/tls/private/logstash-forwarder.key"
+>   }
+> }
+>
+> filter {
+>   if [type] == "syslog-beat" {
+>     grok {
+>       match => { "message" => "%{SYSLOGTIMESTAMP:syslog_timestamp} %{SYSLOGHOST:syslog_hostname} %{DATA:syslog_program}(?:\[%{POSINT:syslog_pid}\])?: %{GREEDYDATA:syslog_message}" }
+>       add_field => [ "received_at", "%{@timestamp}" ]
+>       add_field => [ "received_from", "%{host}" ]
+>     }
+>     geoip {
+>       source => "clientip"
+>     }
+>     syslog_pri {}
+>     date {
+>       match => [ "syslog_timestamp", "MMM d HH:mm:ss", "MMM dd HH:mm:ss" ]
+>     }
+>   }
+> }
+>
+> output {
+>   elasticsearch { }
+>   stdout { codec => rubydebug }
+> }
+> ```
+
+启动
+
+```shell
+service logstash start
+# 停止
+service logstash stop
+# 查看状态
+service logstash status
+# 重启
+service logstash restart
+
+[root@local122 sbin]# service logstash help
+Usage:  {start|stop|force-stop|status|reload|restart|configtest}
+```
+
 ##### 配置
+
+###### 定义数据源
 
 此处演示的是logstash收集mysql的数据然后同步到es上去，即[mysql准实时同步数据到Elasticsearch](https://www.toutiao.com/a6494077866689430030/)
 
@@ -212,6 +315,81 @@ output{
 > - mysql-connector-java-5.1.23-bin.jar的[下载](http://www.java2s.com/Code/Jar/m/Downloadmysqlconnectorjava5124binjar.htm)
 > - elasticsearch的用户和密码不明确，没有配置
 
+logstash的数据源支持从文件，stdin,kafka、beats、redis等来源
+
+###### 定义日志格式
+
+文件日志格式如下：
+
+```
+2015-05-07-16:03:04|10.4.29.158|120.131.74.116|WEB|11299073|http://quxue.renren.com/shareApp?isappinstalled=0&userId=11299073&from=groupmessage|/shareApp|null|Mozilla/5.0 (iPhone; CPU iPhone OS 8_2 like Mac OS X) AppleWebKit/600.1.4 (KHTML, like Gecko) Mobile/12D508 MicroMessenger/6.1.5 NetType/WIFI|duringTime|98||
+```
+
+日志解析：
+
+```json
+filter {
+
+  #定义数据的格式
+  grok { 
+  	match => { "message" => "%{DATA:timestamp}\|%{IP:serverIp}\|%{IP:clientIp}\|%{DATA:logSource}\|%{DATA:userId}\|%{DATA:reqUrl}\|%{DATA:reqUri}\|%{DATA:refer}\|%{DATA:device}\|%{DATA:textDuring}\|%{DATA:duringTime:int}\|\|"}
+  }
+
+  #定义时间戳的格式
+  date {
+    match => [ "timestamp", "yyyy-MM-dd-HH:mm:ss" ]
+    locale => "cn"
+  }
+
+  #定义客户端的IP是哪个字段（上面定义的数据格式）
+  geoip {
+    source => "clientIp"
+  }
+
+  #定义客户端设备是哪一个字段
+  useragent {
+    source => "device"
+    target => "userDevice"
+  }
+
+  # 需要进行转换的字段，这里是将访问的时间转成int，再传给Elasticsearch
+  mutate {
+    convert => ["duringTime", "integer"]
+  }
+}
+```
+
+###### 定义输出配置
+
+```shell
+output {
+  #将输出保存到elasticsearch，如果没有匹配到时间就不保存，因为日志里的网址参数有些带有换行
+  if [timestamp] =~ /^\d{4}-\d{2}-\d{2}/ {
+        elasticsearch { host => localhost }
+  }
+
+   #输出到stdout
+#  stdout { codec => rubydebug }
+
+   #定义访问数据的用户名和密码
+#  user => webService
+#  password => 1q2w3e4r
+}
+```
+
+##### 启动
+
+```shell
+logstash -f xxx.conf
+# 其中xxx.conf上一节的输入源配置、过滤配置和输出配置
+```
+
+#### Redis
+
+```shell
+# Redis作为数据存储层，【作用暂时不明确】
+```
+
 #### Elasticesearch
 
 ##### 安装
@@ -227,13 +405,16 @@ rmp -ivh elasticsearch-2.3.3.rpm
 
 > NOT starting on installation, please execute the following statements to configure elasticsearch service to start automatically using systemd
 >
-> > sudo systemctl daemon-reload
-> >
-> >  sudo systemctl enable elasticsearch.service
+> ```shell
+> sudo systemctl daemon-reload
+> sudo systemctl enable elasticsearch.service
+> ```
 >
 > You can start elasticsearch service by executing
 >
-> > sudo systemctl start elasticsearch.service
+> ```shell
+> sudo systemctl start elasticsearch.service
+> ```
 
 安装插件
 
@@ -244,19 +425,54 @@ rmp -ivh elasticsearch-2.3.3.rpm
 ##### 配置
 
 ```shell
-# 待完善
+vim /etc/elasticsearch/elasticsearch.yml
+# 更多的详细配置待补充
 ```
 
-#### Redis
+##### 启动
 
 ```shell
-# 直接使用即可
+service elasticsearch start
+[root@local122 sbin]# service elasticsearch help
+Usage: /etc/init.d/elasticsearch {start|stop|status|restart|condrestart|try-restart|reload|force-reload}
 ```
 
-#### Kinaba
+#### Kibana
+
+kibana是node.js写的，依赖于java环境
+
+#####  安装
 
 ```shell
-# 配图展示
+wget -c https://download.elastic.co/kibana/kibana/kibana-4.5.1-1.x86_64.rpm
+rpm -ivh kibana-4.5.1-1.x86_64.rpm
+
+# 默认安装目录是/opt/kibana/，将该目录下的bin目录添加到环境变量中即可
+```
+
+##### 配置
+
+```shell
+vim /opt/kibana/config/kibana.yml
+# 默认监听端口是5601，可以修改
+```
+
+##### 启动
+
+```shell
+nohup bin/kibana &
+# 或者
+service kibana start
+[root@local122 config]# service kibana help
+# Usage:  {start|force-start|stop|force-start|force-stop|status|restart}
+```
+
+> 补充说明：这是因为在安装的时候被注册成服务了，因此可以直接使用servive xxx start等命令对服务进行管理，此外还有elasticsearch、filebeat、jenkins、logstash等
+
+#### 问题和进度
+
+```shell
+# 待补充
 ```
 
 ### goaccess
@@ -368,6 +584,100 @@ goaccess -f /var/log/nginx/access.log  -o ./access.html
 
 > 更多的使用可以参考`man goaccess`
 
+### 知识补充
+
+#### filebeat
+
+监控日志文件、转发。
+
+```
+filebeat客户端是一个轻量级的、从服务器山的文件收集日志资源的工具。这些日志转发到处理logstash的服务器上，该filebeat客户端使用的安全的beats协议与logstash实例通信。
+```
+
+##### 安装
+
+```shell
+ wget -c https://download.elastic.co/beats/filebeat/filebeat-1.2.3-x86_64.rpm
+ rpm -ivh filebeat-1.2.3-x86_64.rpm
+```
+
+##### 配置
+
+```shell
+# rpm -qc filebeat
+vim /etc/filebeat/filebeat.yml
+
+[root@rsyslog elk]# cd /etc/filebeat/
+[root@rsyslog filebeat]# tree
+.
+├── conf.d
+│   ├── authlogs.yml
+│   └── syslogs.yml
+├── filebeat.template.json
+└── filebeat.yml
+```
+
+其中filebeat.yml是定义连接logstash服务器的配置。conf.d目录下的连个配置文件是定义监控日志的。
+
+syslog.yml文件内容如下：
+
+```yaml
+filebeat:
+  prospectors:
+    - paths:
+      - /var/log/messages
+      encoding: plain
+      fields_under_root: false
+      input_type: log
+      ignore_older: 24h
+      document_type: syslog-beat
+      scan_frequency: 10s
+      harvester_buffer_size: 16384
+      tail_files: false
+      force_close_files: false
+      backoff: 1s
+      max_backoff: 1s
+      backoff_factor: 2
+      partial_line_waiting: 5s
+      max_bytes: 10485760
+```
+
+**filebeat.yml文件详细解析：**
+
+输入配置：
+
+- filebeat.yml文件定义的每个prospectors都是一个日志源，可以单独的放在conf.d目录中进行管理（此处的`authlogs.yml`和`syslogs.yml`即是两个例子）
+
+- prospectors的公共配置可以放在filebeat.yml文件中
+
+输出配置：
+
+- 输出可以是elasticsearch、logstash、file、console
+
+shipper配置
+
+- 待补充
+
+logging配置
+
+- 待补充
+
+filebeat连接logstath：
+
+```
+# 待补充
+```
+
+
+
+##### 启动
+
+```shell
+service filebeat start
+[root@local122 init.d]# service filebeat help
+# Usage: /etc/init.d/filebeat {start|stop|status|restart|condrestart}
+```
+
 ##  参考
 
 - 手动解析
@@ -391,6 +701,8 @@ goaccess -f /var/log/nginx/access.log  -o ./access.html
   [EFK Nginx日志的可视化分析](http://www.toutiao.com/i6352290798666514945/)
 
   [Centos7 之安装Logstash ELK stack 日志管理系统（推荐）](http://www.cnblogs.com/hanyifeng/p/5509985.html)
+
+  [logstatsh日志分析的配置和使用](https://www.cnblogs.com/yincheng/p/logstash.html)
 
 - goaccess
 
