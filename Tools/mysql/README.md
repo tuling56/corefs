@@ -528,6 +528,26 @@ CSV（Comma-Separated Values逗号分隔值）
 
 参考：[MySQL中的各种引擎的区别](http://blog.csdn.net/gaohuanjie/article/details/50944782)
 
+#### 视图
+
+为什么要用视图？[视图的优点](https://www.toutiao.com/i6496010675456836110/)如下:
+
+1. 安全性
+2. 提高查询性能
+3. 灵活应对功能的改变
+4. 复杂的查询需求
+
+通过更新视图更新真实表
+
+
+
+更新视图的方法：
+
+- 替代方式
+- 具体化方式（中间表方式） 
+
+
+
 ### 高级
 
 #### 锁
@@ -626,6 +646,7 @@ call  sp_name;
 日期字符串转换
 
 ```mysql
+# 单字符串
 ## mysql法
 concat_ws('/',substring(date,1,4),substring(date,5,2),substring(date,7,2))
 
@@ -636,6 +657,27 @@ echo "20161212"| awk '{printf("%s/%s/%s",substr($1,1,4),substr($1,5,2),substr($1
 ## shell法(注意shell循环读入变量的方式)
 a=20161212
 while read line;do echo ${line:0:4}"/"${line:4:2}"/"${line:6:2}; done<<< "${a}"
+
+# 文件
+## mysql法
+#导入导出麻烦
+
+## awk法(指定列修改)
+awk '{for(i=1;i<NF;i++) if(i==1) printf("%s/%s/%s",substr($i,1,4),substr($i,5,2),substr($i,7,8));else printf("\t%s",$i);printf("\n");}' user_pos_num
+
+##shell法
+fin='xxx.data'
+while read line;do
+    linearr=($line)
+    for i in `seq 0 $((${#linearr[@]}-1))`;do
+        if [ $i -eq 0 ];then
+            echo -n ${line:0:4}"/"${line:4:2}"/"${line:6:2}
+        else
+            echo -n -e  "\t"${linearr[$i]}
+        fi
+    done
+    echo 
+done< "$fin"
 ```
 
 > 备注： 日期从20161212转换成2016/12/12,后者的格式能容易被excel处理
@@ -1792,6 +1834,10 @@ cat xxx.file |redis-cli [--pipe]
   [mysql exists和in的效率比较](http://www.cnblogs.com/meibao/p/4973043.html)
 
   [MySQL索引专题(推荐)](https://segmentfault.com/a/1190000010264071)
+
+  [学会写MySQL索引（推荐）](http://mp.weixin.qq.com/s/Z10w5aBgxJvoxmOlrL_IXw)
+
+  [项目中常用的19条MySQL优化（推荐）](https://segmentfault.com/a/1190000012155267)
 
 - 备份
 
