@@ -8,10 +8,10 @@ pbody=$2
 # 创建元素的文档数据
 function create_data()
 {
-	curl -XPUT 'http://localhost:9200/iteblog_book_index' -d '{ "settings": { "number_of_shards": 1 }}'
+	curl -XPUT 'http://localhost:9200/company' -d '{ "settings": { "number_of_shards": 1 }}'
 	# [返回结果]:{"acknowledged":true}
 
-	curl -XPOST 'http://localhost:9200/iteblog_book_index/book/_bulk' -d '
+	curl -XPOST 'http://localhost:9200/company/book/_bulk' -d '
 	{ "index": { "_id": 1 }}
 	{ "title": "Elasticsearch: The Definitive Guide", "authors": ["clinton gormley", "zachary tong"], "summary" : "A distibuted real-time search and analytics engine", "publish_date" : "2015-02-07", "num_reviews": 20, "publisher": "oreilly" }
 	{ "index": { "_id": 2 }}
@@ -29,7 +29,7 @@ function create_data()
 	#     "items": [
 	#         {
 	#             "index": {
-	#                 "_index": "iteblog_book_index",
+	#                 "_index": "company",
 	#                 "_type": "book",
 	#                 "_id": "1",
 	#                 "_version": 1,
@@ -43,7 +43,7 @@ function create_data()
 	#         },
 	#         {
 	#             "index": {
-	#                 "_index": "iteblog_book_index",
+	#                 "_index": "company",
 	#                 "_type": "book",
 	#                 "_id": "2",
 	#                 "_version": 1,
@@ -57,7 +57,7 @@ function create_data()
 	#         },
 	#         {
 	#             "index": {
-	#                 "_index": "iteblog_book_index",
+	#                 "_index": "company",
 	#                 "_type": "book",
 	#                 "_id": "3",
 	#                 "_version": 1,
@@ -71,7 +71,7 @@ function create_data()
 	#         },
 	#         {
 	#             "index": {
-	#                 "_index": "iteblog_book_index",
+	#                 "_index": "company",
 	#                 "_type": "book",
 	#                 "_id": "4",
 	#                 "_version": 1,
@@ -93,16 +93,20 @@ function create_data()
 # 创建索引
 function create_index()
 {
+	curl -XPUT  'http://localhost:9200/company'
 
-	curl -XPUT  'http://localhost:9200/indexdb'
-
+	# 添加文档到索引(添加文档到company索引、external类型中，其ID是1)
+	curl -XPUT 'http://localhost:9200/company/employee/1?pretty' -d '
+	{
+	  "name": "John Doe"
+	}'
 }
 
 
 function mapping_doc()
 {
 
-	curl -XPOST 'http://localhost:9200/indexdb/fulltext/_mapping' -d '
+	curl -XPOST 'http://localhost:9200/company/fulltext/_mapping' -d '
 	{
 	    "fulltext": {
 	       "_all": {
@@ -123,20 +127,20 @@ function mapping_doc()
 }
 
 
-
 # 查询title中包含我的文档
 function index_doc()
 {
-	curl –XPUT/POST  'http://localhost:9200/indexdb/doctype/1?pretty' -d '
+	curl –XPUT/POST  'http://localhost:9200/company/doctype/1?pretty' -d '
 	{
 	  "title": "我的标题",
 	  "content": "我的内容"
 	}'
 }
 
+
 function search_doc()
 {
-	curl -XGET 'http://localhost:9200/indexdb/doctype/_search?pretty=true' -d '
+	curl -XGET 'http://localhost:9200/company/doctype/_search?pretty=true' -d '
 	{
 	    "query":{
 	        "query_string":{"title":"我的"}
@@ -146,14 +150,15 @@ function search_doc()
 
 function word_seg()
 {
-	curl 'http://localhost:9200/indexdb/_analyze?analyzer=ik_max_word&pretty=true' -d'
+	curl 'http://localhost:9200/company/_analyze?analyzer=ik_max_word&pretty=true' -d'
 	{
 	    "text":"中华人民共和国国歌"
 	}'
 
 }
 
-
+# 测试入口
 create_data
+# create_index
 # mapping_doc
 # word_seg

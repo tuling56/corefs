@@ -40,19 +40,21 @@ nohup /usr/local/elasticsearch-1.7.2/bin/elasticsearch > /var/log/logstash.log 2
 测试
 
 ```shell
-#创建索引indexdb
-curl -XPUT  'http://localhost:9200/indexdb'
+#创建索引company
+curl -XPUT  'http://localhost:9200/company'
 
-# 添加文档到索引(添加文档到customer索引、external类型中，其ID是1)
-curl -XPUT 'http://localhost:9200/indexdb/external/1?pretty' -d '
+# 添加文档到索引(添加文档到company索引、employee类型中，其ID是1)
+curl --user 'elastic':'elastic' -XPUT 'http://localhost:9200/company/employee/1?pretty' -d '
 {
   "name": "John Doe"
 }'
 
-# 查询是否添加成功
-curl -XGET/POST 'http://localhost:9200/indexdb/external/_search?q=guide'  #或者
+curl --user 'elastic':'elastic' -XPUT "http://localhost:9200/company/employee/2" -H 'Content-Type: application/json' -d'{"name":"忘打个"}'
 
-curl -XGET/POST 'http://localhost:9200/indexdb/external/_search' -d '
+# 查询是否添加成功
+curl --user 'elastic':'elastic' -XGET/POST 'http://localhost:9200/company/employee/_search'  
+# 或者
+curl --user 'elastic':'elastic' -XGET/POST 'http://localhost:9200/company/employee/_search' -d '
 {
   {
    "query":
@@ -116,7 +118,31 @@ _shareds 分片
 _version 版本
 ```
 
-### 查询
+#### 授权
+
+在安装x-pack插件之后的密码更改：
+
+```shell
+curl -XPUT "http://localhost:9200/_xpack/security/user/kibana/_password" -H 'Content-Type: application/json' -d'
+{
+  "password": "kibana"
+}'
+```
+
+
+
+#### 查询
+
+```shell
+# 注意此处的密码授权
+curl --user 'elastic':'elastic'  -XPUT 'localhost:9200/company'
+```
+
+
+
+
+
+### 进阶
 
 #### 单匹配查询
 
@@ -207,6 +233,8 @@ curl -XGET 'http://localhost:9200/iteblog_book_index/book/_search' -d '
 
 - 基础
 
+  [Elasticsearch6官方安装教程](https://www.elastic.co/guide/en/elasticsearch/reference/6.0/rpm.html)
+
   [Elasticsearch系列文章](https://www.iteblog.com/archives/tag/elasticsearch)
 
   [Elasticsearch5.0系统服务安装](http://www.07net01.com/2016/11/1728006.html)
@@ -214,6 +242,8 @@ curl -XGET 'http://localhost:9200/iteblog_book_index/book/_search' -d '
   [elasticsearch 配置 JDBC数据源 与IK 中文分词插件](http://blog.mreald.com/160)
 
   [head插件安装](http://www.sojson.com/blog/85.html)
+
+  [ElasticSearch集群和索引常用命令](https://www.cnblogs.com/pilihaotian/p/5846173.html)
 
 - 进阶
 

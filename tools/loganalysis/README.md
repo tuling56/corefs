@@ -27,11 +27,13 @@ B-->C2[filebeat]
 C1-->D(logstash)
 C2-->D
 
-D-->E(ElasticSearch)
+D--调通-->E(ElasticSearch)
 C2--直接-->E
 
-E-->F[Kibana]
+E--接入方式?-->F[Kibana]
 ```
+
+
 
 
 
@@ -94,7 +96,7 @@ loganayzer负责读取mysql中的日子数据并可视化
 
 #### Rsyslog
 
-syslog是一个快速处理收集系统日志的程序，rsyslog是syslog的升级版，它将多种来源输入输出转换结果到目的地。
+syslog是一个快速处理收集系统日志的程序，rsyslog是syslog的升级版，它将多种来源不同设施主机发送的日志过滤合并到一个独立的位置。
 
 安装
 
@@ -120,13 +122,16 @@ $UDPServerRun 514    #允许514端口接收使用UDP和TCP协议转发过来的�
 
 # part3:重启rsyslog服务
 /etc/init.d/rsyslog restart
+service rsyslog restart
 ```
 
 配置客户端
 
 ```shell
-//将日志输出到服务器端
+//将日志输出到服务器端,注意在任何情况下都不要说是没明文传输，而是要用TLS/SSL加密
 ```
+
+> 更多的[配置](http://blog.csdn.net/zhangdaisylove/article/details/46843233)
 
 #### MySQL
 
@@ -181,7 +186,11 @@ flush privileges;
 
 ​	logstash是一个数据分析软件，主要目的是分析log日志。整一套软件可以当作一个MVC模型，logstash是controller层，Elasticsearch是一个model层，kibana是view层。
 
-​      首先将数据传给logstash，它将数据进行过滤和格式化（转成JSON格式），然后传给Elasticsearch进行存储、建搜索的索引，kibana提供前端的页面再进行搜索和图表可视化，它是调用Elasticsearch的接口返回的数据进行可视化。
+​      首先将数据传给logstash，它将数据进行过滤和格式化（转成JSON格式），然后传给Elasticsearch进行存储、建搜索的索引，kibana提供前端的页面再进行搜索和图表可视化，它是==调用Elasticsearch的接口返回的数据进行可视化==。
+
+框架图：
+
+![框架图](http://images2015.cnblogs.com/blog/790056/201605/790056-20160523132738038-1099988347.png)
 
 #### Logstash
 
@@ -189,7 +198,7 @@ flush privileges;
 
 ##### 安装
 
-安装logstash
+安装logstash：
 
 ```shell
 wget -c https://download.elastic.co/logstash/logstash/packages/centos/logstash-2.3.2-1.noarch.rpm
@@ -277,6 +286,10 @@ Usage:  {start|stop|force-stop|status|reload|restart|configtest}
 
 除此之外，logstash可以收集多种多样的日志，参见[logstash通过rsyslog对nginx的日志收集和分析](http://blog.51cto.com/bbotte/1615477)
 
+logstash的数据源支持从文件，stdin,kafka、beats、redis等来源
+
+例子1(mysql源):
+
 ```json
 input{
     jdbc {
@@ -294,6 +307,10 @@ input{
         tracking_column => "updatetime"
         last_run_metadata_path => "./logstash_jdbc_last_run"
     }
+}
+
+filter{
+   //最核心部分
 }
 
 output{
@@ -315,7 +332,43 @@ output{
 > - mysql-connector-java-5.1.23-bin.jar的[下载](http://www.java2s.com/Code/Jar/m/Downloadmysqlconnectorjava5124binjar.htm)
 > - elasticsearch的用户和密码不明确，没有配置
 
-logstash的数据源支持从文件，stdin,kafka、beats、redis等来源
+例子2（beats源）：
+
+```json
+input {
+  beats {
+    port => 5044
+    type => "logs"
+  }
+}
+
+filter {
+  if [type] == "syslog-beat" {
+    grok {
+      match => { "message" => "%{SYSLOGTIMESTAMP:syslog_timestamp} %{SYSLOGHOST:syslog_hostname} %{DATA:syslog_program}(?:\[%{POSINT:syslog_pid}\])?: %{GREEDYDATA:syslog_message}" }
+      add_field => [ "received_at", "%{@timestamp}" ]
+      add_field => [ "received_from", "%{host}" ]
+    }
+    geoip {
+      source => "clientip"
+    }
+    syslog_pri {}
+    date {
+      match => [ "syslog_timestamp", "MMM d HH:mm:ss", "MMM dd HH:mm:ss" ]
+    }
+  }
+}
+
+output {
+  elasticsearch { 
+    hosts => "localhost:9200"
+    user => "elastic"
+    password => "es_password"
+    index => "test1"
+  }
+  stdout { codec => rubydebug }
+}
+```
 
 ###### 定义日志格式
 
@@ -329,7 +382,6 @@ logstash的数据源支持从文件，stdin,kafka、beats、redis等来源
 
 ```json
 filter {
-
   #定义数据的格式
   grok { 
   	match => { "message" => "%{DATA:timestamp}\|%{IP:serverIp}\|%{IP:clientIp}\|%{DATA:logSource}\|%{DATA:userId}\|%{DATA:reqUrl}\|%{DATA:reqUri}\|%{DATA:refer}\|%{DATA:device}\|%{DATA:textDuring}\|%{DATA:duringTime:int}\|\|"}
@@ -590,9 +642,13 @@ goaccess -f /var/log/nginx/access.log  -o ./access.html
 
 监控日志文件、转发。
 
-```
+```shell
 filebeat客户端是一个轻量级的、从服务器山的文件收集日志资源的工具。这些日志转发到处理logstash的服务器上，该filebeat客户端使用的安全的beats协议与logstash实例通信。
 ```
+
+filebeat原理
+
+![](http://images2015.cnblogs.com/blog/997621/201612/997621-20161227223331070-312389171.png)
 
 ##### 安装
 
@@ -642,7 +698,44 @@ filebeat:
       max_bytes: 10485760
 ```
 
-**filebeat.yml文件详细解析：**
+nginx.yml文件内容如下：
+
+```json
+filebeat:
+  prospectors:
+    - paths:
+      - /usr/local/nginx/logs/site_acc.log  # 指定要监控的日志，可以具体的文件或目录
+      encoding: plain
+      fields_under_root: false
+      input_type: log  # 固定值，几乎不可修改
+      ignore_older: 24h
+      document_type: syslog-beat
+      scan_frequency: 10s
+      harvester_buffer_size: 16384
+      tail_files: false
+      force_close_files: false
+      backoff: 1s
+      max_backoff: 1s
+      backoff_factor: 2
+      partial_line_waiting: 5s
+      max_bytes: 10485760
+```
+
+filebeat.yml文件内容如下:
+
+```json
+#cat filebeat.yml 
+filebeat:
+  spool_size: 1024
+  idle_timeout: 5s
+  registry_file: .filebeat
+  config_dir: /etc/filebeat/conf.d
+output:
+  logstash:
+     hosts: ["localhost:5044"]
+```
+
+**[filebeat.yml文件详细解析](https://www.cnblogs.com/zlslch/p/6622079.html)：**
 
 输入配置：
 
@@ -667,8 +760,6 @@ filebeat连接logstath：
 ```
 # 待补充
 ```
-
-
 
 ##### 启动
 
@@ -704,11 +795,15 @@ service filebeat start
 
   [logstatsh日志分析的配置和使用](https://www.cnblogs.com/yincheng/p/logstash.html)
 
+  [x-pack插件的安装(推荐)](https://www.elastic.co/downloads/x-pack)
+
 - goaccess
 
   [goaccess日志分析详解](http://www.toutiao.com/i6460608551814431245/)
 
+- 知识补充
 
+  [filebeat原理](http://images2015.cnblogs.com/blog/997621/201612/997621-20161227223331070-312389171.png)
 
 
 

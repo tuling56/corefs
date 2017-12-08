@@ -2,9 +2,9 @@
 
 [TOC]
 
-> 随着云主机的发展，对运维人才的专项需求越来越少，而作为程序开发者掌握基本的运维工具，则是如虎添翼，本学习也是基于此而准备的。自动化运维的本质上减少重复的手工操作。
+随着云主机的发展，对运维人才的专项需求越来越少，而作为程序开发者掌握基本的运维工具，则是如虎添翼，本学习也是基于此而准备的。自动化运维的本质上减少重复的手工操作。
 
-## Ansible部分
+## Ansible
 
 ---
 
@@ -23,7 +23,7 @@
 - 原理是：让管理节点可以无密码ssh登录被管节点，被管理节点上只需安装Python即可
 
 
-**安装**
+#### 安装
 
 Ansible是属于Extra Packages for Enterprise Linux (EPEL)库的一部分，因此要先安装EPEL
 
@@ -40,16 +40,16 @@ Ansible是属于Extra Packages for Enterprise Linux (EPEL)库的一部分，因�
 
 **问题：**
 
-> 如果OSI的数量太多，配置SSH的工作量也很大，其次，这种方式在企业级应用中，也存在安全风险
+如果OSI的数量太多，配置SSH的工作量也很大，其次，这种方式在企业级应用中，也存在安全风险
 
 **解决：**
 
->  通过Ansible Tower来解决这个问题。Ansible Tower相当于Ansible的统一管理界面，类似虚拟化中的管理平台。它可以和AD，LDAP等认证方式做对接、通过统一图形化界面直观地看到被管系统的状态。
+通过Ansible Tower来解决这个问题。Ansible Tower相当于Ansible的统一管理界面，类似虚拟化中的管理平台。它可以和AD，LDAP等认证方式做对接、通过统一图形化界面直观地看到被管系统的状态。
 
 **安装**
 
-> 下载：https://releases.ansible.com/ansible-tower/setup-bundle/ansible-tower-setup-bundle-3.0.2-1.el7.tar.gz
->
+下载：https://releases.ansible.com/ansible-tower/setup-bundle/ansible-tower-setup-bundle-3.0.2-1.el7.tar.gz
+
 > - 修改inventory文件，增加密码
 >
 >
@@ -59,7 +59,7 @@ Ansible是属于Extra Packages for Enterprise Linux (EPEL)库的一部分，因�
 >
 > - > 手动创建目录： mkdir /var/log/tower
 
-​	安装说明：
+安装说明：
 
 > 最后的安装目录如下：/var/lib/awx
 >
@@ -75,28 +75,19 @@ Ansible是属于Extra Packages for Enterprise Linux (EPEL)库的一部分，因�
 > │   └── tower	  #ansilble tower目录
 > └── wsgi.py
 
-参考
-
-1. [CentOS7 安装Ansible](https://my.oschina.net/wangchongya/blog/752027)
-2. [官方参考手册](http://docs.ansible.com/ansible-tower/3.0.3/html/installandreference/requirements_refguide.html#ansible-software-requirements)
-3. [在 CentOS 7 中安装并使用自动化工具 Ansible](http://www.linuxidc.com/Linux/2015-10/123801.htm)
-4. [IT武林的小无相功：Ansible](http://www.toutiao.com/a6353964130168602882/)
-5. [Ansible-tower学习配置博客园](http://www.cnblogs.com/luojie89757/)（官方软件参考安装教程）
-6. [Ansible-tower官网申请](https://www.ansible.com/tower-trial)
-
 对比相似的技术：saltstack
 
-## SaltStack部分
+## SaltStack
 
 ---
 
-> 基于python开发，采用c/s架构（服务端和客户端）配置语法用的是YMAL,使用脚本配置非常简单
+基于python开发，采用c/s架构（服务端和客户端）配置语法用的是YMAL,使用脚本配置非常简单
+
+//待补充
 
 
 
-
-
-## Prometheus部分
+## Prometheus
 
 ---
 
@@ -155,7 +146,9 @@ Ansible是属于Extra Packages for Enterprise Linux (EPEL)库的一部分，因�
 >   - [Data model](https://prometheus.io/docs/introduction/comparison/#data-model)
 >   - [Storage](https://prometheus.io/docs/introduction/comparison/#storage)
 
-### 安装配置
+### 基础
+
+#### 安装
 
 > 在https://github.com/prometheus/prometheus/releases找到对应的系统版本，一般选择[**prometheus-1.3.1.linux-386.tar.gz**](https://github.com/prometheus/prometheus/releases/download/v1.3.1/prometheus-1.3.1.linux-386.tar.gz)
 >
@@ -211,6 +204,8 @@ Ansible是属于Extra Packages for Enterprise Linux (EPEL)库的一部分，因�
 > 1. 适用于监控所有时间序列的项目
 >
 >
+
+#### 配置
 
 配置参考
 
@@ -601,11 +596,13 @@ if __name__ == "__main__":
 > //待添加
 > ```
 
-## Ganglia部分 
+## Ganglia 
 
 易于扩展的监控系统，使用它可以实时查看Linux服务器和集群（图形化展示）中的各项性能指标
 
-### 安装配置
+###  基础
+
+#### 安装配置
 
 在主节点服务器安装监控工具
 
@@ -613,7 +610,6 @@ if __name__ == "__main__":
 yum update && yum install epel-release
 yum install ganglia rrdtool ganglia-gmetad ganglia-gmond ganglia-web
 #其中rrdtool、ganglia-gmetad、ganglia-gmond都是基于ganglia的一些应用，ganglia-web提供ganglia的web服务
-
 ```
 
 ## nmon
@@ -626,7 +622,7 @@ nmon可定时间隔采集数据然后生成报告，在本地使用nmon_analyser
 
 独特的数据格式，只能在excel里自动绘图和查看
 
-## glances
+## Glances
 
 Glances用各个分离的表列展示了你机器当前正运行的各种有用的实时数据。Glances旨在用最小的空间显示尽可能多的信息，我认为它的目标完全达到了。Glances用有限的交互可能性和更深层的信息监控PerCPU, Load, Memory, Swap, Network, Disk i/O, Mount data 和processes，但对于获得一个整体概貌绝对是完美的。有以下特点：
 
@@ -637,11 +633,11 @@ Glances用各个分离的表列展示了你机器当前正运行的各种有用�
 
 ![glances数据视图](https://raw.githubusercontent.com/nicolargo/glances/develop/docs/_static/glances-summary.png)
 
-### 安装和使用
+### 基础
 
-安装
+#### 安装
 
-```
+```shell
 sudo apt-get install glances
 # 或者
 pip install glances
@@ -649,9 +645,9 @@ pip install glances
 
 > 安装注意事项（从日志的中发现的问题）
 
-```
-WARNING -- PyStache lib not installed (action script with mustache will not work)
-ERROR -- Scandir not found. Please use Python 3.5+ or install the scandir lib
+```shell
+#WARNING -- PyStache lib not installed (action script with mustache will not work)
+#ERROR -- Scandir not found. Please use Python 3.5+ or install the scandir lib
 
 #因此需要额外安装两个python包
 pip install PyStache
@@ -660,9 +656,11 @@ pip install scandir   #folder插件要用
 
 > glances依赖psutil,bottle,jinja
 
+#### 配置
+
 配置文件
 
-```
+```shell
 # 若使用yum安装
 vim /etc/glances/glances.conf
 
@@ -672,13 +670,14 @@ vim /etc/glances/glances.conf
 
 You can put your own `glances.conf` file in the following locations:
 
-| `Linux`, `SunOS` | ~/.config/glances/, /etc/glances/        |
+| 平台               | 配置文件位置                                   |
 | ---------------- | ---------------------------------------- |
+| `Linux`, `SunOS` | ~/.config/glances/, /etc/glances/        |
 | `*BSD`           | ~/.config/glances, /usr/local/etc/glances |
 
 > 注：本机使用的是~/.config/glances/这个目录
 
-使用模式
+运行模式
 
 ```shell
 # 单机模式
@@ -687,7 +686,6 @@ $ glances
 # 客户端-服务器模式
 step1：首先在服务器端（ip:192.168.2.2）运行
 glances -s （可以使用-B来绑定服务器端的端IP，-p绑定端口）
-
 
 step2:然后在客户端连接：
 glances -c 192.168.2.2
@@ -700,31 +698,39 @@ and enter the URL http://<ip>:61208 in your favorite web browser.
 
 服务发现
 
-```
+```shell
 You can also detect and display all Glances servers available on your network or defined in the configuration file:
 
 $ glances --browser
 ```
 
+结果输出
+
+```shell
+# 可以查看glances.conf配置文件，可以将结果输出到elasticsearch等
+glances --export-elasticsearch
+```
+
+> 导出到elastcsearch的过程中发现要账号密码，这个未解决
+
 结果导出
 
-```
+```shell
 glances -o CSV -f /home/cjh/glances.csv
 glances -o HTML -f /var/www/glances.html  #可能需要先pip install Jinja2
 ```
 
 可以通过AMP等进行扩展，包括nginx的状态页
 
-### 数据编程
+### 接口编程
 
 #### xml-rpc协议
 
-在系统的80端口提供RPC的服务，而又不影响正在执行的WEB服务，而采用HTTP协议传输RPC包的办法，但http协议本身是用于传输文本的，要在其上传输RPC封包，最方便的方法莫过于把RPC封包编码成文本的形式（例如XML文件）。
+​	在系统的80端口提供RPC的服务，而又不影响正在执行的WEB服务，而采用HTTP协议传输RPC包的办法，但http协议本身是用于传输文本的，要在其上传输RPC封包，最方便的方法莫过于把RPC封包编码成文本的形式（例如XML文件）。
 
-XML- RPC（http://www.xml-rpc.com）是由美国UserLand公司指定的一个RPC协议。它将RPC信息封包编码为XML，然后通过 HTTP传输封包；
-简单的理解：
+​	XML- RPC（http://www.xml-rpc.com）是由美国UserLand公司指定的一个RPC协议。它将RPC信息封包编码为XML，然后通过 HTTP传输封包；
 
- 将数据定义为xml格式，通过http协议进行远程传输。
+简单的理解：将数据定义为xml格式，通过http协议进行远程传输。
 
 **配置**
 
@@ -742,7 +748,7 @@ print s.getCpu()
 
 参考:[glances中使用xml-rpc](https://github.com/nicolargo/glances/wiki/The-Glances-2.x-API-How-to)
 
-#### 	RESTFULL JSON 
+#### 	Restful Json 
 
 服务器端配置成:`glances -w`
 
@@ -765,7 +771,9 @@ Netdata 是一款 Linux 性能实时监测工具.。以web的可视化方式展�
 3. 发报警邮件
 4. 更多的功能等待发掘，查看[官方的文档](https://github.com/firehol/netdata/wiki)
 
-### 安装
+###  基础
+
+#### 安装
 
 ```shell
 # 可能需要事先安装依赖项
@@ -778,10 +786,6 @@ cd netdata
 ```
 
 > 注意安装过程的修改项,可查看有道云笔记的记录
-
-至此Netdata就安装完了
-
-#### 启动和关闭
 
 自启动
 
@@ -797,6 +801,14 @@ systemctl disable netdata
 关闭：killall netdata 或者 service netdata stop
 ```
 
+测试访问
+
+```
+直接用浏览器访问：`http://127.0.0.1:19999 `即可进入主界面。(19999是软件默认的端口，在配置文件中配置)
+```
+
+> 更多的安装信息请参考有道云笔记中的`Fedroa下源码编译安装netdata`文章
+
 #### 配置
 
 ``` shell
@@ -804,19 +816,15 @@ vim /etc/netdata/netdata.conf
 # 更详细的配置参考等待以后发现
 ```
 
-### 访问
-
-直接用浏览器访问：`http://127.0.0.1:19999 `即可进入主界面。(19999是软件默认的端口，在配置文件中配置)
-
-> 更多的安装信息请参考有道云笔记中的`Fedroa下源码编译安装netdata`文章
-
 ## linfo
 
 Linfo 是一个自由开源的跨平台的服务器统计 UI 或库，它可以显示大量的系统信息。Linfo 是可扩展的，通过 composer，很容易使用 PHP5 库以程序化方式获取来自 PHP 应用的丰富的系统统计数据。它有 Web UI 及其Ncurses CLI 视图，在 Linux、Windows、BSD、Darwin/Mac OSX、Solaris 和 Minix 系统上均可用。
 
 Linfo 显示的系统信息包括 CPU 类型/速度[1]、服务器的体系结构、挂载点用量、硬盘/光纤／Flash 驱动器、硬件设备、网络设备和统计信息、运行时间／启动日期、主机名、内存使用量（RAM 和 swap）、温度/电压/风扇速度和 RAID 阵列等。
 
-### 安装
+### 基础
+
+#### 安装
 
 ```shell
 git clone https://github.com/jrgp/linfo.git
@@ -824,7 +832,7 @@ cd linfo
 cp sample.config.inc.php config.inc.php
 ```
 
-### 使用
+##### 使用
 
 浏览器打开 http://SERVER_IP/linfo，界面展示如下：
 
@@ -832,56 +840,70 @@ cp sample.config.inc.php config.inc.php
 
 # 参考
 
-## Ansible部分
+- Ansible
 
-- [Python自动化运维之ansible的介绍以及运行原理](http://www.toutiao.com/a6363987359403344130/)
+  [Python自动化运维之ansible的介绍以及运行原理](http://www.toutiao.com/a6363987359403344130/)
 
-## SaltStack部分
+  [CentOS7 安装Ansible](https://my.oschina.net/wangchongya/blog/752027)
 
-- 待定
+  [官方参考手册](http://docs.ansible.com/ansible-tower/3.0.3/html/installandreference/requirements_refguide.html#ansible-software-requirements)
 
-## Prometheus部分
+  [在 CentOS 7 中安装并使用自动化工具 Ansible](http://www.linuxidc.com/Linux/2015-10/123801.htm)
 
-- [官方文档参考](https://prometheus.io/docs/querying/basics/)
-- [Prometheus监控 - 简介、架构及基本环境配置](http://blog.csdn.net/y_xiao_/article/details/50816248)
-- [使用Prometheus和Grafana监控Mysql服务器性能](http://www.tuicool.com/articles/fiYZriE)
-- [采用prometheus 监控mysql](http://www.cnblogs.com/hf-cherish/p/6016374.html)
-- [Prometheus监控 - 查询表达式篇](http://blog.csdn.net/y_xiao_/article/details/50820225)
-- [Fedroa安装Docker](https://docs.docker.com/engine/installation/linux/fedora/)
+  [IT武林的小无相功：Ansible](http://www.toutiao.com/a6353964130168602882/)
 
+  [Ansible-tower学习配置博客园](http://www.cnblogs.com/luojie89757/)（官方软件参考安装教程）
 
-## Ganglia部分
+  [Ansible-tower官网申请](https://www.ansible.com/tower-trial)
 
-- [使用 Ganglia 对 Linux 网格和集群服务器进行实时监控](http://www.toutiao.com/i6381744290002895362/)
+- SaltStack
 
+  待定
 
-- [Prometheus 和 Grafana 监控系统指南](https://blog.eood.cn/prometheus-grafana-monitoring?utm_source=tuicool&utm_medium=referral)（这个讲到mysql的配置）
+- Prometheus
 
+  [官方文档参考](https://prometheus.io/docs/querying/basics/)
 
-## nmon
+  [Prometheus监控 - 简介、架构及基本环境配置](http://blog.csdn.net/y_xiao_/article/details/50816248)
 
-[监控Linux系统性能的工具--nmon(一)](http://toutiao.com/user/3163731884/pin/)
+  [使用Prometheus和Grafana监控Mysql服务器性能](http://www.tuicool.com/articles/fiYZriE)
 
-## glances
+  [采用prometheus 监控mysql](http://www.cnblogs.com/hf-cherish/p/6016374.html)
 
-[四个Linux服务器监控工具htop,iotop,apachetop,glances](http://blog.jobbole.com/58003/)
+  [Prometheus监控 - 查询表达式篇](http://blog.csdn.net/y_xiao_/article/details/50820225)
 
-[Linux下安装和使用glances系统监控工具](http://www.tuicool.com/articles/rMjIju)
+  [Fedroa安装Docker](https://docs.docker.com/engine/installation/linux/fedora/)
 
-[glances官方文档](https://github.com/nicolargo/glances)
+- Ganglia
 
-[使用资源监控工具glances(推荐)](https://www.ibm.com/developerworks/cn/linux/1304_caoyq_glances/)
+  [使用 Ganglia 对 Linux 网格和集群服务器进行实时监控](http://www.toutiao.com/i6381744290002895362/)
 
-[系统监控glances以及其中用到的python](http://www.toutiao.com/a6358639873155219714/)
+  [Prometheus 和 Grafana 监控系统指南](https://blog.eood.cn/prometheus-grafana-monitoring?utm_source=tuicool&utm_medium=referral)（这个讲到mysql的配置）
 
-## netdata部分
+- nmon
 
-[Netdata安装和使用（Linux 性能实时监测工具）](http://soluck.iteye.com/blog/2291618)
+  [监控Linux系统性能的工具--nmon(一)](http://toutiao.com/user/3163731884/pin/)
 
-## linfo部分
+- glances
 
-[Linfo：实时显示你的 Linux 服务器运行状况](http://www.toutiao.com/i6425010590959272449/)
+  [四个Linux服务器监控工具htop,iotop,apachetop,glances](http://blog.jobbole.com/58003/)
 
-[PHP端的linfo](https://github.com/jrgp/linfo)
+  [Linux下安装和使用glances系统监控工具](http://www.tuicool.com/articles/rMjIju)
 
-[Shell端的linfo](https://github.com/vigeek/linfo)
+  [glances官方文档](https://github.com/nicolargo/glances)
+
+  [使用资源监控工具glances(推荐)](https://www.ibm.com/developerworks/cn/linux/1304_caoyq_glances/)
+
+  [系统监控glances以及其中用到的python](http://www.toutiao.com/a6358639873155219714/)
+
+- netdata
+
+  [Netdata安装和使用（Linux 性能实时监测工具）](http://soluck.iteye.com/blog/2291618)
+
+- linfo
+
+  [Linfo：实时显示你的 Linux 服务器运行状况](http://www.toutiao.com/i6425010590959272449/)
+
+  [PHP端的linfo](https://github.com/jrgp/linfo)
+
+  [Shell端的linfo](https://github.com/vigeek/linfo)
