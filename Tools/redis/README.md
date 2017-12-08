@@ -171,7 +171,17 @@ runoob
 ​	简单的字符串列表，按照插入顺序排序
 
 ```shell
+redis 127.0.0.1:6379> LPUSH runoobkey redis
+(integer) 1
+redis 127.0.0.1:6379> LPUSH runoobkey mongodb
+(integer) 2
+redis 127.0.0.1:6379> LPUSH runoobkey mysql
+(integer) 3
+redis 127.0.0.1:6379> LRANGE runoobkey 0 10
 
+1) "mysql"
+2) "mongodb"
+3) "redis"
 ```
 
 ##### 集合
