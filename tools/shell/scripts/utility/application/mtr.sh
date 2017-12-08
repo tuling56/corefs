@@ -4,7 +4,7 @@
 # Author:tuling56
 # State:
 # Created_Time: 2017-11-02 13:01
-# Last modified: 2017-11-14 02:32:35 PM
+# Last modified: 2017-11-30 10:41:30 AM
 #########################################################################
 #!/bin/bash
 dir=`dirname $0` && dir=`cd $dir && pwd`
@@ -21,7 +21,7 @@ outseq="\t"
 #纯shell解决方案(内存超过:列超长)
 function mtr_bash()
 {
-    iinfo "纯bash解决方案"
+    iinfo "纯shell解决方案"
     headrow=($(head -1 $inputf))
     colnum=${#headrow[*]}
     for c in $(seq 1 $colnum);do
@@ -63,9 +63,9 @@ function mtr_awk2()
 
 
 # 测试入口
-mtr_bash
+#mtr_bash
 mtr_awk
-mtr_awk2
+#mtr_awk2
 
 
 exit 0
