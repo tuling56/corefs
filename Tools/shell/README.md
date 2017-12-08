@@ -1,4 +1,4 @@
-## Shell学习笔记
+## Shell笔记
 
 [TOC]
 
@@ -124,6 +124,18 @@ awk中字符串匹配
 a=(1 2 3 4 5)
 echo ${a[0]}
 echo ${a[@]} # 或者echo ${a[*]}
+# 取长度
+lentmp=${#a[@]}
+len=$((lentmp-1))
+# 遍历
+for i in `seq 0 $((${#a[@]}-1))`;do
+	if [ $i -eq '0'];then
+		echo -n ${line:0:4}"/"${line:4:2}"/"${line:6:2}
+	else
+		echo -en "\t"$i
+	fi
+	echo 
+done
 ```
 
 删除
