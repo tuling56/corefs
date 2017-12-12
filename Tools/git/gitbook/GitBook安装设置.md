@@ -1,4 +1,4 @@
-## GitBook安装设置
+## GitBook笔记
 
 [TOC]
 
@@ -51,7 +51,7 @@ gitbook-cli是gitbook的命令行，可以方便的管理多个gitbook版本
 
    该步骤会自动创建书籍的目录和对应的章节文档
 
-3.  生成书籍`gitbook build`
+3. 生成书籍`gitbook build`
 
    该步骤会在书籍目录生成_book文件夹，里面是书籍的静态html网页
 
@@ -378,6 +378,16 @@ git clone https://127.0.0.1/home/yjm/Documents/gitrepo/gitbook.git
 
 ### 测试
 
+本测试是针对上文发布部分的，匿名http方式、非匿名http方式:
+
+```
+# 匿名方式
+git clone http://host:port/xxx.git
+
+# 非匿名方式
+git clone http://username@host:port/xxx.git
+```
+
 #### pure仓库
 
 git仓库配置在阿里云上,sample仓库是裸仓库，没有工作区，建立方式如下：
@@ -390,7 +400,8 @@ git init --bare sample.git
 
 ```shell
 #存在的问题是可以clone但无法提交,提示错误：
-fatal: git-http-push failed
+fatal: git-http-push failed return code 22
+error: failed to push some refs to 'http://47.95.195.31/gitrepo/sample.git'
 ```
 
 - git clone https://47.95.195.31/gitrepo/sample.git
@@ -398,6 +409,7 @@ fatal: git-http-push failed
 ```shell
 #存在的问题是可以clone但无法提交，提示错误：
 fatal: git-http-push failed
+error: failed to push some refs to 'https://47.95.195.31/gitrepo/sample.git'
 ```
 
 - git clone root@47.95.195.31:/usr/local/nginx/site/gitrepo/sample.git
