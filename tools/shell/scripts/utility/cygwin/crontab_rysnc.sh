@@ -81,6 +81,16 @@ function rsync_docimg()
 	rsync.exe -avP "$local_dimg" "$remote_dimg"
 }
 
+# [Git->OneDrive]Excel笔记同步(有问题为解决)
+function rsync_excel()
+{
+	echo "[Git->OneDrive] excel等同步...."
+	local local_dimg='/cygdrive/c/Users/xl/Downloads/Documents/表情包'
+	local remote_dimg='/cygdrive/e/OneDrive/图片'
+
+	rsync.exe -avP "$local_dimg" "$remote_dimg"
+}
+
 # [本地->OneDrive]gitbash的配置同步(有问题未解决)
 function rsync_gitbash()
 {
