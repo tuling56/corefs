@@ -1735,7 +1735,32 @@ done
 
 ##### mysql之间同步
 
+- 导入导出法
 
+```
+- 不同机器之间的数据库只能利用导入和导出法
+- 不同数据库之间利用导入和导出的方法
+	- 也可以利用外连接表的方法
+- 同数据库不同表之间可以利用insert select的方法
+```
+
+- 利用navicate premium工具
+
+```
+该工具可完成以上所有情况下的任务，但是需要手动操作，不能自动化
+```
+
+- 利用logstash
+
+```
+logstash的更强大的功能待挖掘
+```
+
+- 自写工具
+
+```
+通过编程利用mysql的api操作完成
+```
 
 ##### mysql导入到redis
 
@@ -1762,6 +1787,12 @@ mysql -uroot -proot -N <redis_pipe.sql |redis-cli
 cat xxx.file |redis-cli [--pipe]
 ```
 
+- logstash
+
+```
+输入源是mysql,输出源是redis,可以利用中间的filter达到初步的处理
+```
+
 ### 问题
 
 #### 面试
@@ -1782,17 +1813,17 @@ cat xxx.file |redis-cli [--pipe]
 
 - 基础
 
-  [SQL的存储过程和函数](http://www.toutiao.com/a6391569028531831041/)
-
   [MyCli:支持自动补全和语法高亮的MySQL客户端](http://hao.jobbole.com/mycli-mysql/)
 
-  [是否存在根据MySQL表格自动生成restful接口的技术](https://segmentfault.com/q/1010000008335958?_ea=1878275)
+  [percona-toolkit工具包的安装和使用](http://blog.51cto.com/jonyisme/1754247)(功能待挖掘)
 
   [Linux下修改mysql的root密码](http://www.tuicool.com/articles/yQNZFfr)
 
   [MySQL字符编码深入详解](http://www.jb51.net/article/29960.htm)
 
 - 高级
+
+  [SQL的存储过程和函数](http://www.toutiao.com/a6391569028531831041/)
 
   [MySQL行级锁、表级锁和页级锁](http://www.jb51.net/article/50047.htm)
 
@@ -1816,6 +1847,8 @@ cat xxx.file |redis-cli [--pipe]
 - 积累
 
   [根据MySQL表格自动生成restfull接口](https://segmentfault.com/q/1010000008335958)
+
+  [是否存在根据MySQL表格自动生成restful接口的技术](https://segmentfault.com/q/1010000008335958?_ea=1878275)
 
   [MySQL知识点积累（推荐）](http://www.cnblogs.com/emanlee/category/95551.html)
 
@@ -1852,4 +1885,6 @@ cat xxx.file |redis-cli [--pipe]
   [不同mysql之间数据同步](http://blog.csdn.net/ityouknow/article/details/52710655)
 
   [主从服务器之间数据同步](http://blog.csdn.net/alangmei/article/details/21075055)
+
+  ​
 
