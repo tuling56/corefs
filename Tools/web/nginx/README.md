@@ -349,7 +349,7 @@ SSL使用证书来创建安全连接，有两种验证模式：
 > openssl genrsa -des3 -out https-server.key 1024
 >
 > # 会提示输入密钥口令：
-> #Enter pass phrase for https-server.key:
+> #Enter pass phrase for https-server.key:alhttps
 > #Verifying - Enter pass phrase for https-server.key:
 > ```
 >
@@ -357,7 +357,6 @@ SSL使用证书来创建安全连接，有两种验证模式：
 >
 > ```shell
 > openssl req -new -key https-server.key -out https-server.csr
->
 > # 会提示输入上一步输入的密钥口令
 > ```
 >
@@ -371,6 +370,7 @@ SSL使用证书来创建安全连接，有两种验证模式：
 >
 >  ```shell
 > openssl x509 -req -days 365 -in https-server.csr -signkey https-server.key -out https-server.crt
+> # 会提示输入第一步输入的口令
 >  ```
 >
 > > 另一种方式：
@@ -382,7 +382,7 @@ SSL使用证书来创建安全连接，有两种验证模式：
 > step4:将证书导出成浏览器支持的.p12格式
 >
 >  ```shell
->  openssl pkcs12 -export -clcerts -in https-server.key -inkey https-server.key -out https-server.p12
+> openssl pkcs12 -export -clcerts -in https-server.key -inkey https-server.key -out https-server.p12
 >  ```
 >
 > 总结：
@@ -391,7 +391,7 @@ SSL使用证书来创建安全连接，有两种验证模式：
 
 客户端证书
 
-> 客户端证书如何配置？
+> 客户端证书如何配置？，让访问自建的https站点的时候显示安全（绿色）
 
 **配置https方法2：**
 
