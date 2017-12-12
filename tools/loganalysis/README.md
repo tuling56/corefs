@@ -92,18 +92,20 @@ awk '{url=$7;requests[url]++;bytes[url]+=$10}END{for(url in requests){printf("%s
 - mysql 负责存储收集到日志
 - loganayzer 日志可视化
 
-loganayzer负责读取mysql中的日子数据并可视化
+loganayzer负责读取mysql中的日志数据并可视化
 
 #### Rsyslog
 
 syslog是一个快速处理收集系统日志的程序，rsyslog是syslog的升级版，它将多种来源不同设施主机发送的日志过滤合并到一个独立的位置。
 
-安装
+##### 安装
 
 ```shell
 yum install rsyslog rsyslog-mysql
 # 其中后者是将日志传送到MySQL数据库的一个模块
 ```
+
+##### 配置
 
 配置服务器端
 
@@ -128,7 +130,7 @@ service rsyslog restart
 配置客户端
 
 ```shell
-//将日志输出到服务器端,注意在任何情况下都不要说是没明文传输，而是要用TLS/SSL加密
+//将日志输出到服务器端,注意在任何情况下都不要明文传输，而是要用TLS/SSL加密
 ```
 
 > 更多的[配置](http://blog.csdn.net/zhangdaisylove/article/details/46843233)
@@ -171,7 +173,7 @@ flush privileges;
 
 安装loganalyzer的时候卡在配置文件不可写这一步了
 
-### Logstash+Elasticsearch+Redis+Kinaba
+### Logstash+ES+Kibana
 
 组成说明：
 
@@ -735,30 +737,33 @@ output:
      hosts: ["localhost:5044"]
 ```
 
-**[filebeat.yml文件详细解析](https://www.cnblogs.com/zlslch/p/6622079.html)：**
+###### [filebeat.yml详解](https://www.cnblogs.com/zlslch/p/6622079.html)
 
-输入配置：
+输入配置
 
+```
 - filebeat.yml文件定义的每个prospectors都是一个日志源，可以单独的放在conf.d目录中进行管理（此处的`authlogs.yml`和`syslogs.yml`即是两个例子）
-
 - prospectors的公共配置可以放在filebeat.yml文件中
+```
 
 输出配置：
 
-- 输出可以是elasticsearch、logstash、file、console
+```
+输出可以是elasticsearch、logstash、file、console
+
+filebeat连接logstath：
+```
 
 shipper配置
 
-- 待补充
+```
+待补充
+```
 
 logging配置
 
-- 待补充
-
-filebeat连接logstath：
-
 ```
-# 待补充
+待补充
 ```
 
 ##### 启动
@@ -796,6 +801,10 @@ service filebeat start
   [logstatsh日志分析的配置和使用](https://www.cnblogs.com/yincheng/p/logstash.html)
 
   [x-pack插件的安装(推荐)](https://www.elastic.co/downloads/x-pack)
+
+  [logstatsh插件之grok](https://www.elastic.co/guide/en/logstash/current/plugins-filters-grok.html)
+
+  [慕课网:ELK三剑客安装指南](https://www.imooc.com/learn/920)
 
 - goaccess
 
