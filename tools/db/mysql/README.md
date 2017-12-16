@@ -1340,6 +1340,21 @@ select 年,
 	sum(case when 季度=3 then 销售量 else 0 end) as 三季度, 
 	sum(case when 季度=4 then 销售量 else 0 end) as 四季度 
 from sales group by 年;
+
+select 年, 
+	max(case when 季度=1 then 销售量 else 0 end) as 一季度, 
+	max(case when 季度=2 then 销售量 else 0 end) as 二季度, 
+	max(case when 季度=3 then 销售量 else 0 end) as 三季度, 
+	max(case when 季度=4 then 销售量 else 0 end) as 四季度 
+from sales group by 年;
+
+select 年, 
+	max(if(季度=1,销售量,0) as 一季度, 
+	max(if(季度=2,销售量,0) as 二季度, 
+	max(if(季度=3,销售量,0) as 三季度, 
+	max(if(季度=4,销售量,0) as 四季度 
+from sales group by 年;
+
 ```
 
 > 在sql server 2005中有[pivot函数](http://www.studyofnet.com/news/295.html)可以实现同样的功能
