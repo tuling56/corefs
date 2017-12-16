@@ -7,7 +7,7 @@ nginx和os一般都自带了spawn-cgi支持，不需要再安装什么其它的�
 
 #### 例子
 
-step1:编写c/c++的cgi程序
+##### step1:编写c/c++的cgi程序
 
 ```c
 //myfastcgi.c
@@ -34,14 +34,18 @@ int main()
 
 > 然后编译执行`g++ myfastcgi.c -o myfastcgi -lfcgi ` 
 
-step2:运行spawn-cgi
+##### step2:运行spawn-cgi
 
 ```shell
-spawn-cgi -a 127.0.0.1 -p 9003 -F 3 -f myfastcgi
+[root@local122 cgi-bin]# spawn-fcgi -a 127.0.0.1 -p 9003 -F 3 -f myfastcgi
+spawn-fcgi: child spawned successfully: PID: 29321
+spawn-fcgi: child spawned successfully: PID: 29322
+spawn-fcgi: child spawned successfully: PID: 29323
+
 # 其中myfastcgi是前一步生成的可执行文件
 ```
 
-step3:配置nginx
+##### step3:配置nginx
 
 ```nginx
 #本地cgi-server，监听9003端口
@@ -80,10 +84,18 @@ server {
 }
 ```
 
+测试：
+
+```shell
+# 访问http://cgi-proxy.com/1.cgi,得到如下内容
+FastCGI Hello!Request number 1 running on hostcgi_proxy.com Process ID: 29321
+
+```
+
 
 
  ##参考
 
 - 基础
 
-[nginx配置spawn-fastcgi执行自己编写的CGI程序(c/c++)  ](http://liuzhigong.blog.163.com/blog/static/178272375201351811194428/)
+  [nginx配置spawn-fastcgi执行自己编写的CGI程序(c/c++)  ](http://liuzhigong.blog.163.com/blog/static/178272375201351811194428/)

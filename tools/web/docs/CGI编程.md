@@ -21,7 +21,14 @@ CGI是什么？
 
 在你进行CGI编程前，确保您的Web服务器支持CGI及已经配置了CGI的处理程序。
 
-Apache 支持CGI 配置：
+[Apache 支持CGI 配置](http://blog.csdn.net/naturebe/article/details/7443662)：
+
+```shell
+编译的时候加入 --enable-cgi
+
+#编辑编辑httpd.conf,打开
+LoadModule cgi_module /usr/lib/apache2/modules/mod_cgi.so //默认有则不需要加
+```
 
 设置好CGI目录：
 
@@ -45,7 +52,16 @@ CGI文件的扩展名为.cgi，python也可以使用.py扩展名。默认情况�
 在 AddHandler 中添加 .py 后缀，这样我们就可以访问 .py 结尾的 python 脚本文件：
 
 ```
-AddHandler cgi-script .cgi .pl .py
+AddHandler cgi-script .cgi .pl .py .sh
+#并修改权限为755
+
+# 注意文件的开头必须输出是html的类型头，否则报错
+```
+
+访问：
+
+```
+http://localhost/cgi-bin/xxx.pl
 ```
 
 ###### 测试
@@ -85,7 +101,9 @@ http://localhost:8081/cgi-bin/python_cgi.py?name_get=zhang&url_get=hah
 
 - 基础
 
-  ​
+  [PerlCGI头库](https://stackoverflow.com/questions/22307610/end-of-script-output-before-headers-error-in-apache)
+
+  [教你用shell写cgi程序](http://www.xinghaixu.com/archives/117)
 
 - 进阶
 

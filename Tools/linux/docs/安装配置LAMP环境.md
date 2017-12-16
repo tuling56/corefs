@@ -1,4 +1,4 @@
-## 安装配置LAMP环境
+## LAMP环境搭建
 
 [TOC]
 
@@ -52,27 +52,34 @@ http://localhost/index.php,看看是否出现相关的php和apache信息
 ##### 安装apache
 
 ```shell
-wget http://mirror.bit.edu.cn/apache//httpd/httpd-2.4.29.tar.bz2
+wget -c http://mirror.bit.edu.cn/apache//httpd/httpd-2.4.29.tar.bz2
 tar -jxvf httpd-2.4.29.tar.bz2
 cd httpd-2.4.29
-./configure --prefix=/usr/local/apache --enable-so  --enable-rewrite --enable-ssl --with-apr=/usr/local/apr --with-apr-util=/usr/local/apr-util --with-pcre=/usr/local/pcre  
+./configure --prefix=/usr/local/apache --enable-so  --enable-proxy --enable-rewrite --enable-ssl --enable-cgi --with-apr=/usr/local/apr --with-apr-util=/usr/local/apr-util --with-pcre=/usr/local/pcre  
+make & make install
 ```
 
 > 编译安装的时候遇到问题，其中apr,apr-util和pcre需要单独安装或者利用系统中
 
 ```shell
 # apr
-wget http://archive.apache.org/dist/apr/apr-1.6.2.tar.bz2
+wget -c http://archive.apache.org/dist/apr/apr-1.6.2.tar.bz2
+tar -xvf apr-1.6.2.tar.bz2
+cd apr-1.6.2
 ./configure --prefix=/usr/local/apr  
 make && make install 
 
 # apr-util(注意版本不要太高)
-wget http://archive.apache.org/dist/apr/apr-util-1.5.4.tar.gz
+wget -c http://archive.apache.org/dist/apr/apr-util-1.5.4.tar.gz
+tar -xvf apr-util-1.5.4.tar.gz
+cd apr-util-1.5.4
  ./configure --prefix=/usr/local/apr-util -with-apr=/usr/local/apr/bin/apr-1-config  
 make && make install 
 
 # pcre
-wget http://jaist.dl.sourceforge.net/project/pcre/pcre/8.38/pcre-8.38.zip
+wget -c  http://jaist.dl.sourceforge.net/project/pcre/pcre/8.38/pcre-8.38.zip
+unzip pcre-8.38.zip
+cd pcre-8.38
 ./configure --prefix=/usr/local/pcre  
 make && make install 
 ```
@@ -84,6 +91,7 @@ wget http://cn2.php.net/distributions/php-5.6.32.tar.bz2
 tar -xvf php-5.6.32.tar.bz2
 cd php-5.6.32
 ./configure --prefix=/usr/local/php -–enable-fpm --enable-mbstring --enable-zip --with-apxs2=/usr/local/apache/bin/apxs --with-mysql --with-curl --with-gd --with-zlib
+make & make install
 ```
 
 > 中间过程可能需要安装libxml2,libxml2-devel,zlib-devel
