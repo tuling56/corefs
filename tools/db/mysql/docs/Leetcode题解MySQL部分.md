@@ -20,7 +20,23 @@ order by a.price;
 
 #### [consecutive numbers](https://leetcode.com/problems/consecutive-numbers/description/)
 
-连续数字问题，找出连续出现n次以上的数字
+连续数字问题，找出至少连续出现n次以上的数字
+
+Write a SQL query to find all numbers that appear at least three times consecutively.
+
+```
++----+-----+
+| Id | Num |
++----+-----+
+| 1  |  1  |
+| 2  |  1  |
+| 3  |  1  |
+| 4  |  2  |
+| 5  |  1  |
+| 6  |  2  |
+| 7  |  2  |
++----+-----+
+```
 
 ```mysql
 select distinct Num as ConsecutiveNums a where (select count(distinct Num) from Logs b where a.Num=b.Num)>=3;
@@ -30,6 +46,8 @@ select distinct Num as ConsecutiveNums a where (select count(distinct Num) from 
 
 #### [Employees Earning More Than Their Managers](https://leetcode.com/problems/employees-earning-more-than-their-managers/description/)
 
+找出赚的比他的经理多的人
+
 ```
 select Name as Employee from Employee a where (select Salary from Employee b where a.ManagerID=b.ID)<a.Salary;
 ```
@@ -37,6 +55,43 @@ select Name as Employee from Employee a where (select Salary from Employee b whe
 ####  [Department Highest Salary](https://leetcode.com/problems/department-highest-salary/description/)
 
 组内最大值/前N大
+
+The `Employee` table holds all employees. Every employee has an Id, a salary, and there is also a column for the department Id.
+
+```
++----+-------+--------+--------------+
+| Id | Name  | Salary | DepartmentId |
++----+-------+--------+--------------+
+| 1  | Joe   | 70000  | 1            |
+| 2  | Henry | 80000  | 2            |
+| 3  | Sam   | 60000  | 2            |
+| 4  | Max   | 90000  | 1            |
++----+-------+--------+--------------+
+
+```
+
+The `Department` table holds all departments of the company.
+
+```
++----+----------+
+| Id | Name     |
++----+----------+
+| 1  | IT       |
+| 2  | Sales    |
++----+----------+
+
+```
+
+Write a SQL query to find employees who have the highest salary in each of the departments. For the above tables, Max has the highest salary in the IT department and Henry has the highest salary in the Sales department.
+
+```
++------------+----------+--------+
+| Department | Employee | Salary |
++------------+----------+--------+
+| IT         | Max      | 90000  |
+| Sales      | Henry    | 80000  |
++------------+----------+--------+
+```
 
 ```mysql
 #组内最大值 
@@ -106,17 +161,48 @@ ORDER BY
 
 #### [Nth Highest Salay](https://leetcode.com/problems/nth-highest-salary/description/)
 
-分组N大和不分组N大
+分组第N大和不分组第N大
 
-##### 不分组N大
+Write a SQL query to get the *n*^th^ highest salary from the `Employee` table.
+
+```
++----+--------+
+| Id | Salary |
++----+--------+
+| 1  | 100    |
+| 2  | 200    |
+| 3  | 300    |
++----+--------+
+```
+
+##### 不分组第N大
 
 ```mysql
+# 参加以前的TopN
+```
 
+##### 分组第N大
+
+```mysql
+# groupTopN
 ```
 
 #### [Rising Temperature](https://leetcode.com/problems/rising-temperature/description/)
 
-相邻行之间的比较
+相邻行之间的比较了，找出比前一行值高的记录
+
+write a SQL query to find all dates' Ids with higher temperature compared to its previous (yesterday's) dates.
+
+```
++---------+------------+------------------+
+| Id(INT) | Date(DATE) | Temperature(INT) |
++---------+------------+------------------+
+|       1 | 2015-01-01 |               10 |
+|       2 | 2015-01-02 |               25 |
+|       3 | 2015-01-03 |               20 |
+|       4 | 2015-01-04 |               30 |
++---------+------------+------------------+
+```
 
 ```mysql
 # 有问题(第一行的处理)
@@ -136,7 +222,7 @@ select a.ID from Weather a where a.ID=1 and a.Temperature>(select Temperature fr
 
 #### [Trips and Users](https://leetcode.com/problems/trips-and-users/description/)
 
-连接表求比率
+连接表求比率，分类情况
 
 方法1：存在的问题没有满足条件的时候无返回
 
@@ -232,14 +318,29 @@ AND l2.Num = l3.Num
 
 > 扩展：处理n连续问题
 
+#### [Human Traffic of Stadium](https://leetcode.com/problems/human-traffic-of-stadium/description/)
 
+霍夫曼流量问题，找出至少连续3天大于100的的记录，记录是依次连续的。也是满足条件的最长连续子序列问题
 
-#### 霍夫曼交通问题
+```
++------+------------+-----------+
+| id   | date       | people    |
++------+------------+-----------+
+| 1    | 2017-01-01 | 10        |
+| 2    | 2017-01-02 | 109       |
+| 3    | 2017-01-03 | 150       |
+| 4    | 2017-01-04 | 99        |
+| 5    | 2017-01-05 | 145       |
+| 6    | 2017-01-06 | 1455      |
+| 7    | 2017-01-07 | 199       |
+| 8    | 2017-01-08 | 188       |
++------+------------+-----------+
+```
+
+暂时未解决
 
 ```mysql
 select (select a.* from stadium a inner join stadium b on b.id=a.id+1 and a.people>100 and b.people>100);
 ```
-
-
 
  ##参考
