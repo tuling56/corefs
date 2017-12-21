@@ -44,7 +44,7 @@ chkconfig mysqld on
 
 创建新用户并设置密码
 
-```
+```mysql
 create user 'username'@'host' identified by 'password';
 ```
 
@@ -301,7 +301,7 @@ fields=$(echo "desc media_info.${TABLE_NAME};"| ${LOCAL_MYSQL} | grep -v Field |
 
 ###### 类型
 
-
+待补充
 
 ###### 操作
 
@@ -475,13 +475,16 @@ CREATE TABLE Persons(
 
 存储引擎
 
-```mysql
+```shell
 # 修改表的存储引擎
 alter table table_name engine=innodb;
 
-# 关闭InnoDB的存储引擎
+# 查找使用InnoDB引擎的表
+select table_schema,table_name from information_schema.tables where table_type='base table' and engine='innodb' and table_schema!='mysql' and table_name not like '%innodb%';
+
+# 关闭InnoDB的存储引擎(修改默认的存储引擎)
 #修改my.ini文件：
-找到default-storage-engine=INNODB 改为default-storage-engine=MYISAM
+找到default-storage-engine=INNODB 改为default-storage-engine=MyISAM
 找到#skip-innodb 改为skip-innodb
 ```
 
@@ -499,10 +502,12 @@ CSV（Comma-Separated Values逗号分隔值）
 也称为HEAP
 
 ```
-        该存储引擎通过在内存中创建临时表来存储数据。每个基于该存储引擎的表实际对应一个磁盘文件，该文件的文件名和表名是相同的，类型为.frm。该磁盘文件只存储表的结构，而其数据存储在内存中，所以使用该种引擎的表拥有极高的插入、更新和查询效率。这种存储引擎默认使用哈希（HASH）索引，其速度比使用B-+Tree型要快，但也可以使用B树型索引。由于这种存储引擎所存储的数据保存在内存中，所以其保存的数据具有不稳定性，比如如果mysqld进程发生异常、重启或计算机关机等等都会造成这些数据的消失，所以这种存储引擎中的表的生命周期很短，一般只使用一次。
+    该存储引擎通过在内存中创建临时表来存储数据。每个基于该存储引擎的表实际对应一个磁盘文件，该文件的文件名和表名是相同的，类型为.frm。该磁盘文件只存储表的结构，而其数据存储在内存中，所以使用该种引擎的表拥有极高的插入、更新和查询效率。这种存储引擎默认使用哈希（HASH）索引，其速度比使用B-+Tree型要快，但也可以使用B树型索引。由于这种存储引擎所存储的数据保存在内存中，所以其保存的数据具有不稳定性，比如如果mysqld进程发生异常、重启或计算机关机等等都会造成这些数据的消失，所以这种存储引擎中的表的生命周期很短，一般只使用一次。
 ```
 
 ##### InnoDB
+
+待补充
 
 ##### MyISAM
 
@@ -902,6 +907,13 @@ END
 
 ### 查询
 
+基础查询
+
+```mysql
+# 按汉字的首字母拼音排序
+SELECT name_varchar from study.datatype order by CONVERT(name_varchar USING gbk) ;
+```
+
 #### 索引
 
 单索引和联合索引
@@ -1056,6 +1068,29 @@ UNION All
 SELECT	* from	persons;
 ```
 
+###### cross join
+
+```mysql
+SELECT
+	b.*
+from
+	student a,
+	persons b
+where
+	a.stuno = b.Id_P;
+
+# 等同于
+#SELECT b.* from student a CROSS JOIN persons b where a.stuno=b.Id_P;
+# 总结：
+#1，带where子句的cross join 和inner join(或者join)等效
+#2，不带where子句的产生的查询结果才是笛卡尔积
+```
+
+==连接tips==:
+
+- [join on where的执行顺序](https://www.cnblogs.com/Jessy/p/3525419.html)	
+  - join的时候先对两张表做where条件筛选，然后再做join,这样可以减小联表的量
+
 ##### exists和in
 
 ```mysql
@@ -1132,6 +1167,12 @@ alter table table_1 auto_increment = 2;
 SELECT TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME from information_schema.`COLUMNS` where COLUMN_NAME like '%isover%';
 ```
 
+筛选某种类型的表和所在的库
+
+```mysql
+select table_schema,table_name from information_schema.tables where table_type='base table' and engine='innodb' and table_schema!='mysql' and table_name not like '%innodb%';
+```
+
 #### restful接口
 
 ##### sandman2
@@ -1173,11 +1214,11 @@ optional arguments:
                         Use this named schema instead of default
 ```
 
-> 问题是中午的查询结果是unicode显示，命令行配置jq才能正常显示，而web访问还没有查到显示中文的方式
+> 问题是中文的查询结果是unicode显示，命令行配置jq才能正常显示，而web访问还没有查到显示中文的方式
 
 ##### [xmysql](http://blog.csdn.net/dev_csdn/article/details/78480522)
 
-为mysql书宽恕成rest api
+为mysql数据库快速生成restful api
 
 #### 选取结果添加行号
 
@@ -1844,6 +1885,8 @@ cat xxx.file |redis-cli [--pipe]
 
 
 - 查询
+
+  [MySQL如何对汉字排序](https://www.toutiao.com/i6501470153962684941/)
 
   [MySQL分组后选取指定值问题](http://www.jb51.net/article/31590.htm)
 

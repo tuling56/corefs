@@ -304,13 +304,55 @@ charset utf-8,gbk;
 | $time_local                         | 记录访问时间与时区                                |
 | \$upstream_response_time            | 代理服务器响应时间                                |
 
+补充
+
+| 参数名                 | **意义**                                   |
+| ------------------- | ---------------------------------------- |
+| $arg_[parameter]    | http请求中某个参数的值。例：/index.html?size=100,可以用$arg_size获取100 |
+| $binary_remote_addr | 二进制格式的客户端地址。                             |
+| $body_bytes_sent    | 表示在向客户端发送的http响应中，包体部分的字节数               |
+| $content_length     | 表示在向客户端请求头部中的Content-Length字段            |
+| $content_type       | 表示在向客户端请求头部中的Content-Type字段              |
+| $cookie_[cookie]    | 表示在客户端请求头部中的cookie字段                     |
+| $document_root      | 表示当前请求所使用的root配置项的值                      |
+| $uri                | 表示当前请求URI，不带任何参数                         |
+| $document_uri       | 同上                                       |
+| $request_uri        | 表示客户端发来的原始请求URI，带完整的参数。$uri和$document_uri未必是用户的原始请求，在内部重定向后可能是重定向后的URI，而$request_uri永远不会改变，始终是客户端原始URI |
+| $host               | 表示客户端请求头部中的Host字段。如果Host字段不存在，则以实际处理的server（虚拟主机）名称代替。 |
+| $hostname           | 表示Nginx所在机器的名称。                          |
+| $http_[header]      | 表示当前http请求中相应头部的值。                       |
+| $sent_http_[header] | 表示返回客户端的http响应中相应头部的值。                   |
+| $is_args            | 表示请求中的URI是否带参数，如果带参数，$is_arge值为？，否则为空字符串 |
+| $limit_rate         | 表示当前连接的限速是多少，0表示无限速                      |
+| $nginx_version      | Nginx的版本号                                |
+| $query_string       | 请求URI中的参数，与$args相同，$query_string是只读的不会改变 |
+| $remote_addr        | 表示客户端地址                                  |
+| $remote_port        | 表示客户端端口                                  |
+| $remote_user        | 表示使用Auth Basic Module时定义的用户名             |
+| $request_filename   | 表示用户请求中URI经过root或alias转换后的文件路径           |
+| $request_body       | 表示http请求中的包体，该参数只在proxy_pass或fastcgi_pass中有意义 |
+| $request_body_file  | 表示http请求中的包体存储的临时文件名                     |
+| $request_completion | 当请求已经全部完成时，其值为"ok"；若没有完成，就要返回客户端，则其值为空字符串；或者在断点续传等情况下使用HTTP range访问的并不是文件的最后一块，那么其值也是空字符串 |
+| $request_method     | 表示http请求的方法名，如GET、PUT、POST等              |
+| $scheme             | 表示http scheme，如在请求nginx.com/中表示https     |
+| $server_addr        | 表示服务器地址                                  |
+| $server_name        | 表示服务器名称                                  |
+| $server_port        | 表示服务器端口                                  |
+| $server_protocol    | 表示服务器向客户端发送响应的协议，如HTTP/1.1或HTTP/1.0      |
+
+更详细的[内置变量参考](https://www.toutiao.com/i6501628216908710414/)
+
 #### 日志配置
 
-错误日志
+##### 访问日志
 
-error_log不能改变，日志文件可以指定任意存放日志的目录，错误日志级别常见的有`debug|info|notice|warn|error|crit|alert|emerg`，级别越高，记录的信息越少，生产场景一般是`warn|error|crit`这三个级别之一，注意不要配置info等较低级别，会带来巨大磁盘I/O消耗。
+​	访问日志中使用nginx内置变量进行日志描述
 
-可放置的标签段为:(这这个暂时找不到放置的位置)
+##### 错误日志
+
+​	error_log不能改变，日志文件可以指定任意存放日志的目录，错误日志级别常见的有`debug|info|notice|warn|error|crit|alert|emerg`，级别越高，记录的信息越少，生产场景一般是`warn|error|crit`这三个级别之一，注意不要配置info等较低级别，会带来巨大磁盘I/O消耗。
+
+可放置的标签段为:(这个暂时找不到放置的位置)
 
 context: main， http， server， location
 

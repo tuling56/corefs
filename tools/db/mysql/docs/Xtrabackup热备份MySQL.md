@@ -4,10 +4,14 @@
 
 ### 基础
 
+percona-xtrabackup是一款开源的MySQL热备份工具
+
+> Xtrabackup是由percona开发的一个开源软件，它是innodb热备工具ibbackup（收费的商业软件）的一个开源替代品。Xtrabackup由个部分组成:xtrabackup和innobackupex，其中xtrabackup工具用于备份innodb和 xtraDB引擎的表；而innobackupex工具用于备份myisam和innodb引擎的表，本文将介绍如何用innobackupex工具做全量和增量备份。
+
 #### 安装Xtrabackup
 
-```
-
+```shell
+yum install percona-xtrabackup
 ```
 
 #### 安装MySQL

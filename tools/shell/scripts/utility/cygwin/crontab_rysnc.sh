@@ -61,15 +61,26 @@ function rsync_db()
 	return 0
 }
 
-# [本地->远程]查询sql同步
+# [本地->alecs远程]查询sql同步
 function rsync_query()
 {
 	echo "[本地->远程] 查询sql同步....."
-	local_sql='/cygdrive/c/Users/xl/Documents/Navicat/MySQL/servers/*'
-	remote_sql='/home/yjm/Projects/mysql/sql'
+	local local_sql='/cygdrive/c/Users/xl/Documents/Navicat/MySQL/servers/*'
+	local remote_sql='/home/yjm/Projects/mysql/sql'
 
 	rsync.exe -u -e 'ssh -i /cygdrive/c/Users/xl/.ssh/id_rsa' -avP --delete $local_sql root@47.95.195.31:$remote_sql
 }
+
+# [本地->alecs远程]study数据库
+function rsync_studydb()
+{
+	echo "[本地->alecs远程] study数据库同步....."
+	local local_sql='"/cygdrive/c/ProgramData/MySQL/MySQL Server 5.5/data/"'
+	local remote_sql='/var/lib/mysql/study'
+
+	rsync.exe -u -e 'ssh -i /cygdrive/c/Users/xl/.ssh/id_rsa' -avP --include="*.frm|*.MYD|*.MYI" --exclude='*' $local_sql root@47.95.195.31:$remote_sql
+}
+
 
 # [本地->OneDrive]文档图片等同步
 function rsync_docimg()

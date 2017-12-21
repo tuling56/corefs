@@ -255,6 +255,14 @@ wget -np -nH -r –span-hosts www.mhcf.net/test/
 -L 递归时不进入其它主机，如wget -c -r www.mhcf.net/test/
 ```
 
+#####  axel
+
+```
+
+```
+
+
+
 #### 文件传输
 
 ##### rsync
@@ -310,9 +318,9 @@ Rsync的命令格式可以为以下六种：
 ```shell
 ## include-from和exclude-from可
 #--include-from 指定目录下的部分目录的方法：
-rsync  -avz -P --include-from=/home/include.txt --exclude=/* /home/mnt/data/upload/f/ 
+rsync  -avz -P --include-from=/home/include.txt --exclude=/* /home/mnt    /data/upload/f/ 
 #--exclude-from 排除目录下的部分目录的方法
-rsync  -aSz  --exclude-from=/home/exclude.txt /home/mnt/ user@server1:/mnt/data
+rsync  -aSz  --exclude-from=/home/exclude.txt /home/mnt/ u	ser@server1:/mnt/data
 
 ## include和exclude
 ```
@@ -387,6 +395,125 @@ rpm -qa
 如果恰好有多个包叫同样的名字，使用 rpm -e --allmatches --nodeps <包的名字> 删除所有相同名字的包， 并忽略依赖
 ```
 
+#### 邮件发送
+
+##### sendEmail
+
+sendEmail是一个轻量级，命令行的SMTP邮件客户端。如果你需要使用命令行发送邮件，那么sendEmail是非常完美的选择:使用简单并且功能强大
+
+###### 安装
+
+```shell
+wget http://caspian.dotconf.net/menu/Software/SendEmail/sendEmail-v1.56.tar.gz
+tar -zxvf sendEmail-v1.56.tar.gz
+chmod u+x 
+mv sendEmail /usr/local/bin
+```
+
+使用
+
+```shell
+perl sendEmail -s mail.cc.sandai.net -f monitor@cc.sandai.net -xu monitor@cc.sandai.net -xp 121212 -t yuanjunmiao@cc.sandai.net -u "email title" -m "email body info"  -a "attachment files"
+
+LOG="/tmp/clean.log"
+-o message-file="${LOG}"
+```
+
+说明：
+
+1. perl脚本写的程序，各选项的意义如下
+
+```shell
+-f  发送者
+-s  发送者smtp服务器地址
+-xu 发送服务器的用户名
+-xp 发送服务器的用户密码
+-t  接收用户
+-u  邮件标题
+-m  邮件内容
+-o
+      message-file=FILE    将文件内容作为邮件内容进行发送
+      message-charset=utf8 设置邮件编码
+-a  附件
+```
+
+1. 多个收件人
+
+```
+MAIL_TO="zhangweibing@cc.sandai.net luochuan@cc.sandai.net 
+-t ${MAIL_TO}
+```
+
+一个实验例子：
+
+```shell
+perl sendEmail -s smtp.xxx.com -f xxxx@hostname1 -xu uname@serverhost -xp 111111 -t xxxx@hostname2 -u "email title" -o message-charset=utf8  -m "email body info"  -a "attachment files"
+```
+
+###### 详细参考
+
+Synopsis:  sendEmail -f ADDRESS [options]
+
+  Required:
+
+```
+-f ADDRESS                from (sender) email address
+* At least one recipient required via -t, -cc, or -bcc
+* Message body required via -m, STDIN, or -o message-file=FILE
+```
+
+  Common:
+
+```
+-t ADDRESS [ADDR ...]     to email address(es)
+-u SUBJECT                message subject
+-m MESSAGE                message body
+-s SERVER[:PORT]          smtp mail relay, default is localhost:25
+```
+
+  Optional:
+
+```shell
+-a   FILE [FILE ...]      file attachment(s)
+-cc  ADDRESS [ADDR ...]   cc  email address(es)
+-bcc ADDRESS [ADDR ...]   bcc email address(es)
+-xu  USERNAME             username for SMTP authentication
+-xp  PASSWORD             password for SMTP authentication
+```
+
+  Paranormal:
+
+```shell
+-b BINDADDR[:PORT]        local host bind address
+-l LOGFILE                log to the specified file
+-v                        verbosity, use multiple times for greater effect
+-q                        be quiet (i.e. no STDOUT output)
+-o NAME=VALUE             advanced options, for details try: --help misc
+    -o message-content-type=<auto|text|html>
+    -o message-file=FILE         -o message-format=raw
+    -o message-header=HEADER     -o message-charset=CHARSET
+    -o reply-to=ADDRESS          -o timeout=SECONDS
+    -o username=USERNAME         -o password=PASSWORD
+    -o tls=<auto|yes|no>         -o fqdn=FQDN
+```
+
+  Help:
+
+```shell
+--help                    the helpful overview you're reading now
+--help addressing         explain addressing and related options
+--help message            explain message body input and related options
+--help networking         explain -s, -b, etc
+--help output             explain logging and other output options
+--help misc               explain -o options, TLS, SMTP auth, and more
+```
+
+参考：
+
+[不可或缺的sendEmail](http://blog.csdn.net/leshami/article/details/8314570)
+
+[如何使用sendEmail发送邮件](http://www.ttlsa.com/linux/use-sendemail/)
+
 ### 环境配置
 
 #### 环境变量
@@ -436,115 +563,6 @@ export PATH=$JAVA_HOME/bin:$PATH
 [Linux下安装Sun JDK（删除Open JDK）](http://www.toutiao.com/i6416458864656384514/)
 
 ### 软件使用
-
-#### sendEmail
-
-sendEmail是一个轻量级，命令行的SMTP邮件客户端。如果你需要使用命令行发送邮件，那么sendEmail是非常完美的选择:使用简单并且功能强大
-
-##### 安装
-
-```shell
-wget http://caspian.dotconf.net/menu/Software/SendEmail/sendEmail-v1.56.tar.gz
-tar -zxvf sendEmail-v1.56.tar.gz
-chmod u+x 
-mv sendEmail /usr/local/bin
-```
-
-使用
-
-```shell
-perl sendEmail -s mail.cc.sandai.net -f monitor@cc.sandai.net -xu monitor@cc.sandai.net -xp 121212 -t yuanjunmiao@cc.sandai.net -u "email title" -m "email body info"  -a "attachment files"
-
-LOG="/tmp/clean.log"
--o message-file="${LOG}"
-```
-
-说明：
-
-1. perl脚本写的程序，各选项的意义如下
-
-```shell
--f  发送者
--s  发送者smtp服务器地址
--xu 发送服务器的用户名
--xp 发送服务器的用户密码
--t  接收用户
--u  邮件标题
--m  邮件内容
--o
-      message-file=FILE    将文件内容作为邮件内容进行发送
-      message-charset=utf8 设置邮件编码
--a  附件
-```
-
-2. 多个收件人
-
-```
-MAIL_TO="zhangweibing@cc.sandai.net luochuan@cc.sandai.net 
--t ${MAIL_TO}
-```
-
-一个实验例子：
-
-```shell
-perl sendEmail -s smtp.xxx.com -f xxxx@hostname1 -xu uname@serverhost -xp 111111 -t xxxx@hostname2 -u "email title" -o message-charset=utf8  -m "email body info"  -a "attachment files"
-```
-
-##### 详细参考
-
-Synopsis:  sendEmail -f ADDRESS [options]
-
-  Required:
-    -f ADDRESS                from (sender) email address
-    * At least one recipient required via -t, -cc, or -bcc
-    * Message body required via -m, STDIN, or -o message-file=FILE
-
-  Common:
-    -t ADDRESS [ADDR ...]     to email address(es)
-    -u SUBJECT                message subject
-    -m MESSAGE                message body
-    -s SERVER[:PORT]          smtp mail relay, default is localhost:25
-
-  Optional:
-```shell
--a   FILE [FILE ...]      file attachment(s)
--cc  ADDRESS [ADDR ...]   cc  email address(es)
--bcc ADDRESS [ADDR ...]   bcc email address(es)
--xu  USERNAME             username for SMTP authentication
--xp  PASSWORD             password for SMTP authentication
-```
-
-  Paranormal:
-```shell
--b BINDADDR[:PORT]        local host bind address
--l LOGFILE                log to the specified file
--v                        verbosity, use multiple times for greater effect
--q                        be quiet (i.e. no STDOUT output)
--o NAME=VALUE             advanced options, for details try: --help misc
-    -o message-content-type=<auto|text|html>
-    -o message-file=FILE         -o message-format=raw
-    -o message-header=HEADER     -o message-charset=CHARSET
-    -o reply-to=ADDRESS          -o timeout=SECONDS
-    -o username=USERNAME         -o password=PASSWORD
-    -o tls=<auto|yes|no>         -o fqdn=FQDN
-```
-
-
-  Help:
-```shell
---help                    the helpful overview you're reading now
---help addressing         explain addressing and related options
---help message            explain message body input and related options
---help networking         explain -s, -b, etc
---help output             explain logging and other output options
---help misc               explain -o options, TLS, SMTP auth, and more
-```
-
-参考：
-
-[不可或缺的sendEmail](http://blog.csdn.net/leshami/article/details/8314570)
-
-[如何使用sendEmail发送邮件](http://www.ttlsa.com/linux/use-sendemail/)
 
 #### ffmpeg
 
@@ -611,7 +629,6 @@ postgresql-contrib  # Extension modules distributed with PostgreSQL
 postgresql-libs     # The shared libraries required for any PostgreSQL clients 
 postgresql-server   # The programs needed to create and run a PostgreSQL server
 uuid             	# 用途未知  
-
 ```
 
 初始化
@@ -625,32 +642,6 @@ uuid             	# 用途未知
     postgres -D /home/yjm/xxx
 #or
 	pg_ctl -D /home/yjm/xxx -l logfile start
-```
-
-#### percona-xtrabackup
-
-开源的MySQL热备份工具
-
-> Xtrabackup是由percona开发的一个开源软件，它是innodb热备工具ibbackup（收费的商业软件）的一个开源替代品。Xtrabackup由个部分组成:xtrabackup和innobackupex，其中xtrabackup工具用于备份innodb和 xtraDB引擎的表；而innobackupex工具用于备份myisam和innodb引擎的表，本文将介绍如何用innobackupex工具做全量和增量备份。
-
-##### 安装
-
-```shell
-yum install percona-xtrabackup
-```
-
-##### 使用
-
-全量备份
-
-```
-
-```
-
-增量备份
-
-```shell
-
 ```
 
 ## 参考
