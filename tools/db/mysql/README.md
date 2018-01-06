@@ -204,6 +204,15 @@ tips:
 
 ##### 变量
 
+类型转换
+
+```mysql
+# 字符串转整型
+SELECT CONVERT(filedName, UNSIGNED INTEGER);
+SELECT CAST(filedName as SIGNED);
+
+```
+
 查看变量
 
 ```mysql
@@ -244,6 +253,8 @@ show variables like '%lower_case_table_names%';
 - ISAM
 
 ###### MyISAM
+
+//待补充
 
 ###### Heap
 
@@ -542,11 +553,7 @@ CSV（Comma-Separated Values逗号分隔值）
 3. 灵活应对功能的改变
 4. 复杂的查询需求
 
-通过更新视图更新真实表
-
-
-
-更新视图的方法：
+通过更新视图更新真实表，更新视图的方法：
 
 - 替代方式
 - 具体化方式（中间表方式） 
@@ -599,7 +606,7 @@ MyISAM表的读和写是串行的，即在读操作时不能写操作，写操�
 存储过程和函数的区别：
 
 - 函数中表名和列名都不能是变量
-- PREPARE语句只能用于5.0版本以上的存储过程里，不能用在函数或者触发器里
+- PREPARE语句只能用于MySQL5.0版本以上的存储过程里，不能用在函数或者触发器里
 - 调用方法不一样
 - 存储过程常用在事件和触发器中
 
@@ -620,16 +627,16 @@ BEGIN
   DECLARE 1_id INT DEFAULT 1;
   DECLARE 1_id2 INT DEFAULT 0;
   DECLARE error_status INT DEFAULT 0;
-  DECLARE datas CURSOR  FOR SELECT id FROM test;
+  DECLARE datas CURSOR  FOR SELECT id FROM test;  # 声明游标
   DECLARE CONTINUE HANDLER FOR NOT FOUND SET error_status=1;
-  OPEN datas;
-  FETCH datas INTO 1_id;
-  REPEAT
-  	SET  1_id2=1_id2+2;
-  	UPDATE test SET id2=1_id2 WHERE id=1_id;
-  	FETCH datas INTO 1_id;
-  	UNTIL  error_status
-  END REPEAT;
+  OPEN datas;  # 打开游标
+    FETCH datas INTO 1_id;
+    REPEAT
+      SET  1_id2=1_id2+2;
+      UPDATE test SET id2=1_id2 WHERE id=1_id;
+      FETCH datas INTO 1_id;
+      UNTIL  error_status
+    END REPEAT;
   CLOSE  datas;
 END
 //
@@ -1565,7 +1572,7 @@ ORDER BY
 	b.department_name DESC,a.salary DESC;
 ```
 
-> 用awk如何实现
+> 用awk,python,R,Shell等如何实现
 
 ### 调优
 
@@ -1800,7 +1807,7 @@ done
 - 同数据库不同表之间可以利用insert select的方法
 ```
 
-- 利用navicate premium工具
+- 利用navicat premium工具
 
 ```
 该工具可完成以上所有情况下的任务，但是需要手动操作，不能自动化
@@ -1818,12 +1825,18 @@ logstash的更强大的功能待挖掘
 通过编程利用mysql的api操作完成
 ```
 
+- rsync
+
+```
+对MyISAM引擎存储的文件，可以使用文件同步的方法
+```
+
 ##### mysql导入到redis
 
 - 遍历插入法
 
 ```
-//待实现
+利用各自的接口api实现
 ```
 
 - 命令行法
@@ -1943,6 +1956,8 @@ cat xxx.file |redis-cli [--pipe]
   [不同mysql之间数据同步](http://blog.csdn.net/ityouknow/article/details/52710655)
 
   [主从服务器之间数据同步](http://blog.csdn.net/alangmei/article/details/21075055)
+
+  [innobackupex的安装和使用](http://blog.csdn.net/dbanote/article/details/13295727)
 
   ​
 
