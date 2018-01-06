@@ -71,14 +71,17 @@ function rsync_query()
 	rsync.exe -u -e 'ssh -i /cygdrive/c/Users/xl/.ssh/id_rsa' -avP --delete $local_sql root@47.95.195.31:$remote_sql
 }
 
-# [本地->alecs远程]study数据库
+# [本地->alecs远程]study数据库(文件所属主存在问题,导致数据库无法读取表)
 function rsync_studydb()
 {
 	echo "[本地->alecs远程] study数据库同步....."
-	local local_sql='"/cygdrive/c/ProgramData/MySQL/MySQL Server 5.5/data/"'
-	local remote_sql='/var/lib/mysql/study'
+	local local_db='/cygdrive/c/ProgramData/MySQL/MySQL Server 5.5/data/study/'
+	local remote_db='/var/lib/mysql/study/'
 
-	rsync.exe -u -e 'ssh -i /cygdrive/c/Users/xl/.ssh/id_rsa' -avP --include="*.frm|*.MYD|*.MYI" --exclude='*' $local_sql root@47.95.195.31:$remote_sql
+	rsync.exe -u -og -e 'ssh -i /cygdrive/c/Users/xl/.ssh/id_rsa' -avP --include="*/" --include="*.frm" --include="*.MYD" --include="*.MYI" --exclude='*' "$local_db" root@47.95.195.31:$remote_db
+	# 修补方案更改文件的所属主 
+	#ssh -i /cygdrive/c/Users/xl/.ssh/id_rsa root@47.95.195.31 "cd /var/lib/mysql;chown -R mysql:mysql study;"
+
 }
 
 
@@ -102,23 +105,23 @@ function rsync_excel()
 	rsync.exe -avP "$local_dimg" "$remote_dimg"
 }
 
-# [本地->OneDrive]gitbash的配置同步(有问题未解决)
-function rsync_gitbash()
+# [本地->OneDrive]gitbash的配置
+function rsync_gitconf()
 {
 	echo "[本地->OneDrive] gitbash的配置同步...."
-	local local_conf='"/cygdrive/c/Program Files/Git/etc/bash.bashrc" "/cygdrive/c/Program Files/Git/etc/vimrc"'
-	local remote_conf='"/cygdrive/e/OneDrive - std.uestc.edu.cn/Code/Git/mdotfiles/git/gitbash/"'
-	rsync.exe -avP "$local_conf" "$remote_conf"
+	local local_conf='/cygdrive/c/Program Files/Git/etc/'
+	local remote_conf='/cygdrive/e/OneDrive - std.uestc.edu.cn/Code/Git/mdotfiles/git/gitbash/conf/'
+	rsync.exe -u -avP --include="bash.bashrc" --include="vimrc" --exclude="*" "$local_conf" "$remote_conf"
 }
 
 
 #################################### 主程序入口
 # rsync_pipeline
 rsync_shell
-#rsync_db
+#rsync_studydb
 rsync_query
 rsync_docimg
-#rsync_gitbash
+rsync_gitconf
 
 
 exit 0
