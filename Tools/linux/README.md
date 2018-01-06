@@ -4,6 +4,15 @@
 
 ### 基础知识
 
+#### 账号权限
+
+用户
+
+```
+# 修改root密码
+登录root账号，sudo passwd root或者之间passwd，重复输入两次密码即可
+```
+
 #### 文件目录
 
 ##### 文件
@@ -120,6 +129,28 @@ tar命令和格式.tar.gz和.tar.bz2
 ```
 
 #### 系统启动
+
+##### 开机启动
+
+`chkconfig`和`systemctl enable`
+
+以mysql为例:
+
+```shell
+# step1:将服务文件拷贝到init.d下，并重命名为mysql
+cp /usr/local/mysql/support-files/mysql.server /etc/init.d/mysql   
+
+# step2:赋予可执行权限
+chmod +x /etc/init.d/mysql    
+
+# step3:添加服务
+chkconfig --add mysql        
+
+# step4:显示服务列表
+chkconfig --list 
+# 如果看到345都是on的话，则成功，否则执行
+chkconfig --level 345 mysql on
+```
 
 #### 定时任务
 
@@ -261,15 +292,20 @@ wget -np -nH -r –span-hosts www.mhcf.net/test/
 
 ```
 
-
-
 #### 文件传输
 
 ##### rsync
 
-rsync（remote synchronize）是一个远程数据同步工具，可通过 LAN/WAN 快速同步多台主机之间的文件。也可以使用 rsync 同步本地硬盘中的不同目录。rsync 是用于替代 rcp 的一个工具，rsync 使用所谓的 rsync算法 进行数据同步，这种算法只传送两个文件的不同部分，而不是每次都整份传送，因此速度相当快。
+​	rsync（remote synchronize）是一个远程数据同步工具，可通过 LAN/WAN 快速同步多台主机之间的文件。也可以使用 rsync 同步本地硬盘中的不同目录。rsync 是用于替代 rcp 的一个工具，rsync 使用所谓的 rsync算法进行数据同步，这种算法只传送两个文件的不同部分，而不是每次都整份传送，因此速度相当快。
 
-在使用 rsync 进行远程同步时，可以使用两种方式：远程 Shell 方式（建议使用 ssh，用户验证由 ssh 负责）和 C/S 方式（即客户连接远程 rsync 服务器，用户验证由 rsync 服务器负责）。
+在使用 rsync 进行远程同步时，可以使用两种方式：
+
+- 远程 Shell 方式（建议使用 ssh，用户验证由 ssh 负责）
+- C/S 方式（即客户连接远程 rsync 服务器，用户验证由 rsync 服务器负责）
+
+在C/S方式下Server端会开一个873端口，当有连接过来时，会进行口令检查
+
+###### 传输方式
 
 | 源地址（分为目录的方式和数据库的方式）                    | 目的地址                                     | 备注                                      |
 | -------------------------------------- | ---------------------------------------- | :-------------------------------------- |
@@ -311,21 +347,50 @@ Rsync的命令格式可以为以下六种：
 　　如：rsync -v rsync://172.16.78.192/www
 ```
 
-###### 参数设置
+###### 应用情景
 
-包含和排除
+**包含和排除**
+
+- include-from和exclude-from
 
 ```shell
-## include-from和exclude-from可
 #--include-from 指定目录下的部分目录的方法：
-rsync  -avz -P --include-from=/home/include.txt --exclude=/* /home/mnt    /data/upload/f/ 
-#--exclude-from 排除目录下的部分目录的方法
-rsync  -aSz  --exclude-from=/home/exclude.txt /home/mnt/ u	ser@server1:/mnt/data
+rsync  -avz -P --include-from=/home/include.txt --exclude=/*   /home/mnt /data/upload/f/ 
 
-## include和exclude
+#--exclude-from 排除目录下的部分目录的方法
+rsync  -aSz  --exclude-from=/home/exclude.txt 	/home/mnt/ 	 ser@server1:/mnt/data
 ```
 
-删除
+- include和exclude
+
+```shell
+# --exclude/--include=PATTERN	指定排除/包含传输的文件匹配模式
+```
+
+- 附录(适用于[include-from和include之后pattern规则](https://stackoverflow.com/questions/19296190/rsync-include-from-vs-exclude-from-what-is-the-actual-difference))
+
+> PATTERN 的书写规则如下：
+>
+> - 以 / 开头：匹配被传输的跟路径上的文件或目录
+> - 以 / 结尾：匹配目录而非普通文件、链接文件或设备文件
+> - 使用通配符
+>   - *：匹配非空目录或文件（遇到 / 截止）
+>   - **：匹配任何路径（包含 / ）
+>   - ?：匹配除了 / 的任意单个字符
+>   - [：匹配字符集中的任意一个字符，如 [a-z] 或 [[:alpha:]]
+>   - 可以使用转义字符 \ 将上述通配符还原为字符本身含义
+
+例子
+
+```shell
+#同步指定类型的文件(单文件夹下，不嵌套目录)
+rsync.exe -u -avP --include="bash.bashrc" --include="vimrc" --exclude="*" "$local_conf" "$remote_conf"
+
+#同步指定类型的文件(嵌套目录)
+rsync.exe -u -avP --include="*/" --include="bash.bashrc" --include="vimrc" --exclude="*" "$local_conf" "$remote_conf"
+```
+
+**删除**
 
 > --delete参数删除目标目录比源目录多余的文件
 
@@ -334,14 +399,14 @@ rsync  -aSz  --exclude-from=/home/exclude.txt /home/mnt/ u	ser@server1:/mnt/data
 rsync -avz --delete  dirA/ dirB/
 ```
 
-访问设置
+**访问设置**
 
 ```shell
 # 在使用ssh的方式时候指定ssh的端口（https://segmentfault.com/q/1010000002405966）
 rsync.exe -e 'ssh -p 122' -avP dst.txt yjm@localhost:/tmp
 
 # 在使用ssh的是指定密钥（避免和原先用来登录用户密钥混合）（http://blog.csdn.net/fuguoq1984/article/details/32331941）
-rsync -e "ssh -i /usr/rsync_id_dsa" /tmp/testfile csdn@remotehost:/tmp/ 
+rsync.exe -e "ssh -i /usr/rsync_id_dsa" /tmp/testfile csdn@remotehost:/tmp/ 
 ```
 
 问题：
@@ -350,7 +415,9 @@ rsync -e "ssh -i /usr/rsync_id_dsa" /tmp/testfile csdn@remotehost:/tmp/
 >
 > > chmod  600  id_rsa
 
-##### Fabric、paramito、watchdog
+##### scp/sftp/ssh
+
+Fabric、paramito和watchdog的组合方案
 
 Fabric
 
@@ -381,6 +448,10 @@ inotify-tools安装完成后，会生成inotifywait和inotifywatch两个指令�
 - inotifywait用于等待文件或文件集上的一个特定事件，它可以监控任何文件和目录设置，并可以递归监控整个目录树。
 - inotifywatch用于收集被监控的文件系统统计数据，包括每个inotify事件发生多少次等信息
 
+##### watchdog
+
+//看门狗模块
+
 #### 包管理
 
 ##### rpm
@@ -395,11 +466,15 @@ rpm -qa
 如果恰好有多个包叫同样的名字，使用 rpm -e --allmatches --nodeps <包的名字> 删除所有相同名字的包， 并忽略依赖
 ```
 
+##### yum
+
+//待补充
+
 #### 邮件发送
 
 ##### sendEmail
 
-sendEmail是一个轻量级，命令行的SMTP邮件客户端。如果你需要使用命令行发送邮件，那么sendEmail是非常完美的选择:使用简单并且功能强大
+sendEmail是一个轻量级，命令行的SMTP邮件客户端。其本身是一个perl脚本编写的可执行文件，如果你需要使用命令行发送邮件，那么sendEmail是非常完美的选择:使用简单并且功能强大
 
 ###### 安装
 
@@ -410,11 +485,21 @@ chmod u+x
 mv sendEmail /usr/local/bin
 ```
 
-使用
+使用范例：
 
 ```shell
-perl sendEmail -s mail.cc.sandai.net -f monitor@cc.sandai.net -xu monitor@cc.sandai.net -xp 121212 -t yuanjunmiao@cc.sandai.net -u "email title" -m "email body info"  -a "attachment files"
+perl sendEmail 
+	-s smtp.xxx.com 
+	-f xxxx@hostname1 
+	-xu uname@serverhost 
+	-xp 111111 
+	-t xxxx@hostname2 
+	-o message-charset=utf8
+	-u "email title" 
+	-m "email body info"  
+	-a "attachment files"
 
+# 可以将文件内容作为邮件内容进行发送
 LOG="/tmp/clean.log"
 -o message-file="${LOG}"
 ```
@@ -439,15 +524,28 @@ LOG="/tmp/clean.log"
 
 1. 多个收件人
 
-```
+```shell
 MAIL_TO="zhangweibing@cc.sandai.net luochuan@cc.sandai.net 
 -t ${MAIL_TO}
 ```
 
-一个实验例子：
+2. 在邮件中发送中文：
 
 ```shell
-perl sendEmail -s smtp.xxx.com -f xxxx@hostname1 -xu uname@serverhost -xp 111111 -t xxxx@hostname2 -u "email title" -o message-charset=utf8  -m "email body info"  -a "attachment files"
+SENDMAIL="/usr/local/monitor-base/bin/sendEmail -s mail.cc.sandai.net -f monitor@cc.sandai.net -xu monitor@cc.sandai.net -xp 121212 -o message-charset=utf8 "
+
+logw=$datapath/skewtrend_check_$date
+logu="源数据量下降和不均衡报警 [$date from $(hostname)]"
+logucn=$(echo $logu | iconv -f utf-8 -t GBK)
+MAIL_TO="yuanjunmiao@cc.sandai.net luochuan@cc.sandai.net"
+if [ -s $logw ];then
+   logm="`cat $logw`"
+   logm="$logm\n\n请前往哈勃数据中心源量统计查看:http://tongji.xunlei.com/auto_plain?reportId=104352&elmId=209527&productId=-111018"
+   logmcn=$(echo "$logm"| iconv -f utf-8 -t GBK)
+   ${SENDMAIL} -t ${MAIL_TO} -u "$logucn" -m "$logmcn" -a "$logw"
+else
+   cd $datapath && rm -f skewtrend_check_$date
+fi
 ```
 
 ###### 详细参考
@@ -558,47 +656,44 @@ export PATH=$JAVA_HOME/bin:$PATH
 #验证安装是否成功: java -version
 ```
 
-参考：
-
-[Linux下安装Sun JDK（删除Open JDK）](http://www.toutiao.com/i6416458864656384514/)
-
 ### 软件使用
 
 #### ffmpeg
 
 ##### 安装
 
-> git clone https://git.ffmpeg.org/ffmpeg.git ffmpeg
+```shell
+git clone https://git.ffmpeg.org/ffmpeg.git ffmpeg
 
-> 安装依赖项yasm:`yum install yasm`
->
-> 编译安装：
->
-> - ./configure –enable-shared –prefix=/usr/local/ffmpeg
->
->
-> - make&make install
+#安装依赖项yasm:
+yum install yasm
+
+#编译安装：
+./configure –enable-shared –prefix=/usr/local/ffmpeg
+make&make install
+```
 
 ##### 配置
 
-> 使用：
->
-> > 将ffmpeg工具添加到环境变量中去
-> >
-> > sudo vim ~/.bashrc,末尾添加：export PATH=/usr/local/ffmpeg/bin
->
-> 开发
->
-> > 添加库：
-> >
-> > vim /etc/ld.so.conf，末尾添加/usr/local/ffmpeg/lib
-> >
-> > ldconfig 更新
+使用
 
-**测试**
 
-> ffmpeg --help
->
+```shell
+# 将ffmpeg工具添加到环境变量中去
+sudo vim ~/.bashrc #末尾添加 export PATH=/usr/local/ffmpeg/bin
+```
+
+开发
+```shell
+# 添加库：
+vim /etc/ld.so.conf，# 末尾添加/usr/local/ffmpeg/lib
+ldconfig # 更新
+```
+测试
+
+```shell
+ffmpeg --help
+```
 > ffmpeg -version查看版本信息，如下：
 >
 > [root@local122 ld.so.conf.d]# ffmpeg -version
@@ -613,36 +708,32 @@ export PATH=$JAVA_HOME/bin:$PATH
 > libswscale      4.  3.100 /  4.  3.100
 > libswresample   2.  4.100 /  2.  4.100
 
-**参考**
+#### ssh
 
-[linux下安装编译ffmpeg](http://www.toutiao.com/a6348252505277841666/)
-
-#### PostgreSQL
+ssh本身会附带一个scp命令，用来进行文件的传输
 
 ##### 安装
 
-```shell
-yum install postgresql-contrib  postgresql postgresql-server
-# 该命令会安装以下的包
-postgresql        	# PostgreSQL client programs 
-postgresql-contrib  # Extension modules distributed with PostgreSQL
-postgresql-libs     # The shared libraries required for any PostgreSQL clients 
-postgresql-server   # The programs needed to create and run a PostgreSQL server
-uuid             	# 用途未知  
-```
-
-初始化
+安装
 
 ```shell
-# step1:初始化数据库
-/usr/bin/initdb -D /home/yjm/xxx  # 该命令会创建数据库，并完成一系列的配置
+# 服务器端
+sudo yum install openssh-server
 
-# step2:启动数据库
-# Success. You can now start the database server using:
-    postgres -D /home/yjm/xxx
-#or
-	pg_ctl -D /home/yjm/xxx -l logfile start
+# 客户端
+sudo yum install openssh-client
+
+#启动服务
+service ssh restart
 ```
+
+使用
+
+```shell
+
+```
+
+
 
 ## 参考
 
@@ -672,11 +763,17 @@ uuid             	# 用途未知
 
   [基于paramiko和watchdog的文件夹自动同步工具](http://www.cnblogs.com/MikeZhang/p/autoSync20170617.html)
 
+  [基于inotify-tools和rsync的文件夹自动同步工具](https://www.toutiao.com/i6503742233206850061/)
+
 - 环境配置
+
+  [Linux下安装Sun JDK（删除Open JDK）](http://www.toutiao.com/i6416458864656384514/)
 
 - 软件使用
 
-  [Centos上安装和配置PostgreSQL](http://www.linuxidc.com/Linux/2016-09/135538.htm)
+  [linux下安装编译ffmpeg](http://www.toutiao.com/a6348252505277841666/)
 
-  [innobackupex的安装和使用](http://blog.csdn.net/dbanote/article/details/13295727)
+  [SSH 远程执行任务](http://www.cnblogs.com/sparkdev/p/6842805.html)
+
+  ​
 
