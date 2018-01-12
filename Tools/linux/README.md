@@ -6,12 +6,22 @@
 
 #### 账号权限
 
-用户
+##### 用户
+
+修改root密码
 
 ```
-# 修改root密码
 登录root账号，sudo passwd root或者之间passwd，重复输入两次密码即可
 ```
+
+添加用户
+
+```shell
+# 添加用户ftpuser，指定目录为/opt/ftp,所属组为ftpgroup
+useradd -g ftpgroup -d /opt/ftp -M ftpuser 
+```
+
+
 
 #### 文件目录
 
@@ -176,9 +186,30 @@ chkconfig --level 345 mysql on
 
 ```
 
-##### 其它
+#### 其它
 
-###### 内核升级
+##### 防火墙
+
+###### iptables
+
+命令
+
+```shell
+# 查看iptables状态
+service iptables status
+
+# 开启/关闭/重启
+service iptables start/stop/restart
+```
+
+配置文件
+
+```shell
+vim /etc/sysconfig/iptables-config
+vim /etc/sysconfig/iptables
+```
+
+##### 内核升级
 
 此处的升级方法仅限于centos派的yum/rpm,64bit。另外可参考自[编译内核](https://blog.janfou.com/technical-documents/10485.html)
 
@@ -714,8 +745,6 @@ ssh本身会附带一个scp命令，用来进行文件的传输
 
 ##### 安装
 
-安装
-
 ```shell
 # 服务器端
 sudo yum install openssh-server
@@ -723,17 +752,120 @@ sudo yum install openssh-server
 # 客户端
 sudo yum install openssh-client
 
-#启动服务
+# 启动服务
 service ssh restart
 ```
 
-使用
+##### 使用
+
+参数指定
+
+```shell
+# 指定端口
+ssh root@127.0.0.1 -p 122
+
+# ssh指定要使用的密钥和端口
+ssh -i /cygdrive/c/Users/xl/.ssh/id_rsa -p122
+
+# ssh交互使用(需要输入密码等交互情况下，输入-t参数)
+ssh -t xxx@xxx "sudo ls /tmp"
+```
+
+远程执行
+
+```shell
+# 远程执行命令
+ssh -t xxx@xxx "sudo ls /tmp"
+
+# 远程执行远程脚本
+ssh xxx@xxxx "/home/xx/vv.sh"
+
+# 远程执行本地脚本
+ssh xxx@xxxx < test.sh
+```
+
+> 远程执行-远程脚本传参
+>
+> ```shell
+> # 直接将参数写在后面即可
+> ssh xxx@xxx  /home/nick/test.sh helloworld
+> ```
+>
+> 远程执行-本地脚本传参
+>
+> ```shell
+> # 需要使用bash -s
+> ssh nick@xxx.xxx.xxx.xxx 'bash -s' < test.sh helloworld
+> ```
+
+远程执行获取结果
 
 ```shell
 
 ```
 
+#### scp
 
+​	scp是secure copy的简写，用于在Linux下进行远程拷贝文件的命令，获得远程服务器上的某个文件，远程服务器既没有配置ftp服务器，没有开启web服务器，也没有做共享，无法通过常规途径获得文件时，只需要通过scp命令便可轻松的达到目的；
+
+##### 安装
+
+```
+在安装ssh的时候已经自带了
+```
+
+参数指定
+
+```
+-P 端口(若使用默认的ssh端口，则不需要修改)
+-p 表示保持文件权限；
+-r 表示递归复制；
+-v 和大多数 linux 命令中的 -v 意思一样，用来显示进度，可以用来查看连接、认证或是配置错误；
+-C 使能压缩选项；
+```
+
+##### 使用
+
+上传文件
+
+```shell
+scp /home/liujia/file1.txt  liujia@172.16.252.32:/user/liujia
+# 上传本地file1.txt到远程的/user/liujia目录，最终结果为/user/liujia/file1.txt
+```
+
+上传文件夹
+
+```shell
+scp -r /home/liujia/dir1  liujia@172.16.252.32:/user/liujia
+# 上传本地的dir1目录到远程的/user/liujia目录，最终的结果为/user/liujia/dir1
+```
+
+下载文件
+
+```shell
+scp root@172.16.252.32:/user/liujia/tex.txt  .
+# 下载远程的tex.txt 到当前目录为tex.txt
+```
+
+下载文件夹
+
+```shell
+scp -r liujia@172.16.252.32:/user/liujia/dir1  /home/projects
+# 复制远程的dir1目录到本地的/home/projects目录下，最终的结果是/home/projects/dir1
+```
+
+#### jq
+
+##### 安装
+
+```shell
+git clone https://github.com/stedolan/jq.git
+cd jq
+autoreconf -i
+./configure --disable-maintainer-mode
+make
+sudo make install
+```
 
 ## 参考
 
@@ -774,6 +906,14 @@ service ssh restart
   [linux下安装编译ffmpeg](http://www.toutiao.com/a6348252505277841666/)
 
   [SSH 远程执行任务](http://www.cnblogs.com/sparkdev/p/6842805.html)
+
+  [获取ssh远程执行的结果](http://blog.csdn.net/liuxiao723846/article/details/55045988)
+
+  [命令行下json处理工具:jq](http://blog.csdn.net/neven7/article/details/50626153)
+
+  [scp上传和下载](http://blog.csdn.net/liuxiao723846/article/details/55045988)
+
+  ​
 
   ​
 
