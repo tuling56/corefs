@@ -30,7 +30,7 @@ gitbook-cli是gitbook的命令行，可以方便的管理多个gitbook版本
 | gitbook fetch xx  | 安装指定gitbook版本    |
 | gitbool ls        | 查看本地的gitbook版本   |
 
-### 编辑
+### 使用
 
 #### 创建
 
@@ -53,7 +53,7 @@ gitbook-cli是gitbook的命令行，可以方便的管理多个gitbook版本
 
 3. 生成书籍`gitbook build`
 
-   该步骤会在书籍目录生成_book文件夹，里面是书籍的静态html网页
+   该步骤会在书籍目录生成_book文件夹，里面是书籍的静态html网页，访问即可
 
 4. 网页浏览`gitbook serve `
 
@@ -69,12 +69,6 @@ gitbook-cli是gitbook的命令行，可以方便的管理多个gitbook版本
 ​	若使用GitBook官方，可以在设置中找到协作这，进行添加。对于绑定GitHub repo的GitBook项目，其协作方式和普通的项目没有差异，插件 [edit-link](https://github.com/rtCamp/gitbook-plugin-edit-link)可以在每个页面生成指向 GitHub repo 相应文件的链接，十分方便！但需要版本库支持web编辑的方式，若搭建本地的，要自己实现。
 
 ###  扩展
-
-#### 评论互动
-
-> Gitbook本身提供了对所有电子书按段落评论的功能，（但在本地搭建的gitbook仓库没有这个功能）
->
-> 通过disqus,多说等第三方插件支持
 
 #### 插件配置
 
@@ -134,17 +128,70 @@ gitbook-cli是gitbook的命令行，可以方便的管理多个gitbook版本
 
 > 相关的插件会在生成书籍的时候自动安装
 
+#### [插件](https://plugins.gitbook.com/browse)概览
+
+##### 评论互动
+
+​	Gitbook本身提供了对所有电子书按段落评论的功能，（但在本地搭建的gitbook仓库没有这个功能），通过`disqus`,多说等第三方插件支持
+
+##### 图表库
+
+- mermaid
+- chart
+
+##### 功能按钮
+
+- editlink
+
+  内容顶部显示 “编辑本页” 链接
+
+- [github](https://plugins.gitbook.com/plugin/github)
+
+  在右上角显示 github 仓库的图标链接。
+
+##### 扩展功能
+
+- ad
+
+  在每个页面顶部和底部添加广告或任何自定义内容
+
+- spliter
+
+  在左侧目录和右侧内容之间添加一个可以拖拽的栏，用来调整两边的宽度
+
+- ga
+
+  添加google统计代码
+
+- sitemap
+
+  生成站点地图
+
+更多的插件请搜索[官方插件一览](https://plugins.gitbook.com/browse)
+
 ### 导出
 
 支持html、epub、mobi和pdf等格式的数据，需要配合calibre使用。
 
-#### pdf、epub、mobi格式导出
+#### pdf、epub、mobi格式
 
 ​	在电子书存档目录，如:`E:\xx\gitbook\mybook_test`执行` gitbook pdf|epub|mobi .`或者上一级目录执行
 
 ``gitbook pdf|epub|mobi ./mybook_test`
 
 类似的转换方式还有`pandoc xx.md -o xx.pdf|epub|mobi`
+
+#### html格式
+
+如何将生成的书籍导出成单个网页，而不是一堆的网页文件
+
+方法1：
+
+​	需要将所有的md文档合并成一个，并配置好SUMMARY.md文档，然后使用gitbook build生成
+
+方法2：
+
+​	//待补充
 
 ### 发布
 
@@ -448,14 +495,6 @@ git init sample_nopure.git
 
 ## 参考
 
-- Disqus插件
-
-  [配置Disqus插件](http://www.jianshu.com/p/a87c070dfcf8)
-
-  [Disqus官网](https://disqus.com/)
-
-  [我的Disqus站点](https://tuling56.disqus.com/)
-
 - 简明教程
 
   [Gitbook简易教程](https://segmentfault.com/a/1190000005859901)
@@ -467,6 +506,14 @@ git init sample_nopure.git
   [解决导出的文件中文乱码问题](http://www.tuicool.com/articles/nQNZ3yJ)
 
   [Linux安装新字体](http://www.cnblogs.com/MonkeyF/archive/2013/05/13/3076466.html)
+
+- 插件
+
+  [配置Disqus插件](http://www.jianshu.com/p/a87c070dfcf8)
+
+  [Disqus官网](https://disqus.com/)
+
+  [我的Disqus站点](https://tuling56.disqus.com/)
 
 - 发布
 
