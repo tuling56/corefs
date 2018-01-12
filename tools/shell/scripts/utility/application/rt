@@ -1,0 +1,47 @@
+#!/bin/bash
+# 快速上传文件/文件夹
+
+local_dir=`pwd`
+remote_dir=/home/yjm/Documents
+upfile=$1
+#echo "curdir:" $local_dir/$upfile
+
+# scp方案
+function mscp()
+{
+    if [ -d "$local_dir/$upfile" ];then
+        echo "正在上传文件夹$upfile/"
+        scp -r $upfile root@47.95.195.31:$remote_dir/
+    else
+        echo "正在上传文件$upfile"
+        scp  $upfile root@47.95.195.31:$remote_dir/$upfile
+    fi
+}
+
+# sftp方案
+function msftp()
+{
+    return 0
+}
+
+
+# ftp方案
+function mftp()
+{
+    return 0
+}
+
+# rsync方案
+function mrsync()
+{
+    return 0
+}
+
+
+mscp
+
+exit 0
+
+
+
+

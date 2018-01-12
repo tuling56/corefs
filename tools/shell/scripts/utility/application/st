@@ -1,0 +1,50 @@
+#!/bin/bash
+# 快速下载文件/文件夹
+
+rootdir=/home/yjm/Documents
+downfile=$1
+
+# 远程目录判断
+ssh root@47.95.195.31 "test -d $rootdir/$downfile"
+isdir=$?
+#echo "$isdir"
+
+function mscp()
+{
+    if [ $isdir -eq 0 ];then
+        echo "正在下载目录$downfile"
+        scp -r root@47.95.195.31:$rootdir/$downfile/  ./
+    else
+        echo "正在下载文件$downfile"
+        scp root@47.95.195.31:$rootdir/$downfile  ./$downfile
+    fi
+}
+
+
+# sftp方案
+function msftp()
+{
+    return 0
+}
+
+
+# ftp方案
+function mftp()
+{
+    return 0
+}
+
+# rsync方案
+function mrsync()
+{
+    return 0
+}
+
+mscp
+
+
+exit 0
+
+
+
+
