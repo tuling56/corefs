@@ -1576,17 +1576,7 @@ ORDER BY
 
 ### 调优
 
-#### 性能监控
-
-- explain命令
-
-核心优先使用explain一下查问题,对explain基础知识的理解
-
-```mysql
-explain format=json select avg(k) from sbtest1 where id between 1000 and 2000 \G
-```
-
-注意查询开销`query_cost`
+问题排查部分请单独查看性能部分
 
 #### 配置优化
 
@@ -1672,8 +1662,6 @@ mysqldumpslow -s r -t 20 /mysqldata/mysql/mysql06-slow.log | more
 #####  分表
 
 用法和拆分原则要一开始的时候设计好
-
-
 
 ### 备份
 
@@ -1862,6 +1850,62 @@ cat xxx.file |redis-cli [--pipe]
 输入源是mysql,输出源是redis,可以利用中间的filter达到初步的处理
 ```
 
+### 性能
+
+#### 性能指标
+
+性能指标计算和监控，指标关注如下：
+
+| 指标        | 定义        | 备注   |
+| --------- | --------- | ---- |
+| tps/qps   | 每秒事务数/查询数 |      |
+| 线程状态      |           |      |
+| 流量状态      |           |      |
+| innodb读写  |           |      |
+| innodb日志  |           |      |
+| innode行   |           |      |
+| myisam读写  |           |      |
+| myisam缓冲池 |           |      |
+| 临时表       |           |      |
+| 响应时间      |           |      |
+| 其它        |           |      |
+|           |           |      |
+|           |           |      |
+
+#### 性能监控
+
+##### explain命令
+
+核心优先使用explain一下查问题,对explain基础知识的理解
+
+```mysql
+explain format=json select avg(k) from sbtest1 where id between 1000 and 2000 \G
+```
+
+注意查询开销`query_cost`
+
+##### extended-status命令
+
+```shell
+# 累计值
+mysqladmin -uroot -proot extended-status
+
+# 当前状态（指定刷新频率）
+mysqladmin -uroot -proot extended-status --relative -i1
+#或者
+mysqladmin -uroot -proot extended-status --relative --seleep=1
+```
+
+##### show global status
+
+```mysql
+>show global status;
+```
+
+#### percona-toolkit工具箱
+
+//该工具箱作为重点学习的对象
+
 ### 问题
 
 #### 面试
@@ -1884,7 +1928,7 @@ cat xxx.file |redis-cli [--pipe]
 
   [MyCli:支持自动补全和语法高亮的MySQL客户端](http://hao.jobbole.com/mycli-mysql/)
 
-  [percona-toolkit工具包的安装和使用](http://blog.51cto.com/jonyisme/1754247)(功能待挖掘)
+  [percona-toolkit工具包的安装和使用（推荐）](http://blog.51cto.com/jonyisme/1754247)(功能待挖掘)
 
   [Linux下修改mysql的root密码](http://www.tuicool.com/articles/yQNZFfr)
 
@@ -1925,7 +1969,7 @@ cat xxx.file |redis-cli [--pipe]
 
   [MySQL面试题集锦（推荐）](https://www.toutiao.com/i6488851831869932046/)
 
-- 调优部分
+- 调优
 
   [MySQL性能监控](https://www.percona.com/doc/percona-monitoring-and-management/deploy/index.html)
 
@@ -1959,5 +2003,9 @@ cat xxx.file |redis-cli [--pipe]
 
   [innobackupex的安装和使用](http://blog.csdn.net/dbanote/article/details/13295727)
 
-  ​
+- 性能
+
+  [MySQL性能指标及计算方法](https://www.toutiao.com/i6504034560555090446/)
+
+  [percona toolkit使用系列（推荐）](http://blog.51cto.com/jonyisme/1754250)
 
