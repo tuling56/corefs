@@ -70,7 +70,7 @@ select * from mysql.user where user='cactiuser' \G;
 
 ```shell
 # 命令:
- set password for 'username'@'host' = password('newpassword');
+set password for 'username'@'host' = password('newpassword');
 # 如果是当前登陆用户用
  set password = password("newpassword");
 # 例子: set password for 'lin'@'%' = password("123456");
@@ -1757,6 +1757,18 @@ mysqldump -uroot -pmysql -d db1 tb1> e:\tb1.sql
 >
 > >  --default-character-set=gb2312
 
+[mysqldump导出优化](https://www.toutiao.com/i6515239530671374855/)
+
+```shell
+show variables like '%max_allowed_packet%';
+show variables like '%net_buffer_length%';
+
+mysqldump --defaults-extra-file=/etc/my.cnf  test -e --max_allowed_packet=1048576  --net_buffer_length=16384 > test.sql
+
+```
+
+
+
 - 导出成文件
 
 ```shell
@@ -1850,6 +1862,35 @@ cat xxx.file |redis-cli [--pipe]
 输入源是mysql,输出源是redis,可以利用中间的filter达到初步的处理
 ```
 
+#### 恢复
+
+##### binlog
+
+查看binlog状态
+
+```shell
+show variables like '%log_bin%'  
+```
+
+开启binlog
+
+```shell
+log_bin=ON  
+log_bin_basename=/var/lib/mysql/mysql-bin  
+log_bin_index=/var/lib/mysql/mysql-bin.index  
+# 或者简便方式
+log-bin=/var/lib/mysql/mysql-bin
+
+# 说明
+# 第一个参数是打开binlog日志
+# 第二个参数是binlog日志的基本文件名，后面会追加标识来表示每一个文件
+# 第三个参数指定的是binlog文件的索引文件，这个文件管理了所有的binlog文件的目录
+```
+
+
+
+
+
 ### 性能
 
 #### 性能指标
@@ -1905,6 +1946,54 @@ mysqladmin -uroot -proot extended-status --relative --seleep=1
 #### percona-toolkit工具箱
 
 //该工具箱作为重点学习的对象
+
+####  MySQL Utilities Client工具箱
+
+##### 工具一览
+
+```shell
+mysqluc> help utilities
+Utility            Description
+-----------------  --------------------------------------------------------
+mysqlauditadmin    audit log maintenance utility
+mysqlauditgrep     audit log search utility
+mysqlbinlogmove    binary log relocate utility
+mysqlbinlogpurge   purges unnecessary binary log files
+mysqlbinlogrotate  rotates the active binary log file
+mysqldbcompare     compare databases for consistency
+mysqldbcopy        copy databases from one server to another
+mysqldbexport      export metadata and data from databases
+mysqldbimport      import metadata and data from files
+mysqldiff          compare object definitions among objects where the
+                   difference is how db1.obj1 differs from db2.obj2
+mysqldiskusage     show disk usage for databases
+mysqlfailover      automatic replication health monitoring and failover
+mysqlfrm           show CREATE TABLE from .frm files
+mysqlgrants        display grants per object
+mysqlindexcheck    check for duplicate or redundant indexes
+mysqlmetagrep      search metadata
+mysqlprocgrep      search process information
+mysqlreplicate     establish replication with a master
+mysqlrpladmin      administration utility for MySQL replication
+mysqlrplcheck      check replication
+mysqlrplms         establish multi-source replication
+mysqlrplshow       show slaves attached to a master
+mysqlrplsync       replication synchronization checker utility
+mysqlserverclone   start another instance of a running server
+mysqlserverinfo    show server information
+mysqlslavetrx      skip transactions on slaves
+mysqluserclone     clone a MySQL user account to one or more new users
+```
+
+##### 具体使用:
+
+```shell
+ # 显示文件使用
+ mysqldiskusage --server=root:root@localhost study
+ 
+ # 数据库复制
+ mysqldbcopy --source=root:root@localhost --destination=xxx:xxx@xxx study:study
+```
 
 ### 问题
 
@@ -2002,6 +2091,10 @@ mysqladmin -uroot -proot extended-status --relative --seleep=1
   [主从服务器之间数据同步](http://blog.csdn.net/alangmei/article/details/21075055)
 
   [innobackupex的安装和使用](http://blog.csdn.net/dbanote/article/details/13295727)
+
+  [mysql的binlog的配置](http://blog.csdn.net/king_kgh/article/details/74800513)
+
+  [xtrabackup 备份与恢复（推荐）](https://www.toutiao.com/i6511520757447655949/)
 
 - 性能
 

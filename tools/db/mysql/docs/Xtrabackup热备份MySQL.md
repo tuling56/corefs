@@ -99,19 +99,40 @@ c.官方数据库示例
 
 ![全备份流程](http://p1.pstatp.com/large/2a48000321a5c30c59d4)
 
-#### Innobackupex备份
+#### 全备
+
+##### 备份
 
 1. 创建全备
 
 ```shell
-# innobackupex --defaults-file=/etc/my.cnf  --user=root --password=12345678 /backup/
+# innobackupex --defaults-file=/etc/my.cnf  --user=root --password=12345678 backup/
 ......
 completed OK!
+
+# 备份后的结果文件如下：
+cd backup/2018-01-20_17-29-43
+-rw-r--r-- 1 root root  295 Jan 20 17:29 backup-my.cnf
+-rw-r----- 1 root root  12M Jan 20 17:30 ibdata1
+-rw-r--r-- 1 root root  48M Jan 20 17:30 ib_logfile0
+-rw-r--r-- 1 root root  48M Jan 20 17:30 ib_logfile1
+drwx------ 2 root root 4.0K Jan 20 17:29 mysql/
+drwxr-xr-x 2 root root 4.0K Jan 20 17:29 performance_schema/
+drwxr-xr-x 2 root root 4.0K Jan 20 17:29 typecho/
+-rw-r----- 1 root root   89 Jan 20 17:30 xtrabackup_checkpoints
+-rw-r--r-- 1 root root  509 Jan 20 17:29 xtrabackup_info
+-rw-r----- 1 root root 2.0M Jan 20 17:30 xtrabackup_logfile
 ```
 
-> 该操作会在`/backup/`目录下创建时间戳格式的文件夹，里面存储的是备份文件，
+> 该操作会在`/backup/`目录下创建时间戳格式的文件夹，里面存储的是备份文件
 >
-> 局限:不能指定到数据库，也不能指定到表
+> - xtrabackup_checkpoints  查看备份类型、备份专题等信息
+> - xtrabackup_binlog_info 如果当前服务器开启了binlog,则有此文件
+> - backup-my.cnf
+>
+> 局限:
+>
+> - 不能指定到数据库，也不能指定到表
 
 2. 应用全备日志
 
@@ -121,7 +142,9 @@ completed OK!
 completed OK!
 ```
 
-> 这一步对mysql的备份日志进行恢复，不然数据无法直接使用
+> 这一步对mysql的备份日志进行恢复，不然数据无法直接使用，主要原因如下:
+>
+> > 一般情况下，在备份完成后，数据尚且不能用于恢复操作，因为备份的数据中可能会包含尚<u>未提交的事务</u>或<u>已经提交但尚未同步至数据文件中的事务</u>。因此，此时数据文件仍处理不一致状态。“准备”的主要作用正是通过回滚未提交的事务及同步已经提交的事务至数据文件也使得数据文件处于一致性状态。
 
 3. 查看备份状态
 
@@ -160,6 +183,8 @@ compressed = N
 encrypted = N
 ```
 
+##### 恢复
+
 5.进行全备恢复
 
 a.删除数据库、停止并破坏MySQL
@@ -186,6 +211,8 @@ completed OK!
 mysql> show databases;
 ```
 
+> 关键命令：copy-back
+
 注:如无法启动SQL，可能是SELINUX的问题
 
 ```shell
@@ -193,7 +220,7 @@ mysql> show databases;
 SELINUX=disabled
 ```
 
-#### Innobackupex增量备份
+#### 增量备份
 
 1.创建数据库和表
 
@@ -207,7 +234,13 @@ SELINUX=disabled
 
 6.基于第一次增量备份进行备份
 
-a.向表中添加数据
+​	a.向表中添加数据
+
+​	b.应用第二次增量备份日志
+
+​	c.查看备份状态
+
+​	d.基于全备份和第一次增量备份，恢复第二次增量备
 
 b.应用第二次增量备份日志
 
@@ -215,9 +248,28 @@ c.查看备份状态
 
 d.基于全备份和第一次增量备份，恢复第二次增量备份
 
+##### 备份
+
+首先进行全备，步骤同上
+
+###### 二进制方式
+
+```shell
+cat mysqlback/xxxx/xtrabackup_binlog_info
+mysql-bin.000002 2322
+mysqlbinlog --start-position=2322 mysql-bin.000002 > xxx.sql
+
+```
+
+
+
+##### 恢复
+
+//待添加
+
 ### Xtrabackup
 
-#### Xtrabackup备份
+#### 全备
 
 1.创建全备
 
@@ -227,7 +279,7 @@ d.基于全备份和第一次增量备份，恢复第二次增量备份
 
 4.恢复备份
 
-#### Xtrabackup增量备份
+#### 增量备份
 
 1.第一次增量备份
 

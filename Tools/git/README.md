@@ -190,6 +190,12 @@ git流程和状态图
 | 已commit但未push | git diff master origin/master | git reset --hard origin/master           | master是本地仓库，origin/master是远程仓库 |
 | 已push         |                               | git reset --hard HEAD^ 然后执行git push -f   |                                |
 
+#### 忽略
+
+.gitignore文件的配置
+
+参考`mdotfiles/git/gitignore`仓库
+
 ### 高级
 
 #### [分支](https://git-scm.com/book/zh/v1/Git-%E5%88%86%E6%94%AF-%E5%88%86%E6%94%AF%E7%9A%84%E6%96%B0%E5%BB%BA%E4%B8%8E%E5%90%88%E5%B9%B6)

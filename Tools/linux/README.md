@@ -6,7 +6,7 @@
 
 #### 账号权限
 
-##### 用户
+##### [用户](https://www.cnblogs.com/xd502djj/archive/2011/11/23/2260094.html)
 
 修改root密码
 
@@ -19,6 +19,11 @@
 ```shell
 # 添加用户ftpuser，指定目录为/opt/ftp,所属组为ftpgroup
 useradd -g ftpgroup -d /opt/ftp -M ftpuser 
+# 修改ftpuser的密码passwd ftpuser   
+
+# 添加组
+groupadd test   
+
 ```
 
 
