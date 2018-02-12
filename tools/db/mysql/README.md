@@ -11,7 +11,9 @@
 先检查已安装版本
 
 ```shell
+ # 查看已安装
  rpm -qa | grep mysql
+ # 卸载
  rpm -e --nodeps mysql_xxxx
 ```
 
@@ -19,16 +21,17 @@
 
 ```shell
 #1.下载mysql的repo源
-$ wget http://repo.mysql.com/mysql-community-release-el7-5.noarch.rpm
+wget http://repo.mysql.com/mysql-community-release-el7-5.noarch.rpm
+# 或者新版：http://dev.mysql.com/get/mysql57-community-release-el7-8.noarch.rpm
 
 #2.安装mysql-community-release-el7-5.noarch.rpm包
-$ sudo rpm -ivh mysql-community-release-el7-5.noarch.rpm
+sudo rpm -ivh mysql-community-release-el7-5.noarch.rpm
 #安装这个包后，会获得两个mysql的yum repo源：
-#/etc/yum.repos.d/mysql-community.repo
-#/etc/yum.repos.d/mysql-community-source.repo
+vim /etc/yum.repos.d/mysql-community.repo
+vim /etc/yum.repos.d/mysql-community-source.repo
 
 #3.安装mysql
-$ sudo yum install mysql-server
+sudo yum install mysql-server
 ```
 
 配置开机启动
@@ -312,7 +315,13 @@ fields=$(echo "desc media_info.${TABLE_NAME};"| ${LOCAL_MYSQL} | grep -v Field |
 
 ###### 类型
 
-待补充
+json
+
+> [json类型](http://www.jb51.net/article/89219.htm)是在mysql5.7及之后的版本中添加的
+
+```mysql
+
+```
 
 ###### 操作
 
@@ -1098,6 +1107,16 @@ where
 - [join on where的执行顺序](https://www.cnblogs.com/Jessy/p/3525419.html)	
   - join的时候先对两张表做where条件筛选，然后再做join,这样可以减小联表的量
 
+######  full join
+
+mysql本身不支持full join 需要变通解决
+
+```mysql
+# 本身
+```
+
+
+
 ##### exists和in
 
 ```mysql
@@ -1111,6 +1130,21 @@ select * from ecs_goods a where EXISTS(select cat_id from ecs_category b where a
 ### 积累
 
 #### 基础
+
+##### 语句类型
+
+DML、DDL、DCL区别 .
+
+```shell
+DML(data manipulation language)：
+它们是SELECT、UPDATE、INSERT、DELETE，就象它的名字一样，这4条命令是用来对数据库里的数据进行操作的语言
+
+DDL(data definition language)：
+DDL比DML要多，主要的命令有CREATE、ALTER、DROP等，DDL主要是用在定义或改变表(TABLE)的结构，数据类型，表之间的链接和约束等初始化工作上，他们大多在建立表时使用
+
+DCL(Data Control Language)：
+是数据库控制功能。是用来设置或更改数据库用户或角色权限的语句，包括(grant,deny,revoke等)语句。在默认状态下，只有sysadmin,dbcreator,db_owner或db_securityadmin等人员才有权力执行DCL
+```
 
 ##### 运行方式技巧
 
@@ -1858,7 +1892,7 @@ cat xxx.file |redis-cli [--pipe]
 
 - logstash
 
-```
+```shell
 输入源是mysql,输出源是redis,可以利用中间的filter达到初步的处理
 ```
 
@@ -1869,7 +1903,7 @@ cat xxx.file |redis-cli [--pipe]
 查看binlog状态
 
 ```shell
-show variables like '%log_bin%'  
+show variables like '%log_bin%';  
 ```
 
 开启binlog
@@ -1886,10 +1920,6 @@ log-bin=/var/lib/mysql/mysql-bin
 # 第二个参数是binlog日志的基本文件名，后面会追加标识来表示每一个文件
 # 第三个参数指定的是binlog文件的索引文件，这个文件管理了所有的binlog文件的目录
 ```
-
-
-
-
 
 ### 性能
 
@@ -2023,6 +2053,8 @@ mysqluserclone     clone a MySQL user account to one or more new users
 
   [MySQL字符编码深入详解](http://www.jb51.net/article/29960.htm)
 
+  [yum安装最新版mysql](http://blog.csdn.net/xyang81/article/details/51759200)
+
 - 高级
 
   [SQL的存储过程和函数](http://www.toutiao.com/a6391569028531831041/)
@@ -2035,6 +2067,8 @@ mysqluserclone     clone a MySQL user account to one or more new users
   [MySQL如何对汉字排序](https://www.toutiao.com/i6501470153962684941/)
 
   [MySQL分组后选取指定值问题](http://www.jb51.net/article/31590.htm)
+
+  [MySQL实现full join](https://www.cnblogs.com/liuyifan/p/4985512.html)
 
   [MySQL存储过程的动态行转列](http://www.tuicool.com/articles/FNRVJvb)
 
@@ -2049,6 +2083,8 @@ mysqluserclone     clone a MySQL user account to one or more new users
   [MySQL分组取TopN](http://www.jb51.net/article/31590.htm)
 
 - 积累
+
+  [MySQL语句概述（各种语句的区别）](https://www.2cto.com/database/201610/555167.html)
 
   [根据MySQL表格自动生成restfull接口](https://segmentfault.com/q/1010000008335958)
 

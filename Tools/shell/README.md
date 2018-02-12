@@ -297,13 +297,13 @@ function f2(){
 
 > 尚存在问题没有解决，只能传递数组的第一个值
 
-##### 运算符
+#### 运算符
 
-###### 算术运算法
+##### 算术运算法
 
-###### 关系运算符
+##### 关系运算符
 
-###### 布尔运算符
+##### 布尔运算符
 
 | 运算符  | 说明                                | 举例                                   |
 | ---- | --------------------------------- | ------------------------------------ |
@@ -311,7 +311,7 @@ function f2(){
 | -o   | 或运算，有一个表达式为 true 则返回 true。        | [ $a -lt 20 -o \$b -gt 100 ] 返回 true |
 | -a   | 与运算，两个表达式都为 true 才返回 true         | [ $a -lt 20 -a \$b -gt 100 ] 返回      |
 
-###### 字符串运算符
+##### 字符串运算符
 
 运算符	说明	举例
 =	检测两个字符串是否相等，相等返回 true。	[ $a = $b ] 返回 false。
@@ -322,11 +322,94 @@ str	检测字符串是否为空，不为空返回 true。		[ $a ] 返回 true。
 
 > 注意字符串运算符的等判断和数字的等判断的区别
 
-###### 文件测试运算符
+##### 文件测试运算符
 
-##### 函数
+```wiki
 
-函数的返回值通过`$?`获得只能是整数，不接受其它类型的返回值，可以通过修改变量的方式实现返回其它类型的值。另外函数可以不显示的使用return,此时函数的返回值是函数的退出状态，0代表成功退出，非0代表函数执行过程中有异常。
+```
+
+#### 语句
+
+##### 条件语句
+
+###### if then fi
+
+```shell
+# 两重
+if [ $a == $b ];then
+   echo "a is equal to b"
+else
+   echo "a is not equal to b"
+fi
+
+# 多重嵌套
+if [ expression 1 ];then
+   Statement(s) to be executed if expression 1 is true
+elif [ expression 2 ];then
+   Statement(s) to be executed if expression 2 is true
+elif [ expression 3 ];then
+   Statement(s) to be executed if expression 3 is true
+else
+   Statement(s) to be executed if no expression is true
+fi
+```
+
+###### [case when](http://blog.csdn.net/qq_39591494/article/details/79285173)
+
+```shell
+case 变量名 in  
+    值1)  
+      指令1  
+    ;;  
+    值2)  
+      指令2  
+    ;;  
+    值3)  
+      指令3  
+    ;;  
+esac  
+```
+
+##### 循环语句
+
+###### while
+
+```shell
+
+```
+
+###### for
+
+```shell
+
+```
+
+#### 函数
+
+​	函数的返回值通过`$?`获得只能是整数，不接受其它类型的返回值，可以通过修改变量的方式实现返回其它类型的值。另外函数可以不显示的使用return,此时函数的返回值是函数的退出状态，0代表成功退出，非0代表函数执行过程中有异常。
+
+函数的三种定义方式：
+
+```shell
+function 函数名 () {  
+        指令...  
+        return -n  
+}  
+  
+function 函数名 {  
+        指令...  
+        return -n  
+}  
+  
+函数名 () {  
+    指令...  
+    return -n  
+}  
+```
+
+##### 分离函数体执行函数
+
+![分离函数体](http://tuling56.site/imgbed/2018-02-08_133315.png)
 
 #### 应用
 
@@ -822,7 +905,7 @@ awk '{if(NR%2==0){printf $0 "\n"}else{printf "%s\t",$0}}' /etc/passwd
 sed '/hrwang/{s/hrwang/HRWANG/;q;}' datafile  #匹配到hrwang的行处理后就退出sed程序
 ```
 
-##### 正则匹配
+##### 正则
 
 sed添加-r才支持扩展正则
 
@@ -917,7 +1000,7 @@ sed -i 's/oldstr/newstr/g' `grep oldstr -rl odlstr $datadir`
 
 ##### 正则
 
-grep加-E支持扩展正则（？+|和（））
+grep加-E支持扩展正则`？+|（）`,相当于egrep
 
 ### find
 
@@ -950,7 +1033,7 @@ function method2()
 {
         find . -type f -mtime -7 -name "*.py"|while read f;do
                 sed -i 's/\t/    /g'  "$f"    # 注意$f两边的引号不可缺少
-                #echo "$f"
+                echo "$f"
         done
 }
 
@@ -959,64 +1042,11 @@ method2
 exit 0
 ```
 
-#### 应用
+### 应用
 
-//待完善
+#### 文件转换
 
-### 参考
-
-- **bash部分**
-
-  [linux参数太长的换行问题](http://blog.csdn.net/feng27156/article/details/39057773)
-
-  [shell关联数组](http://blog.csdn.net/mm_bit/article/details/48417157)
-
-- **awk部分**
-
-  [awk手册](http://luy.li/data/awk.html)
-
-  [awk快速指南](http://man.linuxde.net/awk)(推荐)
-
-  [awk学习详细文档](http://www.cnblogs.com/gaoxufei/p/6058584.html)
-
-  [awk处理多维数组](http://blog.csdn.net/ithomer/article/details/8478716)
-
-  [awk常见数组处理技巧](http://www.cnblogs.com/lixiaohui-ambition/archive/2012/12/11/2813419.html)
-
-  [awk 内置变量使用介绍](http://blog.jobbole.com/92494/)
-
-  [awk 内置函数详细介绍（实例）](http://blog.jobbole.com/92497/)
-
-  [awk运算符介绍](http://blog.csdn.net/gaoming655/article/details/7390207)
-
-  [awk中的输入和输出重定向](http://blog.chinaunix.net/uid-10540984-id-356795.html)（推荐）
-
-  [awk的模式匹配(推荐)](http://blog.csdn.net/puqutogether/article/details/45865631)
-
-  [awk数组操作详细介绍（推荐）](http://www.cnblogs.com/chengmo/archive/2010/10/08/1846190.html)
-
-- **sed部分**
-
-  [sed简明教程](http://coolshell.cn/articles/9104.html?hmsr=toutiao.io&utm_medium=toutiao.io&utm_source=toutiao.io)
-
-  [sed命令](http://man.linuxde.net/sed)
-
-  [sed处理流程概述（推荐）](http://blog.csdn.net/yiqingnian28/article/details/23133043)
-
-- grep部分
-
-  //待补充
-
-
-## 工具积累
-
-### 文件传输
-
-文件自动备份
-
-### 文件转换
-
-#### 转置
+##### 转置
 
 行转列，实现方法如下：
 
@@ -1055,22 +1085,80 @@ awk '{i=1;
 	}' $inputf
 ```
 
-#### tab和空格
+##### tab和空格
 
-tab转空格
+tab转space
 
 ```shell
 expand -t4 xxx.txt > yyy.txt
 ```
 
-空格转tab
+space转tab
 
 ```shell
 unexpand -t4 xxx.txt >yyy.txt
 ```
 
+##### Linux和DOS格式
+
+```shell
+dos2unix xx.txt
+unix2dos xx.txt
+```
+
+## 参考
+
+- **bash部分**
+
+  [linux参数太长的换行问题](http://blog.csdn.net/feng27156/article/details/39057773)
+
+  [shell关联数组](http://blog.csdn.net/mm_bit/article/details/48417157)
+
+  [<Shell 编程范例>面向操作对象学Shell(推荐)](https://github.com/tinyclub/open-shell-book)
+
+- **awk部分**
+
+  [awk手册](http://luy.li/data/awk.html)
+
+  [awk快速指南](http://man.linuxde.net/awk)(推荐)
+
+  [awk学习详细文档](http://www.cnblogs.com/gaoxufei/p/6058584.html)
+
+  [awk处理多维数组](http://blog.csdn.net/ithomer/article/details/8478716)
+
+  [awk常见数组处理技巧](http://www.cnblogs.com/lixiaohui-ambition/archive/2012/12/11/2813419.html)
+
+  [awk 内置变量使用介绍](http://blog.jobbole.com/92494/)
+
+  [awk 内置函数详细介绍（实例）](http://blog.jobbole.com/92497/)
+
+  [awk运算符介绍](http://blog.csdn.net/gaoming655/article/details/7390207)
+
+  [awk中的输入和输出重定向](http://blog.chinaunix.net/uid-10540984-id-356795.html)（推荐）
+
+  [awk的模式匹配(推荐)](http://blog.csdn.net/puqutogether/article/details/45865631)
+
+  [awk数组操作详细介绍（推荐）](http://www.cnblogs.com/chengmo/archive/2010/10/08/1846190.html)
+
+- **sed部分**
+
+  [sed简明教程](http://coolshell.cn/articles/9104.html?hmsr=toutiao.io&utm_medium=toutiao.io&utm_source=toutiao.io)
+
+  [sed命令](http://man.linuxde.net/sed)
+
+  [sed处理流程概述（推荐）](http://blog.csdn.net/yiqingnian28/article/details/23133043)
+
+- **grep部分**
+
+  [grep用法详解与正则表达式](http://blog.csdn.net/deyili/article/details/5548603)
+
+- **find部分**
+
+  //待补充
+
+- **应用部分**
+
+  //待补充
 
 
-### 参考
 
-[Rsync与inotify 进行实时同步](http://www.toutiao.com/i6351627805494608385/)

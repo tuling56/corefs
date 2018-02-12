@@ -301,12 +301,17 @@ curl -XPOST 'http://localhost:9200/indexdb/fulltext/_mapping' -d '
     }                                                             
   }                                                               
 }'                                                                
+```
 
+[curl指定用户名和密码](http://www.bubuko.com/infodetail-2309629.html)
+
+```shell
+curl -u yjm:123 http://localhost:8066/?search=%E5%BC%A0
 ```
 
 ##### wget
 
-需要下载某个目录下面的所有文件。命令如下
+需要下载某个目录下面的所有文件，命令如下
 
 ```shell
 wget -c -r -np -k -L -p www.mhcf.net/test/
@@ -321,6 +326,31 @@ wget -np -nH -r –span-hosts www.mhcf.net/test/
 -k 将绝对链接转为相对链接，下载整个站点后脱机浏览网页，最好加上这个参数
 -L 递归时不进入其它主机，如wget -c -r www.mhcf.net/test/
 ```
+
+###### 应用
+
+检测网址是否有效
+
+```shell
+#!/bin/bash  
+#no.1  
+if [ "$#" -ne 1 ]  
+  then  
+      echo "/root/sh/ $0" 请您输入一个网址  
+      exit 1  
+fi  
+#no.2  
+wget --spider -q -o /dev/null --tries=1 -T 3 $1  
+if [ "$?" -eq 0 ]  
+  then  
+    echo "$1 检测是成功的！"  
+  else  
+    echo "$1 检测是失败的！"  
+    exit 1  
+fi  
+```
+
+
 
 #####  axel
 
@@ -492,9 +522,22 @@ inotify-tools安装完成后，会生成inotifywait和inotifywatch两个指令�
 
 ##### rpm
 
+安装
+
 ```shell
 rpm -ivh
 rpm -qa
+```
+
+查看
+
+```
+rpm -ql 包名
+```
+
+卸载
+
+```shell
 # 卸载rpm包
 首先通过  rpm -q <关键字> 可以查询到rpm包的名字
 然后 调用 rpm -e <包的名字> 删除特定rpm包
@@ -504,7 +547,13 @@ rpm -qa
 
 ##### yum
 
-//待补充
+yum源的本质是什么？
+
+查看所有已安装的yum源
+
+```shell
+yum repolist enabled
+```
 
 #### 邮件发送
 
@@ -891,6 +940,8 @@ sudo make install
   [详解rsync好文（推荐）](http://blog.csdn.net/lianzg/article/details/24817087)
 
   [使用rsync 的 --delete参数删除目标目录比源目录多余的文件](http://www.linuxidc.com/Linux/2014-03/98835.htm)
+
+  [Rsync与inotify 进行实时同步](http://www.toutiao.com/i6351627805494608385/)
 
   [rsync命令参数详解](http://www.jb51.net/article/34869.htm)
 
