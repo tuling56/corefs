@@ -1,4 +1,4 @@
-## Git学习笔记
+## Git笔记
 
 [TOC]
 
@@ -6,24 +6,25 @@
 
 #### 配置
 
-##### 授权配置
+三层配置文件:
 
-###### ssh密钥配置
+- `/etc/gitconfig` 文件：系统中对所有用户都普遍适用的配置。若使用 `git config` 时用 `--system` 选项，读写的就是这个文件。
+- `~/.gitconfig` 文件：用户目录下的配置文件只适用于该用户。若使用 `git config` 时用 `--global` 选项，读写的就是这个文件。
+- 当前项目的 Git 目录中的配置文件（也就是工作目录中的 `.git/config` 文件）：这里的配置仅仅针对当前项目有效。每一个级别的配置都会覆盖上层的相同配置，所以 `.git/config` 里的配置会覆盖 `/etc/gitconfig` 中的同名变量。
+
+查看配置：
 
 ```shell
-ssh-keygen -t rsa -C "xxx@gmail.com"
-# 生成私钥id_rsa和公钥id_rsa.pub两个文件,将id_rsa.pub拷贝到网站上
+#查看所有配置
+git config --list
+
+# 查看某个变量的配置
+git config user.name
 ```
 
-为不同的环境配置不同的ssh密钥？
+> 有时候会看到重复的变量名，那就说明它们来自不同的配置文件（比如 `/etc/gitconfig` 和 `~/.gitconfig`），不过最终 Git 实际采用的是最后一个。
 
-###### https账号配置
-
-//https访问如何自动添加账号和密码
-
-##### 用户配置
-
-配置文件
+配置文件样例：
 
 ```git
 [user]
@@ -40,22 +41,28 @@ ssh-keygen -t rsa -C "xxx@gmail.com"
     pretty = format:%h %ai %an, %s
 ```
 
-> 注：以上配置文件放置在个人的~/.gitconfig，使用`git config --list`查看已有的配置
+##### 授权配置
 
-###### [别名配置](http://blog.csdn.net/zhang31jian/article/details/41011313)
+###### ssh密钥配置
 
+```shell
+ssh-keygen -t rsa -C "xxx@gmail.com"
+# 生成私钥id_rsa和公钥id_rsa.pub两个文件,将id_rsa.pub拷贝到网站上
 ```
-# 待补充
-```
 
-###### 日志配置
+为不同的环境配置不同的ssh密钥？
 
-```R
-图形化：git log --pretty=format:'%h : %s(%an-%ai)' --graph
-原始格式：git log --pretty=full
-定制格式：git log --pretty=format:'%h %ai : %an , %s'
-git log --stat #显示每次提交（commit）中哪些文件被修改了  
-```
+###### https账号配置
+
+以https协议方式提交的时候，需要输入用户名和密码，对应的如果是登录的网站，则就是登录的网站和密码，若是nginx的https设置的账号密码，则对应输入即可。
+
+![https访问配置](http://tuling56.site/imgbed/2018-02-12_172432.png)
+
+
+
+//https访问如何自动添加账号和密码,待补充
+
+##### 用户配置
 
 ###### 账号配置
 
@@ -65,7 +72,7 @@ git log --stat #显示每次提交（commit）中哪些文件被修改了
 git config --global user.name "tuling56"  
 git config --global user.email "tuling56@gmail.com"  
 
-# 注意:用户名必须是已注册的用户名，邮箱必须为该用户绑定的邮箱地址
+# 注意:用户名必须是已注册的用户名，邮箱必须为该用户绑定的邮箱地址.这个配置很重要，每次git提交时候都会引用这两条信息，说明是谁提交了更新，所以会随更新内容一起呗永久纳入历史记录。
 ```
 
 为每个仓库单独设置user name和email:
@@ -79,25 +86,62 @@ git config --global --unset user.email
 git config user.name "gitlab's Name"
 git config user.email "gitlab@xx.com"
 git config --list
-
 ```
 
 > - git config --list查看当前配置, 在当前项目下面查看的配置是全局配置+当前项目的配置, 使用的时候会优先使用当前项目的配置
 > - 在项目中如果不进行单独配置用户名和邮箱的话，则会使用全局的，正确的做法是针对公司的项目，在项目根目录下单独进行配置：
 
+###### [别名配置](http://blog.csdn.net/zhang31jian/article/details/41011313)
+
+```
+# 待补充
+```
+
+###### 其它
+
+日志配置
+
+```shell
+图形化：git log --pretty=format:'%h : %s(%an-%ai)' --graph
+原始格式：git log --pretty=full
+定制格式：git log --pretty=format:'%h %ai : %an , %s'
+git log --stat #显示每次提交（commit）中哪些文件被修改了  
+```
+
+文本编辑器
+
+```shell
+git config --global core.editor emacs
+# Git 需要你输入一些额外消息的时候，会自动调用一个外部文本编辑器给你用
+```
+
+差异分析工具
+
+```shell
+git config --global merge.tool vimdiff
+# 还有一个比较常用的是，在解决合并冲突时使用哪种差异分析工具。比如要改用 vimdiff 的话
+```
+
 #### 使用
 
-##### 创建版本库
+##### 基础流程
+
+###### 创建版本库
 
 ```shell
 mkdir git_pro1
 cd git_pro1
 git init
-git config user.name "XX"
-git config user.email "xxx@xx.com"
 ```
 
-##### 添加远程仓库
+> 创建之后可选择修改仓库的配置:
+>
+> ```shell
+> git config user.name "XX"
+> git config user.email "xxx@xx.com"
+> ```
+
+###### 添加远程仓库
 
 ```shell
 git remote add [reponame] [repoaddress]
@@ -107,13 +151,85 @@ git remote add [reponame] [repoaddress]
 
 可以添加多个远程仓库，在推送的时候选择要推送的仓库即可
 
-##### 推送到远程仓库
+###### 推送到远程仓库
 
 ```shell
 git push [reponame] [repobranch]
+
+#例如推送到origin仓库的dev分支上
+git push origin dev
 ```
 
-> 其中reponame是远程仓库名，repobranch是远程仓库的分支（默认是是master）,若不指定reponame和repobranch则推送到origin仓库的master分支，即`git pust origin master`
+> 其中reponame是远程仓库名，repobranch是远程仓库的分支（默认是master）,若不指定reponame和repobranch则推送到origin仓库的master分支，即`git pust origin master`
+
+##### 命令解释
+
+######  clone
+
+clone指定分支
+
+```shell
+git clone -b 仓库地址
+```
+
+###### commit
+
+```powershell
+
+```
+
+###### fetch
+
+```shell
+fetch的操作本质是更新repo所指定的远程
+```
+
+###### merge
+
+```shell
+
+```
+
+###### pull
+
+pull=fetch+merge
+
+pull指定远程仓库
+
+```shell
+# 默认仓库是origin
+git pull 远程仓库名 远程分支:本地分支
+```
+
+> 如遇到问题，可以添加`--rebase`参数
+
+###### checkout
+
+将远程git仓库的指定分支拉取到本地
+
+```shell
+git checkout -b 本地分支名 origin/远程分支名
+#例如：
+git checkout -b branch1 origin/branch1
+#Branch branch1 set up to track remote branch branch1 from origin.
+#Switched to a new branch 'branch1'
+```
+
+> - 这个自动会创建新的本地分支branch1,并与指定的远程分支关联起来，本地并自动切换到branch1分支上，若报错，则先执行`git fetch`，然后再执行。
+>
+> - 经过关联之后的分支，再次执行`git push`的时候会自动推送到远程的对应分支上
+>
+>   ![本地分支关联远程分支](http://tuling56.site/imgbed/2018-02-12_172745.png)
+
+###### push
+
+```shell
+git push 远程仓库名 远程仓库分支
+```
+
+##### 参数解释
+
+//待补充
 
 #### 传输协议
 
@@ -204,10 +320,14 @@ git流程和状态图
 
 ##### 查看分支
 
-查看远程分支
+查看分支
 
 ```shell
-$git branch -a
+# 查看本地分支
+git branch
+
+# 查看所有分支
+git branch -a
 * dev   # 标注出当前的分支所在
   master
   remotes/origin/HEAD -> origin/master
@@ -306,11 +426,30 @@ cd /var/git/web3/etc/puppet
 
 ### 问题
 
-//待补充
+#### 推送到非空仓库的问题
+
+```shell
+remote: error: refusing to update checked out branch: refs/heads/master
+remote: error: By default, updating the current branch in a non-bare repository
+remote: error: is denied, because it will make the index and work tree inconsistent
+remote: error: with what you pushed, and will require 'git reset --hard' to match
+remote: error: the work tree to HEAD.
+remote: error:
+remote: error: You can set 'receive.denyCurrentBranch' configuration variable to
+remote: error: 'ignore' or 'warn' in the remote repository to allow pushing into
+remote: error: its current branch; however, this is not recommended unless you
+remote: error: arranged to update its work tree to match what you pushed in some
+remote: error: other way.
+remote: error:
+remote: error: To squelch this message and still keep the default behaviour, set
+remote: error: 'receive.denyCurrentBranch' configuration variable to 'refuse'.
+```
 
 ## 参考
 
 - 基础
+
+  [Git入门参考手册(推荐)](https://git-scm.com/book/zh/v1/%E8%B5%B7%E6%AD%A5-%E5%88%9D%E6%AC%A1%E8%BF%90%E8%A1%8C-Git-%E5%89%8D%E7%9A%84%E9%85%8D%E7%BD%AE)
 
   [看完这篇文章才算对Git有新认识](http://www.cnblogs.com/godok/p/6279177.html)
 

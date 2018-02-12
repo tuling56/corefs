@@ -34,6 +34,8 @@ gitbook-cli是gitbook的命令行，可以方便的管理多个gitbook版本
 
 #### 创建
 
+##### 整体流程
+
 1. 编写书籍大纲的SUMMARY.md文件和书籍说明的README.md文档（SUMMARY.md参考本目录下）
 
 ```markdown
@@ -58,6 +60,41 @@ gitbook-cli是gitbook的命令行，可以方便的管理多个gitbook版本
 4. 网页浏览`gitbook serve `
 
    该步骤会启动自带的web服务器(似乎不可以自定义端口)，可以通过http://localhost:4000 通过网页查看书籍
+
+##### 书籍生成
+
+书籍仓库
+
+```shell
+_book/		# 生成的书籍目录
+book.json	# 书籍的配置 
+ch1/		# 以下是原始的md文档内容
+ch2/
+ch3/
+ch4/
+ch5/
+ch6/
+end/
+node_modules/ # 依赖的nodesj模块
+README.md	# 书籍首页文档
+SUMMARY.md	# 书籍大纲文档
+```
+
+书籍目录：
+
+```shell
+ls -lh _book/
+ch1/
+ch2/
+ch3/
+ch4/
+ch5/
+ch6/
+end/
+gitbook/
+index.html	# 根据summary.md生成的文件
+search_index.json	# 搜索数据
+```
 
 #### 方式选择
 
@@ -236,21 +273,17 @@ git config http.sslVerify false
 
 #### 自建发布
 
-##### 基础流程
+​	在要发布的机器上，构建gitbook文档，并使用git进行管理（非裸仓库），远程机器可以git clone该版本库，但不能git push,所有的修改只能在发布的机器上进行，修改完文档后重启gitbook服务，重新构建文档，对应协同操作，按如下的方式：
 
-**方法1：同机**
+##### 构建仓库
 
-​	在要发布的机器上，构建gitbook文档，并使用git进行管理（非裸仓库），远程机器可以git clone该版本库，但不能git push,所有的修改只能在发布的机器上进行，修改完文档后重启gitbook服务，重新构建文档
-
-**方法2：跨机协同**
-
-在要发布的机器上构建git版本管理的裸仓库（没有工作区）:
+在要发布的机器上构建git版本管理的==裸仓库==（没有工作区）:
 
 ```shell
 git init --bare sample_pure.git
 ```
 
-然后配置`post-receive`钩子如下：
+然后配置版本仓库的`.git/hooks/post-receive`钩子如下：
 
 ```shell
 vim hooks/post-receive
@@ -272,40 +305,60 @@ exit 0
 
 注意事项：
 
-> 需要先把gitbook用到的node插件的目录如下：node_modules/  拷贝到gitbook的工作目录内，避免重复的插件下载和安装。
+> - 需要先把gitbook用到的node插件的目录(node_modules/ ) 拷贝到生成的当前git的工作目录内，最后会生成文件到_book/gitbook的目录内，避免重复的插件下载和安装，或者使用`gitbook install`命令，该命令会根据`book.json`中使用到的插件进行安装
+> - 注意修改post-receive文件的权限为755
 
-从远程机器上clone下仓库，编辑然后推送
+##### 添加内容
+
+方法1:从远程机器上clone下仓库，编辑然后推送
 
 ```shell
 git clone root@127.0.0.1:/home/yjm/Documents/gitrepo/gitbook.git
 git add .
 git commit -m "添加内容和修改等"
 git push 
-# 会在推送之后，显示gitbook build的信息如下：
-Total 4 (delta 1), reused 0 (delta 0)
-remote: info: 17 plugins are installed
-remote: info: 12 explicitly listed
-remote: info: loading plugin "navigator"... OK
-remote: info: loading plugin "toolbar"... OK
-remote: info: loading plugin "edit-link"... OK
-remote: info: loading plugin "ad"... OK
-remote: info: loading plugin "chart"... OK
-remote: info: loading plugin "highlight"... OK
-remote: info: loading plugin "search"... OK
-remote: info: loading plugin "lunr"... OK
-remote: info: loading plugin "sharing"... OK
-remote: info: loading plugin "fontsettings"... OK
-remote: info: loading plugin "theme-default"... OK
-remote: info: found 17 pages
-remote: info: found 2 asset files
-remote: warn: "this.generator" property is deprecated, use "this.output.name" instead
-remote: warn: "navigation" property is deprecated
-remote: warn: "book" property is deprecated, use "this" directly instead
-remote: warn: "options" property is deprecated, use config.get(key) instead
-remote: info: >> generation finished with success in 6.5s !
 ```
 
-通过http://localhost:4000来web访问修改的内容(若要支持在线编辑，需要通过web服务器来实现，暂时没有)
+> 会在推送之后，显示gitbook build的信息如下：
+>
+> ```shell
+>
+> Total 4 (delta 1), reused 0 (delta 0)
+> remote: info: 17 plugins are installed
+> remote: info: 12 explicitly listed
+> remote: info: loading plugin "navigator"... OK
+> remote: info: loading plugin "toolbar"... OK
+> remote: info: loading plugin "edit-link"... OK
+> remote: info: loading plugin "ad"... OK
+> remote: info: loading plugin "chart"... OK
+> remote: info: loading plugin "highlight"... OK
+> remote: info: loading plugin "search"... OK
+> remote: info: loading plugin "lunr"... OK
+> remote: info: loading plugin "sharing"... OK
+> remote: info: loading plugin "fontsettings"... OK
+> remote: info: loading plugin "theme-default"... OK
+> remote: info: found 17 pages
+> remote: info: found 2 asset files
+> remote: warn: "this.generator" property is deprecated, use "this.output.name" instead
+> remote: warn: "navigation" property is deprecated
+> remote: warn: "book" property is deprecated, use "this" directly instead
+> remote: warn: "options" property is deprecated, use config.get(key) instead
+> remote: info: >> generation finished with success in 6.5s !
+> ```
+
+方法2:为本地已存在的仓库添加远程仓库
+
+```shell
+# 切换到仓库目录内,执行
+git remote add lorigin root@127.0.0.1:/home/yjm/Documents/gitrepo/open-c-book.git
+ 
+# 在推送的时候选择要推送到的远程仓库
+git push lorigin
+```
+
+##### web访问
+
+​	通过http://localhost:4000来web访问修改的内容(若要支持在线编辑，需要通过web服务器来实现，暂时没有)
 
 **增强**：通过配置nginx的服务器的方式来实现gitbook内容的访问，这样就不必再启动gitbook serve了
 

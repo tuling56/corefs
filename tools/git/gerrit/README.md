@@ -1,4 +1,4 @@
-##Gerrit
+##Gerrit笔记
 [TOC]
 
 ### 基础
@@ -32,6 +32,18 @@ htpasswd /home/yjm/Documents/gerrit/passwd  [new-user-name]
 /home/yjm/Documents/gerrit/bin/gerrit.sh stop
 /home/yjm/Documents/gerrit/bin/gerrit.sh restart
 ```
+
+#### 使用
+
+推送
+
+```shell
+git push origin HEAD:refs/for/master
+# 只有通过审核和才会合并到
+git push origin HEAD:refs/heads/master
+```
+
+
 
 #### 配置
 
