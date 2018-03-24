@@ -568,6 +568,22 @@ CSV（Comma-Separated Values逗号分隔值）
 - 具体化方式（中间表方式） 
 
 
+#### 执行顺序
+
+```mysql
+(7)     SELECT
+(8)     DISTINCT <select_list>
+(1)     FROM <left_table>
+(3)     <join_type> JOIN <right_table>
+(2)     ON <join_condition>
+(4)     WHERE <where_condition>
+(5)     GROUP BY <group_by_list>
+(6)     HAVING <having_condition>
+(9)     ORDER BY <order_by_condition>
+(10)    LIMIT <limit_number>
+```
+
+> 此处牵涉到别名的使用地点问题
 
 ### 高级
 
@@ -783,7 +799,42 @@ BEGIN
 END
 ```
 
+##### 函数集锦
 
+###### inerval
+
+```mysql
+# INTERVAL()函数进行比较列表(N，N1，N2，N3等等)中的N值。该函数如果N<N1返回0，如果N<N2返回1，如果N<N3返回2 等等。如果N为NULL，它将返回-1。列表值必须是N1<N2<N3的形式才能正常工作
+SELECT INTERVAL(6,1,2,3,4,5,6,7,8,9,1); -- 返回比N大的位置
+SELECT NOW()-INTERVAL 24 HOUR  -- 时间比较： 返回 前一天
+```
+
+###### group_concat
+
+将组值多行合并成一列
+
+```mysql
+select name,GROUP_CONCAT(course SEPARATOR '_') as names,GROUP_CONCAT(score ORDER BY score SEPARATOR '_') as scores from name_course_score group by name;
+```
+
+演示：
+
+```
+张三	语文	66
+张三	数学	23
+张三	英语	89
+李四	语文	95
+李四	数学	12
+李四	物理	2
+
+-- 转换成
+张三	语文_数学_英语	23_66_89
+李四	语文_数学_物理	2_12_95
+```
+
+> 反向拆分：
+>
+> 将一列拆分成多行，参见列转行部分
 
 #### 事件 
 
@@ -1316,6 +1367,8 @@ select (DATEDIFF(DATE_ADD(curdate, INTERVAL - DAY(curdate)+ 1 DAY), date_add(cur
 
 #### 字符包含问题
 
+##### 单字段包含
+
 判断某个字段是否[包含](http://blog.csdn.net/hechurui/article/details/49278493)某个字符串的方法
 
 ```mysql
@@ -1335,6 +1388,14 @@ update site set url =concat('http://',url) where locate('http://',url)=0;
 ```mysql
 select if(b.channel_type is NULL,'其它',b.channel_type),a.channel from channels_data a LEFT JOIN channels_conf b on FIND_IN_SET(a.channel,b.channels)>0;
 ```
+
+##### 多列组合包含
+
+```mysql
+select * from `magazine` where concat(ifnull(`title`,''),ifnull(`tag`,''),ifnull(`description`,'')) like '%关键字%';
+```
+
+> 注意多列组合包含的情况下，若一列为null，则整个为null,遗漏记录
 
 #### 跨库Join问题
 
@@ -1469,6 +1530,32 @@ SELECT user_name,'skills2',skills3 from nameskills_col ORDER BY user_name;
 ```
 
 > 这部分还有很多要完善的地方！，进一步扩展的是求一行的最大值和最小值等
+
+#### 区间分组
+
+使用到interval和etl函数
+
+```mysql
+mysql> select * from k1;
++------+------+
+| id   | yb   |
++------+------+
+|    1 |  100 |
+|    2 |   11 |
+|    3 |    5 |
+|    4 |  501 |
+|    5 | 1501 |
+|    6 |    1 |
++------+------+
+
+select 
+	elt(interval(d.yb,0, 100, 500, 1000), '1/less100', '2/100to500', '3/500to1000', '4/more1000') as yb_level, 
+	count(d.id) as cnt
+ from k1 d   
+group by elt(interval(d.yb, 0, 100, 500, 1000), '1/less100', '2/100to500', '3/500to1000', '4/more1000K');
+```
+
+
 
 #### 同一属性多值过滤
 
@@ -2055,6 +2142,8 @@ mysqluserclone     clone a MySQL user account to one or more new users
 
   [yum安装最新版mysql](http://blog.csdn.net/xyang81/article/details/51759200)
 
+  [关于sql和mysql的语句执行顺序](http://blog.csdn.net/u014044812/article/details/51004754)
+
 - 高级
 
   [SQL的存储过程和函数](http://www.toutiao.com/a6391569028531831041/)
@@ -2081,6 +2170,8 @@ mysqluserclone     clone a MySQL user account to one or more new users
   [GroupTopN问题解决](http://blog.csdn.net/wzy_1988/article/details/52871636)
 
   [MySQL分组取TopN](http://www.jb51.net/article/31590.htm)
+
+  [Mysql区间分组统计](https://www.cnblogs.com/lazyx/p/5577105.html)
 
 - 积累
 
@@ -2111,6 +2202,8 @@ mysqluserclone     clone a MySQL user account to one or more new users
   [学会写MySQL索引（推荐）](http://mp.weixin.qq.com/s/Z10w5aBgxJvoxmOlrL_IXw)
 
   [项目中常用的19条MySQL优化（推荐）](https://segmentfault.com/a/1190000012155267)
+
+  [MySQL大表优化方案](https://www.toutiao.com/i6533174790650331655/)
 
 - 备份
 
