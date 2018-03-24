@@ -359,10 +359,12 @@ fi
 ```shell
 case 变量名 in  
     值1)  
-      指令1  
+      指令1
+      指令11
     ;;  
     值2)  
-      指令2  
+      指令2 
+      指令21
     ;;  
     值3)  
       指令3  
@@ -1002,20 +1004,29 @@ sed -i 's/oldstr/newstr/g' `grep oldstr -rl odlstr $datadir`
 
 grep加-E支持扩展正则`？+|（）`,相当于egrep
 
+#### 应用
+
+//待补充
+
 ### find
 
 #### 基础
+
+##### 排除
 
 ```shell
 #  搜索但跳出指定目录
 #（注意-prune后面的-o不能缺少），另外需要说明的是跳出的是目录内部的内容，但目录本身还是会被包含进去的
 find . -path "./sk" -prune -o -name "*.txt" -print
-
 ```
 
 ```shell
 find . -type f -exec echo "{}" \;  # 为输出的文件名加上双引号
 ```
+
+##### 问题
+
+###### 文件名空格
 
 文件名中存在空格的时候无法处理，解决方式如下：
 
@@ -1042,7 +1053,11 @@ method2
 exit 0
 ```
 
-### 应用
+#### 应用
+
+//待补充
+
+### 实践
 
 #### 文件转换
 
@@ -1110,11 +1125,17 @@ unix2dos xx.txt
 
 - **bash部分**
 
+  [shell教程(c语言中文网)](http://c.biancheng.net/cpp/view/2740.html)(推荐)
+
   [linux参数太长的换行问题](http://blog.csdn.net/feng27156/article/details/39057773)
 
   [shell关联数组](http://blog.csdn.net/mm_bit/article/details/48417157)
 
   [<Shell 编程范例>面向操作对象学Shell(推荐)](https://github.com/tinyclub/open-shell-book)
+
+  [bash中set命令的使用（阮一峰推荐）](http://www.ruanyifeng.com/blog/2017/11/bash-set.html)
+
+  [shell单行和多行注释](http://blog.csdn.net/lansesl2008/article/details/20558369/)
 
 - **awk部分**
 

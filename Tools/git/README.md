@@ -314,6 +314,14 @@ git流程和状态图
 
 ### 高级
 
+#### 工作区
+
+##### 查看工作区
+
+```shell
+git status
+```
+
 #### [分支](https://git-scm.com/book/zh/v1/Git-%E5%88%86%E6%94%AF-%E5%88%86%E6%94%AF%E7%9A%84%E6%96%B0%E5%BB%BA%E4%B8%8E%E5%90%88%E5%B9%B6)
 
 本地有dev和master分支，远程也有dev和master分支，如何对应
@@ -377,7 +385,7 @@ git checkout test
 
 ```shell
 #先切换到master分支，然后执行以下命令，将test分支合并到master分支上
-git merge test
+git merge test  # 合并分支的时候总是加上--no-ff，即git merge --no-ff test
 ```
 
 master合并到指定分支
@@ -388,6 +396,8 @@ git merge master
 
 # 待子分支a完成后再合并到master上
 ```
+
+> 在合并分支的时候总是先切换到要合并到的分支上，然后将需要合并的分支合并过来
 
 ##### 删除分支
 
@@ -450,6 +460,8 @@ remote: error: 'receive.denyCurrentBranch' configuration variable to 'refuse'.
 - 基础
 
   [Git入门参考手册(推荐)](https://git-scm.com/book/zh/v1/%E8%B5%B7%E6%AD%A5-%E5%88%9D%E6%AC%A1%E8%BF%90%E8%A1%8C-Git-%E5%89%8D%E7%9A%84%E9%85%8D%E7%BD%AE)
+
+  [Git使用规范流程（阮一峰）](http://www.ruanyifeng.com/blog/2015/08/git-use-process.html)
 
   [看完这篇文章才算对Git有新认识](http://www.cnblogs.com/godok/p/6279177.html)
 
