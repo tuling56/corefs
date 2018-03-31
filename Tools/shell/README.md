@@ -383,6 +383,14 @@ esac
 ###### for
 
 ```shell
+for((i=0;i<10;i++));do
+for i in {0..10};do
+for i in `seq 10`;do
+for i in $(seq 10);do
+	echo "$i"
+	j=$(echo "$i*12.6-1.5"|bc)
+	echo $j
+done
 
 ```
 
@@ -414,6 +422,39 @@ function 函数名 {
 ![分离函数体](http://tuling56.site/imgbed/2018-02-08_133315.png)
 
 #### 应用
+
+##### 生成序列
+
+###### 日期序列
+
+```shell
+# 生成连续的日期序列
+start_date=`date -d"-7 day" +%Y%m%d`
+end_date=`date -d"-1 day" +%Y%m%d`
+while [[ $start_date -le $end_date ]];do
+    echo -e "\e[1;31mstep:\e[0m"$start_date
+    process ${start_date}
+    start_date=`date -d${start_date}"+1 day" +%Y%m%d`
+done
+
+# 生成不连续的日期序列
+
+```
+
+###### 整数序列
+
+生成整数序列
+
+```shell
+seq 1 2 10  # 生成序列：1 3 5 7 9
+for i in {1..10};do echo $i;done  # 生成序列1，2,3,4,....19
+```
+
+生成随机数
+
+```shell
+
+```
 
 ##### 文件重命名
 
@@ -478,6 +519,74 @@ done
 > 此处的多进程是处理每个表的多个数据来源的时候采用并发的多进程来处理，没有锁的高级使用
 
 shell的多进程之间没有锁，只有靠wait变相实现
+
+##### 进制转换
+
+shell 脚本默认数值是由10 进制数处理,除非这个数字某种特殊的标记法或前缀开头. 才可以表示其它进制类型数值。如：以 0 开头就是 8 进制.以0x 开头就是16 进制数.使用 BASE#NUMBER 这种形式可以表示其它进制.BASE值：2-64.
+
+[printf格式说明](https://blog.csdn.net/sinat_34009734/article/details/51646469)
+
+###### [其它进制转十进](http://www.jb51.net/article/57943.htm)制
+
+```shell
+# 二进制转十进制
+((num=2#111));echo $num  --7
+
+
+# 八进制转十进制
+((num=8#12));echo $num   --10
+((num=012));echo $num    --10
+let num=012;echo $num  	 --10
+
+# 十六进制转十进制
+((num=16#12));echo $num  --18
+((num=0x12)); echo $num  --18
+let num=0x12;echo $num   --18
+
+
+# base32转十进制
+((num=32#ffff));echo $num
+
+# base64转十进制
+((num=64#abc_));echo $num 
+
+
+```
+
+###### 十进制转其它进制
+
+printf方法
+
+```shell 
+# 十进制转16进制
+printf "%X" 255  --FF
+printf "%x" 255  --ff
+
+# 十进制转8进制
+printf "%o" 10  --12
+
+# 十进制转二进制
+
+```
+
+bc方法
+
+```shell
+# 十进制转二进制(5)
+echo "obase=2;5"|bc  -- 101
+
+# 十进制转八进制(64)
+echo "obase=8;64"|bc  -- 100
+
+# 十进制转十六进制(64)
+echo "obase=16;256"|bc --100
+
+# 十进制转base32
+echo "obase=32;507375"|bc 
+
+# 十进制转base32
+echo "obase=32;2667327"|bc 
+```
 
 ### awk
 
@@ -715,15 +824,65 @@ END{  # 这个括号不能移到下一行
 }
 ```
 
-##### awk数组
+##### [awk数组](http://blog.csdn.net/beyondlpf/article/details/7024730)
+
+基础
 
 ```shell
-awk 'BEGIN{a[0,0]=12;a[1,1]=13;}END{for(k in a) {print k,a[k];split(k,idx,SUBSEP);print idx[1],idx[2],a[idx[1],idx[2]]}}' </dev/null
+# 数组的长度
+length(a)
+
+# 数组遍历
+awk 'BEGIN{a[1]="c";a[2]="d";a[3]="e";n=length(a);for(i=1;i<=n;i++) print a[i]}'
+awk 'BEGIN{a[1]="c";a[2]="d";a[3]="e";for(k in a) print k,a[k]}'
 ```
 
-参考:
+多维数组
 
-[awk数组的使用](http://blog.csdn.net/beyondlpf/article/details/7024730)
+```shell
+awk 'BEGIN{a[0,0]=12;a[1,1]=13;}
+	 END{for(k in a) 
+	 	   {
+	 	   	print k,a[k];
+	 	    split(k,idx,SUBSEP);
+	 		print idx[1],idx[2],a[idx[1],idx[2]]
+	 	   }
+	 }' </dev/null
+```
+
+###### 排序
+
+```shell
+$ cat sortd.txt
+aaa 125
+ddd 123
+bbb 128
+ccc 120
+```
+
+**asort**
+
+对key进行文本排序，不能保存key-value的映射关系(这大部分还存在问题)
+
+```  
+$ awk '{a[$2]=$0}END{for(i=1;i<=asort(a);i++)print a[i]}' sortd.txt
+aaa 125
+bbb 128
+ccc 120
+ddd 123
+```
+
+**asorti**
+
+对value进行数字排序，可以保存key-value的映射关系
+
+```shell
+$ awk '{a[$2]=$0}END{for(i=1;i<=asorti(a,b);i++)print a[b[i]]}' sortd.txt
+ccc 120
+ddd 123
+aaa 125
+bbb 128
+```
 
 #### 应用
 
@@ -823,6 +982,25 @@ awk 'BEGIN{"date"|getline d;split(d,a);print a[2]}'
 ```shell
 awk '{getline j<"b";for(i=1;i<=NF;i++){$i>j?$i=$i-j:$i=j-$i}}1' a|column -t
 # columnt -t的作用是让结果列对齐，该程序还有些问题
+```
+
+##### awk选取某列不同的n个
+
+选取第一列不同的n个，其它列可以重复
+
+```shell
+# cat test.data
+a 1
+a 2
+a 3
+b 1
+c 2
+d 2
+f 6
+
+awk '{a[$1]=$1;n=length(a);print NR,n; if(n<=3) print $0}END{print n}'  test.data
+
+# 注意此处不要用asort或asorti求数组的长度
 ```
 
 
@@ -1137,6 +1315,8 @@ unix2dos xx.txt
 
   [shell单行和多行注释](http://blog.csdn.net/lansesl2008/article/details/20558369/)
 
+  [shell生成随机数](https://blog.csdn.net/taiyang1987912/article/details/39997303)
+
 - **awk部分**
 
   [awk手册](http://luy.li/data/awk.html)
@@ -1160,6 +1340,8 @@ unix2dos xx.txt
   [awk的模式匹配(推荐)](http://blog.csdn.net/puqutogether/article/details/45865631)
 
   [awk数组操作详细介绍（推荐）](http://www.cnblogs.com/chengmo/archive/2010/10/08/1846190.html)
+
+  [awk排序](https://blog.csdn.net/newmarui/article/details/49849197)
 
 - **sed部分**
 

@@ -4,7 +4,7 @@
 # Author:tuling56
 # State:
 # Created_Time: 2017-05-09 17:12
-# Last modified: 2017-10-26 10:00:01 AM
+# Last modified: 2018-03-26 09:05:16 PM
 #########################################################################
 #!/bin/bash
 
@@ -161,6 +161,7 @@ function split_s2_m1()
     echo "[day]:"$day
     echo "[hour]:"$hour
 }
+
 
 function split_s2_m2()
 {
