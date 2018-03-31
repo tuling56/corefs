@@ -312,13 +312,26 @@ git流程和状态图
 
 参考`mdotfiles/git/gitignore`仓库
 
+#### 对比
+
+对比本地工作区和远程仓库的差异
+
+```shell
+git fetch origin
+#然后可以比对
+git diff 本地分支 origin/xxxx
+```
+
+
+
 ### 高级
 
 #### 工作区
 
-##### 查看工作区
+##### 基本
 
 ```shell
+# 查看工作区
 git status
 ```
 
@@ -430,7 +443,11 @@ cd /var/git/web3/etc/puppet
 /usr/bin/git pull
 ```
 
-####  tag
+####  Tag
+
+//待补充
+
+### 应用
 
 //待补充
 

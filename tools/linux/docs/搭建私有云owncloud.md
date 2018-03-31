@@ -17,11 +17,11 @@
 
 - PC客户端操作
 
-[下载PC客户端软件](https://download.owncloud.com/desktop/stable/ownCloud-2.3.3.8250-setup.exe)
+  [下载PC客户端软件](https://download.owncloud.com/desktop/stable/ownCloud-2.3.3.8250-setup.exe)
 
 - 移动端操作
 
-应用市场下载对应的移动端app软件
+  应用市场下载对应的移动端app软件，需要到google- play上下
 
 ##### 网页端
 
