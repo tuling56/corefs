@@ -169,12 +169,22 @@ chkconfig --level 345 mysql on
 
 #### 定时任务
 
-##### crontab配置
+##### crontab
 
-在计算机正常的情况下，才执行
+在计算机正常的情况下，才执行，参数列表如下:
 
-```
+```shell
+-u user：用来设定某个用户的crontab服务，例如，“-u ixdba”表示设定ixdba用户的crontab服务，此参数一般有root用户来运行。
 
+file：file是命令文件的名字,表示将file做为crontab的任务列表文件并载入crontab。如果在命令行中没有指定这个文件，crontab命令将接受标准输入（键盘）上键入的命令，并将它们载入crontab。
+
+-e：编辑某个用户的crontab文件内容。如果不指定用户，则表示编辑当前用户的crontab文件。
+
+-l：显示某个用户的crontab文件内容，如果不指定用户，则表示显示当前用户的crontab文件内容。
+
+-r：从/var/spool/cron目录中删除某个用户的crontab文件，如果不指定用户，则默认删除当前用户的crontab文件。
+
+-i：在删除用户的crontab文件时给确认提示。
 ```
 
 在crontab中使用命令和变量牵涉到%的时候要用“\”转义
@@ -183,7 +193,7 @@ chkconfig --level 345 mysql on
 00 01 * * * mysqldump -u root --password=passwd-d mustang > /tmp/mustang_$(date +\%Y\%m\%d_\%H\%M\%S).sql
 ```
 
-##### anacron配置
+##### anacron
 
 处理服务器开关机问题,在该执行的时候因为故障没有执行，在服务器正常的时候，重新执行
 

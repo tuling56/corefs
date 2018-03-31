@@ -1265,6 +1265,26 @@ SELECT TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME from information_schema.`COLUMNS` whe
 select table_schema,table_name from information_schema.tables where table_type='base table' and engine='innodb' and table_schema!='mysql' and table_name not like '%innodb%';
 ```
 
+##### 注释
+
+行注释
+
+```mysql
+（1） # 到该行结束      # 这个注释直到该行结束 
+（2）-- 到该行结束      -- 这个注释直到该行结束（注意断划线后的空格）
+```
+
+块注释
+
+```mysql
+SELECT 1+
+       /* 这是一个
+          多行注释
+          的形式
+      */
+      1;
+```
+
 #### restful接口
 
 ##### sandman2
@@ -1431,17 +1451,21 @@ COMMENT='task.xmp_uninstall－链接表[3306]';
 
 ### 应用
 
-#### 行转列
+#### 行列互转
 
-有两种实现方式`case when`和`inner join`:
+##### 行转列
+
+###### 行转多列
+
+不存在分列情况下,有两种实现方式`case when`和`inner join`:
 
 ```mysql
 # 原始的的数据格式是按行的，现在想拼接为列，其中还有汇总和所占比，实现方式如下:
 select a.date,a.f1 as '总量',b.f2 as '360域名总量',
-round(c.f3*100/b.f2,2) as 'http://hao.360.cn/?src=lm&ls=n4abc0a4199',
-round(d.f4*100/b.f2,2) as 'http://hao.360.cn/?src=lm&ls=n79f40a409c',
-round(e.f5*100/b.f2,2) as 'http://hao.360.cn/?src=lm&ls=n110c004e9b',
-round(f.f6*100/b.f2,2) as 'https://hao.360.cn/?src=lm&ls=n556c014b9f'
+  round(c.f3*100/b.f2,2) as 'http://hao.360.cn/?src=lm&ls=n4abc0a4199',
+  round(d.f4*100/b.f2,2) as 'http://hao.360.cn/?src=lm&ls=n79f40a409c',
+  round(e.f5*100/b.f2,2) as 'http://hao.360.cn/?src=lm&ls=n110c004e9b',
+  round(f.f6*100/b.f2,2) as 'https://hao.360.cn/?src=lm&ls=n556c014b9f'
 from
 (select date,sum(cnts) as f1 from pgv_stat.xmpcloud2_ie_stat where date>=20161201 group by date) a
 inner join
@@ -1457,7 +1481,7 @@ inner join
 order by a.date desc;
 ```
 
-案例参考：
+**例子:**
 
 | 年    | 季度   | 销售量  |
 | ---- | ---- | ---- |
@@ -1502,7 +1526,15 @@ from sales group by 年;
 
 > 在sql server 2005中有[pivot函数](http://www.studyofnet.com/news/295.html)可以实现同样的功能
 
-#### 列转行
+###### 行转单列
+
+```mysql
+# 在行转多列的基础上，进行列合并成单列
+```
+
+##### 列转行
+
+###### 单列转行
 
 有两种实现方式:`序列化表`和`union all` 
 
@@ -1530,6 +1562,24 @@ SELECT user_name,'skills2',skills3 from nameskills_col ORDER BY user_name;
 ```
 
 > 这部分还有很多要完善的地方！，进一步扩展的是求一行的最大值和最小值等
+
+###### 多列转行
+
+```mysql
+select r.姓名,a.语文,b.数学,c.英语,d.物理 from study.name_course_score_tr r
+inner join
+(select 姓名,语文 from study.name_course_score_tr)a
+on r.姓名=a.姓名
+inner join
+(select 姓名,数学 from study.name_course_score_tr)b
+on r.姓名=b.姓名
+inner join
+(select 姓名,英语 from study.name_course_score_tr)c
+on r.姓名=c.姓名
+inner join
+(select 姓名,物理 from study.name_course_score_tr)d
+on r.姓名=d.姓名;
+```
 
 #### 区间分组
 
@@ -1701,13 +1751,48 @@ ORDER BY
 
 #### 配置优化
 
+##### 提高硬件配置
+
+//balala
+
+##### 优化代码逻辑
+
 //待补充
 
-#### 具体方法
+##### 优化表结构
+
+- 尽量使用int代替char
+- 尽量使用char代替varchar
+- 不要滥用bigint,参考[各种整型的取值范围](http://wayne173.iteye.com/blog/1631095)
+
+##### 添加缓存(本地/redis)
+
+//待补充
+
+##### 优化查询语句
+
+- 请尽量使用简单的查询，避免使用表链接
+- 请尽量避免全表扫描，会造成全表扫描的语句包括但不限于：
+  - where子句条件横真或为空
+  - 使用LIKE
+  - 使用不等操作符（<>、!=）
+  - 查询含有is null的列
+  - 在非索引列上使用or
+- 多条件查询时，请把简单查询条件或则索引列查询置于前面
+- 请尽量指定需要查询的列，不要偷懒使用select *
+  - 如果不指定，一方面会返回多余的数据，占用宽带等
+  - 另一方面MySQL执行查询的时候，没有字段时会先去查询表结构有哪些字段
+- 大些的查询关键字比小写快一点点
+- 使用子查询会创建临时表，会比链接（JOIN）和联合（UNION）稍慢
+- 在索引字段上查询尽量不要使用数据库函数，不便于缓存查询结果
+- 当只要一行数据时，请使用LIMIT 1，如果数据过多，请适当设定LIMIT，分页查询
+- 千万不要 ORDER BY RAND()，性能极低
+
+#### 优化方向
 
 ##### 索引
 
-索引通过减少查询必须扫描的数据库中的数据量来提高查询效率，如何设计索引的使用，索引会引入额外的性能问题，比如插入会稍慢。
+​	索引通过减少查询必须扫描的数据库中的数据量来提高查询效率，如何设计索引的使用，索引会引入额外的性能问题，比如插入会稍慢。
 
 - 多列索引的设计及什么情况下索引会失效
 
@@ -1776,13 +1861,27 @@ mysqldumpslow -s r -t 20 /mysqldata/mysql/mysql06-slow.log | more
 
 一写多读，写入的数据实时从写库同步到读库，开源代理插件360的atlas
 
-##### 分库
+##### 分库/分表
 
-分布式和事务的控制
-
-#####  分表
+分布式和事务的控制，分库分表的前提条件是在执行查询语句之前，已经知道需要查询的数据可能会落在哪一个分库和哪一个分表中
 
 用法和拆分原则要一开始的时候设计好
+
+#### 具体建议
+
+##### 尽可能不使用NULL
+
+NULL的缺点：
+
+- `NULL`使得索引维护更加复杂，强烈建议对索引列设置`NOT NULL`
+- `NOT IN`、`!=`等负向条件查询在有`NULL`值的情况下返回永远为空结果，查询容易出错
+- `NULL`列需要一个额外字节作为判断是否为`NULL`的标志位
+- 使用`NULL`时和该列其他的值可能不是同种类型，导致问题。（在不同的语言中表现不一样）
+- MySQL难以优化对可为`NULL`的列的查询
+
+##### 整型代替字符串
+
+- 可以用整型`tinyint`表示的数据就不要使用字符串类型，
 
 ### 备份
 
@@ -2010,6 +2109,62 @@ log-bin=/var/lib/mysql/mysql-bin
 
 ### 性能
 
+#### 日志
+
+```mysql
+show variables like '%_log%';
+```
+
+
+
+##### 错误日志
+
+##### 查询日志
+
+###### 普通查询日志
+
+```mysql
+set global general_log = ON;
+show variables like '%general_log%';
+set global general_log = OFF;
+```
+
+###### 慢查询日志
+
+慢查询日志是用来记录执行时间超过指定时间的查询语句，建议开启，对服务器的性能影响微乎其微
+
+```shell
+vi/data/3306/my.cnf
+[mysqld_safe]
+	long_query_time= 1
+	log-slow-queries= /data/3306/slow.log
+	log_queries_not_using_indexes
+```
+
+
+
+##### 二进制日志
+
+记录数据被修改的相关信息，由参数log-bin指定位置和文件名
+
+```mysql
+show variables like '%log_bin';
+```
+
+###### Statememt Level
+
+SQL语句级别，默认
+
+###### Row Level
+
+行级模式
+
+###### Mixed Level
+
+混合模式，官方推荐
+
+
+
 #### 性能指标
 
 性能指标计算和监控，指标关注如下：
@@ -2205,6 +2360,8 @@ mysqluserclone     clone a MySQL user account to one or more new users
 
   [MySQL大表优化方案](https://www.toutiao.com/i6533174790650331655/)
 
+  [MySQL优化小建议](http://www.cnblogs.com/youyoui/p/8657331.html)
+
 - 备份
 
   [mysql导入导出中文乱码的解决方法](http://www.jb51.net/article/31615.htm)
@@ -2226,6 +2383,8 @@ mysqluserclone     clone a MySQL user account to one or more new users
   [xtrabackup 备份与恢复（推荐）](https://www.toutiao.com/i6511520757447655949/)
 
 - 性能
+
+  [MySQL日志基础知识及基本操作](https://www.toutiao.com/a6538541360855646728/)
 
   [MySQL性能指标及计算方法](https://www.toutiao.com/i6504034560555090446/)
 
