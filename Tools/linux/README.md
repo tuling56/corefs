@@ -8,25 +8,113 @@
 
 ##### [用户](https://www.cnblogs.com/xd502djj/archive/2011/11/23/2260094.html)
 
-修改root密码
-
-```
-登录root账号，sudo passwd root或者之间passwd，重复输入两次密码即可
-```
-
 添加用户
 
 ```shell
-# 添加用户ftpuser，指定目录为/opt/ftp,所属组为ftpgroup
-useradd -g ftpgroup -d /opt/ftp -M ftpuser 
-# 修改ftpuser的密码passwd ftpuser   
+# -M添加用户ftpuser,-d指定目录为/opt/ftp,-g所属组为ftpgroup
+useradd -g ftpgroup -d /opt/ftp -M ftpuser
 
-# 添加组
-groupadd test   
+# 可以直接使用-m选项为用户创建相应的账号和用户目录/home/username
 
+# 修改ftpuser的密码
+passwd ftpuser   
 ```
 
+> 默认情况下，添加用户的操作会相应的增加一个同名的组，
 
+删除用户
+
+```shell
+userdel -r username
+#带-r删除用户的同时，删除其目录
+```
+
+其它
+
+```shell
+#修改root密码
+登录root账号，sudo passwd root或者之间passwd，重复输入两次密码即可
+```
+
+##### 组
+
+添加组
+
+```shell
+groupadd test   
+```
+
+查看组
+
+```shell
+#查看当前用户所属组
+groups
+
+# 查看系统所有组
+cat /etc/group
+```
+
+> [/etc/group详解](/etc/group详解)
+>
+> 组名:口令:组标识号:组内用户列表(逗号隔开)
+
+添加用户到组
+
+```
+usermod -G groupname username
+```
+
+> 一个用户可以属于多个组，此命令将用户添加到新组中，不改变其原先的组
+
+变更用户组
+
+```shell
+usermod -g groupname username
+```
+
+> 将用户添加到新组中，并从原有的组中除去
+
+##### 权限
+
+查看权限
+
+```
+使用ls -l可查看文件的属性字段，文件属性字段总共有10个字母组成，第一个字母表示文件类型，如果这个字母是一个减号”-”,则说明该文件是一个普通文件。字母”d”表示该文件是一个目录， 后面的9个字母为该文件的权限标识，3个为一组，分别表示文件所属用户、用户所在组、其它用户的读写和执行权限
+```
+
+更改权限
+
+```shell
+chown userMark(+|-)PermissionsMark
+```
+
+> userMark取值：
+>
+> - u：用户
+> - g：组
+> - o：其它用户
+> - a：所有用户
+>
+> PermissionsMark取值：
+>
+> - r:读
+> - w：写
+> - x：执行
+
+更改所有者
+
+```shell
+chown username:groupname dirOrFile
+
+#使用-R选项递归该目录下所有文件的拥有者
+chown -R username:groupname dir
+```
+
+更改所属组
+
+```shell
+chgrp -v -R dirOrFile
+```
 
 #### 文件目录
 
@@ -143,9 +231,11 @@ tar命令和格式.tar.gz和.tar.bz2
     只查看 tar -ztvf xx.tar.gz 只查看
 ```
 
-#### 系统启动
+#### 服务管理
 
-##### 开机启动
+##### 系统启动
+
+###### 开机启动
 
 `chkconfig`和`systemctl enable`
 
@@ -167,9 +257,9 @@ chkconfig --list
 chkconfig --level 345 mysql on
 ```
 
-#### 定时任务
+##### 定时任务
 
-##### crontab
+###### crontab
 
 在计算机正常的情况下，才执行，参数列表如下:
 
@@ -193,13 +283,131 @@ file：file是命令文件的名字,表示将file做为crontab的任务列表文
 00 01 * * * mysqldump -u root --password=passwd-d mustang > /tmp/mustang_$(date +\%Y\%m\%d_\%H\%M\%S).sql
 ```
 
-##### anacron
+###### anacron
 
 处理服务器开关机问题,在该执行的时候因为故障没有执行，在服务器正常的时候，重新执行
 
 ```
 
 ```
+
+#### 进程管理
+
+##### 查询进程
+
+ps
+
+```shell
+# 查询所有进程
+ps -ef
+ps -ajx  # 以完整的格式显示所有进程
+
+# 查询某个用户的进程
+ps -ef|grep username
+ps -lu username
+
+# 查询进程名中包含re的进程
+pgrep re
+```
+
+lsof
+
+```shell
+# 查看端口占用的进程
+lsof -i:3306
+
+# 查看文件占用的进程
+lsof abc.txt # 显示开打开文件abc.txt的进程
+
+# 查看指定的用户(进程)打开的文件
+lsof -u username
+
+# 查看指定的进程号打开的文件
+lsof -p pid
+lsof -c pname
+
+# 查看指定目录下本进程打开的文件(使用+D递归目录)
+lsof +d dir1/
+lsof +D dir1/ 同上，但是会搜索目录下的目录，时间较长
+```
+
+##### 杀死进程
+
+```shell
+kill pid
+
+# 杀死相关进程
+kill -9 pid
+
+# 批量杀死进程
+pkill -9 pname
+```
+
+> 批量杀死进程
+>
+> ```shell
+> ps -ef |grep mysql2hdfs |awk '{print $2}' |xargs kill -9
+> #或者
+> ps -ef  | grep mysql2hdfs |awk '{print "kill -9 " $2}'|sh
+> ```
+>
+> 详细参考：[使用awk批量杀死进程](http://blog.csdn.net/hi_kevin/article/details/17024107),其功能等效于pkill 进程名称
+
+##### 进程监控
+
+```shell
+top
+htop
+```
+
+
+
+#### 网络管理
+
+##### 查询网络服务和端口
+
+```shell
+# 列出所有端口
+netstat -a
+
+# 列出所有tcp端口
+netstat -at
+
+# 列出所有监听的服务状态
+netstat -l
+```
+
+查询xx端口现在运行什么程序
+
+```shell
+#第一步，查询使用该端口的进程的PID；
+lsof -i:7902
+# 第二步,查询该进程
+ps -ef|grep pid
+```
+
+##### 网络路由
+
+```shell
+# 查看路由状态
+route -n
+
+# 探测前往地址IP的路由路径
+traceroute IP
+
+# dns查询，寻找域名domain对应的IP
+host www.baidu.com
+#或者ping查询，查找域名对应的ip
+
+# 反向dns查询
+host ip
+```
+
+
+
+#### 性能监控
+
+//待补充
 
 #### 其它
 
@@ -934,6 +1142,8 @@ sudo make install
 ## 参考
 
 - 基础知识
+
+  [每天一个Linux命令(强烈推荐)](http://blog.jobbole.com/109781/)
 
   [Centos/Linux升级系统内核](http://www.linuxidc.com/Linux/2015-02/112961.htm)
 

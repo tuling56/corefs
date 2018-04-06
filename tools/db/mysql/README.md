@@ -2340,6 +2340,8 @@ mysqluserclone     clone a MySQL user account to one or more new users
 
   [MySQL面试题集锦（推荐）](https://www.toutiao.com/i6488851831869932046/)
 
+  [58同城MySQL规范](https://www.toutiao.com/a6538937654111633933/)
+
 - 调优
 
   [MySQL性能监控](https://www.percona.com/doc/percona-monitoring-and-management/deploy/index.html)

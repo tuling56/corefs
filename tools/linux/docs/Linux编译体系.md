@@ -1,7 +1,59 @@
-##Linux编译体系
+##Linux编译
 [TOC]
 
-### configure体系
+
+
+### 基础
+
+#### 程序构建
+
+##### 配置
+
+###### 查看配置
+
+```shell
+# 查询可用的配置选项:
+./configure --help
+
+# 指定配置路径:
+./configure --prefix=/usr/local/snmp #–prefix是配置使用的最常用选项，设置程序安装的路径；
+```
+
+##### 编译
+
+###### make
+
+```shell
+make -f makefile
+```
+
+> 通过-f选项显示指定需要编译的makefile；如果待使用makefile文件在当前路径，且文件名为以下几个，则不用显示指定
+
+makefile编写
+
+```shell
+待补充
+```
+
+##### 安装
+
+```shell
+
+```
+
+
+
+#### 程序调试
+
+gdb
+
+```shell
+
+```
+
+### 体系
+
+#### configure体系
 
 ```mermaid
 graph LR
@@ -9,9 +61,7 @@ A[configure]-->B[make]
 B-->C[make install]
 ```
 
-
-
-#### 环境变量设置
+##### 环境变量设置
 
 ```
 For compilers to find this software you may need to set:
@@ -40,7 +90,7 @@ export CPPLAGS="$LDFALGS　-I/path1/ -I/path2/"
 export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/lib:/usr/local/opencv/lib:/usr/local/opencv3/lib
 ```
 
-#### pkg-config
+##### pkg-config
 
 ```shell
 # 查看包含目录
@@ -74,14 +124,34 @@ Cflags: -I${includedir_old} -I${includedir_new}
 > export PKG_CONFIG_PATH=${PKG_CONFIG_PATH}:/usr/local/lib/pkgconfig:/usr/local/opencv/lib/pkgconfig/:/usr/local/opencv3/lib/pkgconfig/
 > ```
 
+### 高级
+
+#### 性能优化
+
+//待补充
+
+#### 调试利器
+
+##### gdb
+
+```shell
+
+```
+
+
+
  ##参考
 
-[关于configure和makefile](http://blog.csdn.net/mitesi/article/details/44759949)
+- 基础
 
-[Configure，Makefile.am, Makefile.in, Makefile文件之间的关系](http://my.oschina.net/qihh/blog/66113)
+- 体系
 
-[cmake手册详解系列- SirDigit - 博客园](http://www.cnblogs.com/coderfenghc/tag/cmake/)
+  [关于configure和makefile](http://blog.csdn.net/mitesi/article/details/44759949)
 
-[Linux中的configure,make,make install到底在做些什么](https://www.toutiao.com/i6465202322342412813/)
+  [Configure，Makefile.am, Makefile.in, Makefile文件之间的关系](http://my.oschina.net/qihh/blog/66113)
 
-[gcc指定头文件路径及动态链接库路径 - 开源中国社区（推荐）](http://www.oschina.net/question/565065_115133)
+  [cmake手册详解系列- SirDigit - 博客园](http://www.cnblogs.com/coderfenghc/tag/cmake/)
+
+  [Linux中的configure,make,make install到底在做些什么](https://www.toutiao.com/i6465202322342412813/)
+
+  [gcc指定头文件路径及动态链接库路径 - 开源中国社区（推荐）](http://www.oschina.net/question/565065_115133)
