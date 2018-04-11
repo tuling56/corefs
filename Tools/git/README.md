@@ -9,8 +9,14 @@
 三层配置文件:
 
 - `/etc/gitconfig` 文件：系统中对所有用户都普遍适用的配置。若使用 `git config` 时用 `--system` 选项，读写的就是这个文件。
+
 - `~/.gitconfig` 文件：用户目录下的配置文件只适用于该用户。若使用 `git config` 时用 `--global` 选项，读写的就是这个文件。
-- 当前项目的 Git 目录中的配置文件（也就是工作目录中的 `.git/config` 文件）：这里的配置仅仅针对当前项目有效。每一个级别的配置都会覆盖上层的相同配置，所以 `.git/config` 里的配置会覆盖 `/etc/gitconfig` 中的同名变量。
+
+- 当前项目的 Git 目录中的配置文件（也就是工作目录中的 `.git/config` 文件）：这里的配置仅仅针对当前项目有效。
+
+  ​
+
+  每一个级别的配置都会覆盖上层的相同配置，所以 `.git/config` 里的配置会覆盖 `/etc/gitconfig` 中的同名变量。
 
 查看配置：
 
@@ -122,22 +128,46 @@ git config --global merge.tool vimdiff
 # 还有一个比较常用的是，在解决合并冲突时使用哪种差异分析工具。比如要改用 vimdiff 的话
 ```
 
+##### 帮助
+
+```shell
+git help xxx
+git xxx --help
+man git-xxx
+# 其中xxx是具体的命令，例如config命令
+```
+
 #### 使用
 
 ##### 基础流程
 
+```mermaid
+graph LR
+A[创建本地仓库]--> B[添加远程仓库]
+B-->C[推送到远程仓库]
+
+D(克隆远程仓库)-->C
+C-->D
+```
+
+
+
 ###### 创建版本库
 
+创建版本库之后会在当前目录下生成`.git`文件夹
+
 ```shell
+# 说明git_pro1可以是已有的目录
 mkdir git_pro1
 cd git_pro1
+
 git init
 ```
 
 > 创建之后可选择修改仓库的配置:
 >
 > ```shell
-> git config user.name "XX"
+> git config user.name "xx"
 > git config user.email "xxx@xx.com"
 > ```
 
@@ -166,11 +196,13 @@ git push origin dev
 
 ######  clone
 
-clone指定分支
+克隆仓库，可以在clone时候指定分支，clone指定分支
 
 ```shell
-git clone -b 仓库地址
+git clone -b 仓库地址  [本地仓库名]
 ```
+
+
 
 ###### commit
 
@@ -233,14 +265,14 @@ git push 远程仓库名 远程仓库分支
 
 #### 传输协议
 
-- 本地协议
+协议一览：
+
+- 本地协议(不常用)
 - git协议(不推荐)
 - ssh协议
-- http/s协议
+- http[s]协议
 
-##### ssh/https
-
-在git中clone项目有两种方式：HTTPS和SSH，它们的区别如下：
+综述：在git中clone项目有两种方式：HTTPS和SSH，它们的区别如下：
 
 - HTTPS
 
@@ -250,9 +282,13 @@ git push 远程仓库名 远程仓库分支
 
   clone的项目你必须是拥有者或者管理员，而且需要在clone前添加SSH Key。SSH 在push的时候，是不需要输入用户名的，如果配置SSH key的时候设置了密码，则需要输入密码的，否则直接是不需要输入密码的。
 
-###### https协议
+##### https协议
 
 以https协议clone的项目在推送的时候还需要配置配置一个post-update挂钩，否则推送不成功
+
+##### ssh协议
+
+ssh协议
 
 ### 进阶
 
@@ -449,7 +485,65 @@ cd /var/git/web3/etc/puppet
 
 ####  Tag
 
-//待补充
+给历史中的某一个提交打上标签，比如用来标记发布节点
+
+##### 列出标签
+
+```shell
+#列出所有标签
+git tag
+
+#列表指定系列的标签
+git tag -l 'v1.85*'
+```
+
+##### 创建标签
+
+两种标签类型：轻量标签和附注标签
+
+###### 附注标签
+
+```shell
+git tag -a v1.4 -m "my version1.4"
+```
+
+> `-m` 选项指定了一条将会存储在标签中的信息。 如果没有为附注标签指定一条信息，Git 会运行编辑器要求你输入信息。通过使用 `git show` 命令可以看到<u>标签信息</u>与对应的<u>提交信息</u>
+>
+> ```shell
+> git show v1.4
+> ```
+
+###### 轻量标签
+
+轻量标签只是将提交检验和存储到一个文件中，没有保存任何其它信息
+
+```shell
+git tag v1.4
+```
+
+> `git show`不会看到额外的标签信息，只会显示出提交信息
+>
+> ```shell
+> git show v1.4
+> ```
+
+###### 后期打标签
+
+对过去的提交打标签
+
+```shell
+#　查看过去的提交
+git log --pretty=oneline
+
+# 为过去的某个提交打标签
+git tag -a v1.4 xxxxx(校验和)
+```
+
+> `git show`查看打的标签
+>
+> ```shell
+> git show v1.4
+> ```
 
 ### 应用
 
@@ -475,6 +569,14 @@ remote: error:
 remote: error: To squelch this message and still keep the default behaviour, set
 remote: error: 'receive.denyCurrentBranch' configuration variable to 'refuse'.
 ```
+
+#### Rebase和Merge的区别
+
+```shell
+
+```
+
+
 
 ## 参考
 

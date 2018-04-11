@@ -166,6 +166,26 @@ fi
 mkdir -p ./application/{controllers,models,static,static/css,static/js,templates}
 ```
 
+##### 权限
+
+**文件**
+
+文件的最高权限是666，umask的默认是0022，第一位0是特殊权限，022是默认权限，
+
+最高权限-默认权限=文件的真实权限`_rw_r__r__`
+
+**文件夹**
+
+文件夹的最高权限是777，umask的默认是0033，第一位0是特殊权限，033是默认权限
+
+最高权限-默认权限=文件的真实权限`_rw_r__r__`
+
+[umask更改](https://www.cnblogs.com/wish123/p/7073114.html)
+
+```shell
+umask 0022
+```
+
 ##### 解压缩
 
 zip 命令（zip格式）
@@ -960,6 +980,21 @@ export PATH=$JAVA_HOME/bin:$PATH
 ```
 
 ### 软件使用
+
+linux下软件安装的方式：
+
+1、自动安装： yum install package
+
+2、用二进制文件安装：rpm -ivh file.rpm
+
+3、源代码安装：
+
+```shell
+1) cd 到源代码解压后的目录；
+2) ./configure [--prefix=newpath](自己指定安装路径)；
+3) make ; 
+4) make install(这一步要有root权限)
+```
 
 #### ffmpeg
 
