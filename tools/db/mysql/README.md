@@ -323,6 +323,30 @@ json
 
 ```
 
+整型
+
+```shell
+bigint int smallint tinyint
+```
+
+浮点型
+
+```shell
+float decimal
+```
+
+字符串
+
+```shell
+char vachar
+```
+
+日期时间
+
+```shell
+
+```
+
 ###### 操作
 
 [增加字段](http://c.biancheng.net/cpp/html/1456.html)
@@ -336,6 +360,9 @@ alter table newexample add address varchar(110) after stu_id;
 
 ```mysql
 alter table table_name change old_field_name new_field_name field_type;
+
+#例子：
+alter table study.test change author author varchar(25) not null default '';
 ```
 
 删除字段
@@ -401,31 +428,28 @@ UPDATE tbl SET col1 = col1 + 1, col2 = col1;
 4. 全文索引适用于海量数据的关键字模糊搜索。
 ```
 
-
-
 ##### 创建和删除
 
->加索引
+加索引
 
-mysql> alter table 表名 add index 索引名 (字段名1[，字段名2 …]);
+```mysql
+# 加普通索引
+alter table 表名 add index 索引名 (字段名1[，字段名2 …]);
 
->加主关键字的索引
+# 加主索引
+alter table 表名 add primary key (字段名);
 
-mysql> alter table 表名 add primary key (字段名);
+# 加唯一索引
+alter table 表名 add unique 索引名 (field1,filed2);
+```
 
-例子： mysql> alter table employee add primary key(id);
+删除索引
 
->加唯一限制条件的索引
+```mysql
+alter table 表名 drop index 索引名;
+```
 
- mysql> alter table 表名 add unique 索引名 (field1,filed2);
-
- 例子： mysql> alter table employee add unique emp_name2(cardnumber);
-
->删除某个索引
-
-mysql> alter table 表名 drop index 索引名;
-
-> 添加约束
+添加约束
 
 ```mysql
 # 单列约束
@@ -434,7 +458,7 @@ ALTER TABLE Persons ADD UNIQUE (Id_P);
 ALTER TABLE Persons ADD CONSTRAINT uc_PersonID UNIQUE (Id_P,LastName);
 ```
 
-> 撤销约束
+撤销约束
 
 ```mysql
 # unique是索引的一种
@@ -583,7 +607,7 @@ CSV（Comma-Separated Values逗号分隔值）
 (10)    LIMIT <limit_number>
 ```
 
-> 此处牵涉到别名的使用地点问题
+> 此处牵涉到别名的使用地点问题，只有在select和orderby 中才能使用
 
 ### 高级
 
@@ -983,9 +1007,7 @@ SELECT name_varchar from study.datatype order by CONVERT(name_varchar USING gbk)
 
 #### 索引
 
-单索引和联合索引
-
-##### 索引类型
+单索引和联合索引，单索引有以下的类型:
 
 索引类型是基于索引方法的，有各自的特点 
 
@@ -1002,6 +1024,14 @@ SELECT name_varchar from study.datatype order by CONVERT(name_varchar USING gbk)
 唯一索引:数据列不允许重复，允许为NULL值，一个表允许多个列创建唯一索引。
 普通索引:基本的索引类型，没有唯一性的限制，允许为NULL值。
 ```
+
+##### 主键索引
+
+##### 唯一索引
+
+##### 普通索引
+
+##### 联合索引
 
 #### 正则
 
@@ -1022,7 +1052,11 @@ select 'JetPack 1000'  regexp '^1000';
 
 ##### 模糊匹配
 
+模糊
 
+```mysql
+select * from xx where xx like '%_%'
+```
 
 #### 子查询
 
@@ -1042,7 +1076,17 @@ select 'JetPack 1000'  regexp '^1000';
 - where之后:where子查询
 - from之后：from子查询
 
+例子：
+
+```mysql
+select id-(select pv_int from study.task where id=2) from study.task;
+```
+
+
+
 ##### 关键字
+
+exists、any、all三个关键字，这些关键字此处配合的都是where子查询
 
 ###### exists关键字
 
@@ -1228,6 +1272,8 @@ source file3.SQL
 ```
 
 ##### 插入技巧
+
+一次性多插
 
 ```mysql
 # 一次性插入多个值
@@ -2310,6 +2356,8 @@ mysqluserclone     clone a MySQL user account to one or more new users
 
   [MySQL如何对汉字排序](https://www.toutiao.com/i6501470153962684941/)
 
+  [MySQL最左前缀原理与实现](https://www.toutiao.com/i6548007500254282247/)
+
   [MySQL分组后选取指定值问题](http://www.jb51.net/article/31590.htm)
 
   [MySQL实现full join](https://www.cnblogs.com/liuyifan/p/4985512.html)
@@ -2341,6 +2389,8 @@ mysqluserclone     clone a MySQL user account to one or more new users
   [MySQL面试题集锦（推荐）](https://www.toutiao.com/i6488851831869932046/)
 
   [58同城MySQL规范](https://www.toutiao.com/a6538937654111633933/)
+
+  [互联网MySQL规范](https://www.toutiao.com/a6535777088434078211/)
 
 - 调优
 
