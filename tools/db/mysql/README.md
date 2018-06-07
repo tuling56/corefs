@@ -325,7 +325,7 @@ json
 
 整型
 
-```shell
+```mysql
 bigint int smallint tinyint
 ```
 
@@ -333,6 +333,7 @@ bigint int smallint tinyint
 
 ```shell
 float decimal
+
 ```
 
 字符串
@@ -345,6 +346,19 @@ char vachar
 
 ```shell
 
+```
+
+==综合测试==
+
+```mysql
+create table if not exists basic_test(
+    ia_tiny tinyint unsigned,
+    ib_small smallint unsigned,
+    ib1_small smallint,
+    ic_float float,
+    id_double decimal,
+    ie_boolen boolean
+);
 ```
 
 ###### 操作
@@ -1378,7 +1392,9 @@ optional arguments:
 
 为mysql数据库快速生成restful api
 
-#### 选取结果添加行号
+#### 结果处理
+
+##### 选取结果添加行号
 
 ```mysql
 # 方法1 
@@ -1392,7 +1408,9 @@ select (@mycnt := @mycnt + 1) as ROWNUM , vv from task1_tbl order by vv;
 # #用Python等脚本语言对查询结果进行二次组装
 ```
 
-#### 近段时间数据修复
+#### 日期操作
+
+##### 上周同期
 
 ```mysql
 # 用上周同期的数据浮动修复本周的数据
@@ -1423,7 +1441,7 @@ where
 	date='20170309'  and  date<='20170315' and date!='20170313';
 ```
 
-#### 选取指定日期
+##### 选取指定日期
 
 ```mysql
 select (DATEDIFF(DATE_ADD(curdate, INTERVAL - DAY(curdate)+ 1 DAY), date_add(curdate- DAY(curdate)+ 1, INTERVAL -1 MONTH)))  as '上月总天数', DATE_ADD(curdate,interval -day(curdate)+1 day) as '当月第一天', date_add(curdate-day(curdate)+1,interval -1 month ) as '上月第一天';
@@ -1431,9 +1449,11 @@ select (DATEDIFF(DATE_ADD(curdate, INTERVAL - DAY(curdate)+ 1 DAY), date_add(cur
 
 > 这段还没有完全调通
 
-#### 字符包含问题
+#### 字符串
 
-##### 单字段包含
+##### 字符包含
+
+###### 单字段包含
 
 判断某个字段是否[包含](http://blog.csdn.net/hechurui/article/details/49278493)某个字符串的方法
 
@@ -1455,7 +1475,7 @@ update site set url =concat('http://',url) where locate('http://',url)=0;
 select if(b.channel_type is NULL,'其它',b.channel_type),a.channel from channels_data a LEFT JOIN channels_conf b on FIND_IN_SET(a.channel,b.channels)>0;
 ```
 
-##### 多列组合包含
+###### 多列组合包含
 
 ```mysql
 select * from `magazine` where concat(ifnull(`title`,''),ifnull(`tag`,''),ifnull(`description`,'')) like '%关键字%';
@@ -1463,7 +1483,31 @@ select * from `magazine` where concat(ifnull(`title`,''),ifnull(`tag`,''),ifnull
 
 > 注意多列组合包含的情况下，若一列为null，则整个为null,遗漏记录
 
-#### 跨库Join问题
+##### 字符替换
+
+###### 特殊字符替换
+
+char(9) 水平制表符
+char(10)换行键
+char(13)回车键
+
+```mysql
+1> 回车符  char(13)
+SELECT *, REPLACE(detail, CHAR(13) , '<br>') AS 显示替换后的内容 FROM Test
+
+2>换行符
+SELECT *, REPLACE(detail, CHAR(10), '<br>') AS 显示替换后的内容 FROM Test
+
+3>回车换行符
+SELECT *, REPLACE(detail, CHAR(13) + CHAR(10), '<br>') AS 显示替换后的内容 FROM Test
+
+4>将回车换行符替换成<BR><BR>
+UPDATE Test SET detail = REPLACE(detail, CHAR(13) + CHAR(10), '<br><br>');
+```
+
+#### join问题
+
+##### 跨库Join
 
 - 字段冗余设计
 - 表复制和同步到一个库中
@@ -2317,7 +2361,9 @@ mysqluserclone     clone a MySQL user account to one or more new users
 
 #### 面试
 
-##### 自增主键
+##### 索引和主键
+
+###### 自增主键
 
 问题描述：
 
@@ -2332,6 +2378,8 @@ mysqluserclone     clone a MySQL user account to one or more new users
 ## 参考
 
 - 基础
+
+  [新手MySQL工程师命令必备手册](https://www.toutiao.com/i6556743086267957763/)
 
   [MyCli:支持自动补全和语法高亮的MySQL客户端](http://hao.jobbole.com/mycli-mysql/)
 
@@ -2377,6 +2425,8 @@ mysqluserclone     clone a MySQL user account to one or more new users
   [Mysql区间分组统计](https://www.cnblogs.com/lazyx/p/5577105.html)
 
 - 积累
+
+  [MySQL日期操作（推荐）](https://www.toutiao.com/i6558233017058329091/)
 
   [MySQL语句概述（各种语句的区别）](https://www.2cto.com/database/201610/555167.html)
 

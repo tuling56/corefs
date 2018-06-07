@@ -1,10 +1,12 @@
-## Perl学习笔记
+## Perl笔记
 
 [TOC]
 
 ### 基础
 
-#### 运行方式
+#### 基本
+
+##### 运行方式
 
 交互式编程
 
@@ -20,6 +22,18 @@ perl -e 'print "Hello World\n"'
 # 输出 "Hello, World"   # 这是perl单行注释方法
 print "Hello, world\n";
 
+```
+
+然后执行`chmod 0755 hello.pl && ./hello.pl`,或者`perl hello.pl` 
+
+##### 注释
+
+```perl
+# 单行注释
+# 输出 "Hello, World"   # 这是perl单行注释方法
+print "Hello, world\n";
+
+# 多行注释
 =pod注释名称
 这是一个多行注释
 \=pod、 \=cut只能在行首。
@@ -28,11 +42,11 @@ print "Hello, world\n";
 =cut
 ```
 
-然后执行`chmod 0755 hello.pl && ./hello.pl`,或者`perl hello.pl` 
-
-#### 数据类型
+#### 数据类型 
 
 perl是弱类型的语言， 所以变量不需要指定类型，perl解释器会根据上下文自动选择匹配的类型。
+
+##### 基础类型
 
 perl有三个基本的数据类型：变量、数组和哈希
 
@@ -60,6 +74,27 @@ $mysecond=233.23;   #浮点数　
 # 哈希是一个无序的 key/value 对集合。可以使用键作为下标获取值。哈希变量以字符"%"开头。
 %h=('a'=>1,'b'=>2); 
 ```
+
+##### 复杂类型
+
+###### 引用
+
+引用就是指针，perl引用是一个标量类型可以窒息变量，数组和哈希（关联数据组）甚至子程序
+
+```perl
+# 待补充
+```
+
+#### 运算符
+
+- [算术运算符](http://www.runoob.com/perl/perl-operators.html#Arithmetic)
+- [比较运算符](http://www.runoob.com/perl/perl-operators.html#Equality)
+- [逻辑运算符](http://www.runoob.com/perl/perl-operators.html#Logical)
+- [赋值运算符](http://www.runoob.com/perl/perl-operators.html#Assignment)
+- [位运算符](http://www.runoob.com/perl/perl-operators.html#Bitwise)
+- [引号运算符](http://www.runoob.com/perl/perl-operators.html#Quote)
+- [其他运算符](http://www.runoob.com/perl/perl-operators.html#Miscellaneous)
+- [运算符优先级](http://www.runoob.com/perl/perl-operators.html#Precedence)
 
 #### 控制语句
 
@@ -100,16 +135,15 @@ $mysecond=233.23;   #浮点数　
 | [redo 语句](http://www.runoob.com/perl/perl-redo-statement.html) | redo 语句直接转到循环体的第一行开始重复执行本次循环，redo语句之后的语句不再执行，continue语句块也不再执行； |
 | [goto 语句](http://www.runoob.com/perl/perl-goto-statement.html) | Perl 有三种 goto 形式：got LABLE，goto EXPR，和 goto &NAME。 |
 
-#### 运算符
+#### 输入输出
 
-- [算术运算符](http://www.runoob.com/perl/perl-operators.html#Arithmetic)
-- [比较运算符](http://www.runoob.com/perl/perl-operators.html#Equality)
-- [逻辑运算符](http://www.runoob.com/perl/perl-operators.html#Logical)
-- [赋值运算符](http://www.runoob.com/perl/perl-operators.html#Assignment)
-- [位运算符](http://www.runoob.com/perl/perl-operators.html#Bitwise)
-- [引号运算符](http://www.runoob.com/perl/perl-operators.html#Quote)
-- [其他运算符](http://www.runoob.com/perl/perl-operators.html#Miscellaneous)
-- [运算符优先级](http://www.runoob.com/perl/perl-operators.html#Precedence)
+##### 格式化输出
+
+perl是一个非常强大的文本数据处理语言，perl中可以使用format来定义一个模板，然后使用write按指定模板输出数据
+
+> 这部分比较繁琐啊
+
+### 进阶
 
 #### 子程序（函数）
 
@@ -118,16 +152,6 @@ $mysecond=233.23;   #浮点数　
 变量的作用域
 
 函数的返回值
-
-#### 引用
-
-引用就是指针，perl引用是一个标量类型可以窒息变量，数组和哈希（关联数据组）甚至子程序
-
-#### 格式化输出
-
-perl是一个非常强大的文本数据处理语言，perl中可以使用format来定义一个模板，然后使用write按指定模板输出数据
-
-> 这部分比较繁琐啊
 
 #### 错误处理
 
@@ -194,7 +218,7 @@ Can't locate URI/Escape.pm in @INC (you may need to install the URI::Escape modu
 
 perl如何安装第三方的模块
 
-```
+```perl
 一些常用模块的简单描述 http://www.perldoc.com/perl5.6/pod/perlmodlib.html 
 
 在perl 中使用模块： 
@@ -248,7 +272,7 @@ perldoc Net::FTP
 
 ### 应用
 
-#### 日期时间操作
+#### 日期时间
 
 时间的获取：localtime,time()和gmtime()
 
@@ -284,7 +308,7 @@ perl的正则表达是最强大的，主要有以下匹配、替换和转化三�
 
 缺乏分组和前向匹配和后向匹配是说明
 
-#### 数据库操作
+#### 数据库
 
 基本的查询完成，但数据库的事务等还没涉及
 
@@ -294,9 +318,15 @@ perl的正则表达是最强大的，主要有以下匹配、替换和转化三�
 
 ##  参考
 
-[菜鸟网络Perl教程](http://www.runoob.com/perl/perl-process-management.html)
+- 基础
 
-[Perl已有和常用模块使用总结](http://blog.csdn.net/wangwenwen/article/details/17427967)
+  [菜鸟网络Perl教程](http://www.runoob.com/perl/perl-process-management.html)
 
-[Perl模块的安装](http://www.cnblogs.com/wangkangluo1/archive/2012/06/14/2548677.html)
+- 进阶
+
+  [Perl已有和常用模块使用总结](http://blog.csdn.net/wangwenwen/article/details/17427967)
+
+  [Perl模块的安装](http://www.cnblogs.com/wangkangluo1/archive/2012/06/14/2548677.html)
+
+- 应用
 

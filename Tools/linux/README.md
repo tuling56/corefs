@@ -313,6 +313,8 @@ file：file是命令文件的名字,表示将file做为crontab的任务列表文
 
 #### 进程管理
 
+进程是操作系统的概念，每次执行一个程序就相当于创建了一个进程，伴随着资源的分配和释放，可以认为进程是一个程序的执行过程
+
 ##### 查询进程
 
 ps
@@ -379,8 +381,6 @@ pkill -9 pname
 top
 htop
 ```
-
-
 
 #### 网络管理
 
@@ -719,9 +719,129 @@ rsync.exe -e "ssh -i /usr/rsync_id_dsa" /tmp/testfile csdn@remotehost:/tmp/
 >
 > > chmod  600  id_rsa
 
-##### scp/sftp/ssh
+##### scp
 
-Fabric、paramito和watchdog的组合方案
+​	scp是secure copy的简写，用于在Linux下进行远程拷贝文件的命令，获得远程服务器上的某个文件，远程服务器既没有配置ftp服务器，没有开启web服务器，也没有做共享，无法通过常规途径获得文件时，只需要通过scp命令便可轻松的达到目的；
+
+###### 安装
+
+```
+在安装ssh的时候已经自带了
+
+```
+
+参数指定
+
+```
+-P 端口(若使用默认的ssh端口，则不需要修改)
+-p 表示保持文件权限；
+-r 表示递归复制；
+-v 和大多数 linux 命令中的 -v 意思一样，用来显示进度，可以用来查看连接、认证或是配置错误；
+-C 使能压缩选项；
+
+```
+
+###### 使用
+
+上传文件
+
+```shell
+scp /home/liujia/file1.txt  liujia@172.16.252.32:/user/liujia
+# 上传本地file1.txt到远程的/user/liujia目录，最终结果为/user/liujia/file1.txt
+```
+
+上传文件夹
+
+```shell
+scp -r /home/liujia/dir1  liujia@172.16.252.32:/user/liujia
+# 上传本地的dir1目录到远程的/user/liujia目录，最终的结果为/user/liujia/dir1
+```
+
+下载文件
+
+```shell
+scp root@172.16.252.32:/user/liujia/tex.txt  .
+# 下载远程的tex.txt 到当前目录为tex.txt
+```
+
+下载文件夹
+
+```shell
+scp -r liujia@172.16.252.32:/user/liujia/dir1  /home/projects
+# 复制远程的dir1目录到本地的/home/projects目录下，最终的结果是/home/projects/dir1
+```
+
+##### sftp
+
+```shell
+sftp -o port=60066 user@serverip:/home/user/
+#其中-o port选项指定非缺省的ssh端口。
+```
+
+下载文件
+
+```shell
+get remote_file_name local_file_name
+```
+
+下载文件夹
+
+```
+get -r some_directory_name
+```
+
+上传文件
+
+```shell
+put local_file_name
+```
+
+上传文件夹
+
+```shell
+put -r local_directory_name
+```
+
+##### ftp/lftp
+
+//使用方法待补充
+
+lftp是增强版的ftp客户端，可进行文件夹的下载，还支持tab的自动补全，而原生的ftp客户端对文件夹的下载支持很不好
+
+此外,登录方式也有差异：
+
+原生ftp的登录方式是:
+
+```shell
+ftp ip/hostname,然后提示输入用户名和密码连接即可
+```
+
+而lftp的登录方式则是一键登录，用户名和密码卸载一起
+
+```shell
+lftp yjm:123@192.168.0.194
+```
+
+lftp也可以直接从配置文件中读取命令
+
+```shell
+lftp -f lftp_collection.ini
+```
+
+> 其中lftp_collection.ini内容如下
+>
+> ```shell
+> open hostxxxx
+> user username  passwd
+> cd /htdocs/aggr/
+> put ./collection.html
+> mv ./collection.html ./index.html
+> ```
+
+
+##### 自建方案
+
+基于ssh技术，使用Fabric、paramito和watchdog的组合方案
 
 Fabric
 
@@ -738,6 +858,7 @@ watchdog
 基于Fabric的文件自动同步工具
 
 ![](http://p1.pstatp.com/large/31d30002e98f69b6957f)
+
 
 #### 文件监控
 
@@ -769,7 +890,7 @@ rpm -qa
 
 查看
 
-```
+```shell
 rpm -ql 包名
 ```
 
@@ -929,11 +1050,11 @@ Synopsis:  sendEmail -f ADDRESS [options]
 --help misc               explain -o options, TLS, SMTP auth, and more
 ```
 
-参考：
+##### python自建
 
-[不可或缺的sendEmail](http://blog.csdn.net/leshami/article/details/8314570)
-
-[如何使用sendEmail发送邮件](http://www.ttlsa.com/linux/use-sendemail/)
+```shell
+使用相应的python包和自动发送邮件预警
+```
 
 ### 环境配置
 
@@ -983,9 +1104,9 @@ export PATH=$JAVA_HOME/bin:$PATH
 
 linux下软件安装的方式：
 
-1、自动安装： yum install package
+1、自动安装： `yum install package`
 
-2、用二进制文件安装：rpm -ivh file.rpm
+2、用二进制文件安装：`rpm -ivh file.rpm`
 
 3、源代码安装：
 
@@ -1111,57 +1232,9 @@ ssh xxx@xxxx < test.sh
 
 ```
 
-#### scp
-
-​	scp是secure copy的简写，用于在Linux下进行远程拷贝文件的命令，获得远程服务器上的某个文件，远程服务器既没有配置ftp服务器，没有开启web服务器，也没有做共享，无法通过常规途径获得文件时，只需要通过scp命令便可轻松的达到目的；
-
-##### 安装
-
-```
-在安装ssh的时候已经自带了
-```
-
-参数指定
-
-```
--P 端口(若使用默认的ssh端口，则不需要修改)
--p 表示保持文件权限；
--r 表示递归复制；
--v 和大多数 linux 命令中的 -v 意思一样，用来显示进度，可以用来查看连接、认证或是配置错误；
--C 使能压缩选项；
-```
-
-##### 使用
-
-上传文件
-
-```shell
-scp /home/liujia/file1.txt  liujia@172.16.252.32:/user/liujia
-# 上传本地file1.txt到远程的/user/liujia目录，最终结果为/user/liujia/file1.txt
-```
-
-上传文件夹
-
-```shell
-scp -r /home/liujia/dir1  liujia@172.16.252.32:/user/liujia
-# 上传本地的dir1目录到远程的/user/liujia目录，最终的结果为/user/liujia/dir1
-```
-
-下载文件
-
-```shell
-scp root@172.16.252.32:/user/liujia/tex.txt  .
-# 下载远程的tex.txt 到当前目录为tex.txt
-```
-
-下载文件夹
-
-```shell
-scp -r liujia@172.16.252.32:/user/liujia/dir1  /home/projects
-# 复制远程的dir1目录到本地的/home/projects目录下，最终的结果是/home/projects/dir1
-```
-
 #### jq
+
+json格式化筛选和查询工具
 
 ##### 安装
 
@@ -1172,6 +1245,98 @@ autoreconf -i
 ./configure --disable-maintainer-mode
 make
 sudo make install
+```
+
+##### 使用
+
+```shell
+# jq的使用
+```
+
+#### q
+
+[q](http://harelba.github.io/q/examples.html#example1)是像mysql一样对csv等格式化的文本数据进行统计
+
+##### 安装
+
+```shell
+wget -c  --no-check-certificate https://github.com/harelba/packages-for-q/raw/master/rpms/q-text-as-data-1.7.1-1.noarch.rpm
+
+rpm -ivh q-text-as-data-1.7.1-1.noarch.rpm
+rpm -U q-text-as-data-1.7.1-1.noarch.rpm
+```
+
+##### 使用
+
+参数配置
+
+```shell
+# 输入参数
+-H	输入是否包含头部
+-d	输入分割符
+-t	输入分割符为tab
+-q	从指定的输入分割符文件列表中读取
+
+#输出参数
+-O	输出头
+-D	输出分割符
+-T	输出分割符为tab
+```
+
+列名
+
+```
+Use  -H  to  signify  that  the  input contains a header line. Column names will be detected automatically in that case, and can be used in the query. If this option is not provided,
+       columns will be named cX, starting with 1 (e.g. q "SELECT c3,c8 from ...").
+```
+
+###### 基础 
+
+首先使用`man q`进行帮助查看
+
+```shell
+# 读取单个文件
+q -H -d, "select max(wt),count(distinct cyl) from ./mtcars.csv"
+q -H -d, "select name,cyl,wt from ./mtcars.csv where cyl=4 order by wt limit 10"
+q -H -d, "select cyl,count(*) from ./mtcars.csv group by cyl"
+
+# 读取多个文件
+SELECT * FROM datafile1+datafile2+datefile3;
+SELECT * FROM mydata*.dat;
+
+```
+
+###### 高级
+
+读取标准输入
+
+```shell
+# 处理文件目录
+sudo find /tmp -ls | q "SELECT c5,c6,sum(c7)/1024.0/1024 AS total FROM - GROUP BY c5,c6 ORDER BY total desc"
+
+# 读取文件的标注输入
+cat ./mtcars.csv |q -H -d, "select cyl,count(*) from - group by cyl"
+```
+
+> 像mysql一样使用，若没有列则直接用c1,c2来表示
+
+文件关联
+
+```shell
+q -H -d, "SELECT myfiles.c8,emails.c2 
+	FROM exampledatafile myfiles 
+	JOIN group-emails-example emails 
+	ON (myfiles.c4 = emails.c1) 
+	WHERE myfiles.c8 = 'ppp'
+	"
+```
+
+#### lynx/w3m 
+
+无界面浏览器
+
+```shell
+
 ```
 
 ## 参考
@@ -1208,6 +1373,14 @@ sudo make install
 
   [基于inotify-tools和rsync的文件夹自动同步工具](https://www.toutiao.com/i6503742233206850061/)
 
+  [不可或缺的sendEmail](http://blog.csdn.net/leshami/article/details/8314570)
+
+  [如何使用sendEmail发送邮件](http://www.ttlsa.com/linux/use-sendemail/)
+
+  [scp上传和下载](http://blog.csdn.net/liuxiao723846/article/details/55045988)
+
+  [手把手教你使用sftp进行文件传输](https://www.tuicool.com/articles/FZRF7v)
+
 - 环境配置
 
   [Linux下安装Sun JDK（删除Open JDK）](http://www.toutiao.com/i6416458864656384514/)
@@ -1222,9 +1395,6 @@ sudo make install
 
   [命令行下json处理工具:jq](http://blog.csdn.net/neven7/article/details/50626153)
 
-  [scp上传和下载](http://blog.csdn.net/liuxiao723846/article/details/55045988)
+  [CSV统计工具:q](http://harelba.github.io/q/install.html)
 
-  ​
-
-  ​
 

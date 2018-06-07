@@ -1,9 +1,9 @@
-##LeetCode题解MySQL
+##LeetCode题解--MySQL
 [TOC]
 
 ### 题目
 
-#### [rank scores](https://leetcode.com/problems/rank-scores/description/)
+#### [Rank scores](https://leetcode.com/problems/rank-scores/description/)
 
 相等的同样的排序，然后后续接着来，中间不空
 
@@ -48,7 +48,7 @@ select distinct Num as ConsecutiveNums a where (select count(distinct Num) from 
 
 找出赚的比他的经理多的人
 
-```
+```mysql
 select Name as Employee from Employee a where (select Salary from Employee b where a.ManagerID=b.ID)<a.Salary;
 ```
 
@@ -175,16 +175,16 @@ Write a SQL query to get the *n*^th^ highest salary from the `Employee` table.
 +----+--------+
 ```
 
-##### 不分组第N大
+不分组第N大
 
 ```mysql
-# 参加以前的TopN
+# 参考以前的TopN
 ```
 
-##### 分组第N大
+分组第N大
 
 ```mysql
-# groupTopN
+# 参考groupTopN
 ```
 
 #### [Rising Temperature](https://leetcode.com/problems/rising-temperature/description/)
@@ -343,4 +343,10 @@ AND l2.Num = l3.Num
 select (select a.* from stadium a inner join stadium b on b.id=a.id+1 and a.people>100 and b.people>100);
 ```
 
+### 扩展
+
+//待补充
+
  ##参考
+
+[LeetCode题解-MySQL](https://leetcode.com/problemset/database/)

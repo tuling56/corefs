@@ -116,17 +116,27 @@ awk中字符串匹配
 
 ##### 数组
 
-###### 普通数组
+###### [普通数组](http://www.cnblogs.com/chengmo/archive/2010/09/30/1839632.html)
 
 读取
 
 ```shell
 a=(1 2 3 4 5)
+
+# 取单个
 echo ${a[0]}
+
+# 取所有
 echo ${a[@]} # 或者echo ${a[*]}
+
 # 取长度
 lentmp=${#a[@]}
 len=$((lentmp-1))
+```
+
+遍历
+
+```shell
 # 遍历
 for i in `seq 0 $((${#a[@]}-1))`;do
 	if [ $i -eq '0'];then
@@ -135,6 +145,22 @@ for i in `seq 0 $((${#a[@]}-1))`;do
 		echo -en "\t"$i
 	fi
 	echo 
+done
+
+#并行遍历(要求两个数组一样长)
+a=(1 2 3 4 5)
+b=('a' 'b' 'c' 'd' 'e')
+for i in `seq 0 $((${#a[@]}-1))`;do
+    echo  "${a[$i]}:${b[$i]}"
+done
+
+# 笛卡尔积
+a=(1 2 3 4 5)
+b=('a' 'b' 'c' 'd' 'e')
+for i in `seq 0 $((${#a[@]}-1))`;do
+	for j in `seq 0 $((${#b[@]}-1))`;do
+    	echo  "${a[$i]}:${b[$j]}"
+    done
 done
 ```
 
@@ -152,6 +178,7 @@ echo ${#a[*]} # 结果为4
 赋值
 
 ```shell
+a=(1 2 3 4 5)
 a[1]=100
 echo ${a[*]} # 结果为1 100 2 3 4 5
 ```
@@ -169,13 +196,9 @@ echo ${a[@]:0:3}  # 结果为 1 2 3
 # ${数组名[@或*]/查找字符/替换字符} 该操作不会改变原先数组内容，如果需要修改，可以看上面例子，重新定义数据。
 ```
 
-参考：
-
-[Linux Shell数组建立及使用技巧](https://mp.weixin.qq.com/s?__biz=MzAxODI5ODMwOA==&mid=2666540837&idx=1&sn=f74069270e46c66e9a8bf398e2bc5393&chksm=80dceb8eb7ab6298f57e78a07a217ef8784bb505a800177e0fbdf8c01a0cea645e94becb99cb&scene=0&key=6f6e2130da6015f10fb0174028d998ccfa947b568766e6506a0a2b36dc0d0a6b4553dbb0851e1ab32b6ed2a9179a6294b6b35f43ddda6d17aee9c38b6578f4f1d091b004cdc4dd3723396390ccacdb87&ascene=0&uin=MjQxMzQ2MjU0Mg%3D%3D&devicetype=iMac+MacBookPro12%2C1+OSX+OSX+10.12.4+build(16E195)&version=12010310&pass_ticket=iRlWFNF8bDqkSyuDbwzP7HxW3MoqbC2TNA7mipckDMJx2QkUizxvlkIKyBJb0LkY&winzoom=1&nettype=WIFI&fontScale=100)
-
 ###### 关联数组
 
-命令
+读取
 
 ```shell
 echo ${!garray[*]}   	#取关联数组所有键  
@@ -297,6 +320,52 @@ function f2(){
 
 > 尚存在问题没有解决，只能传递数组的第一个值
 
+##### 输入输出
+
+###### 输入
+
+标准输入
+
+```shell
+#!/bin/bash
+# substr(fu1,2,5),fu2,fu5,fu7,fip,finsert_time
+# 2A5F8   [3,0,8] ["5486","0","0"]        0,1,0   124.91.9.111    1517673596
+while read line;do
+    infos=($line)
+    echo -e -n "hahh:${infos[0]}\t${infos[1]}\t${infos[2]}\t${infos[3]}\t${infos[4]}"
+    ds=`date -d @${infos[5]} "+%Y-%m-%d"`
+    echo -e -n "${ds}\n"
+done
+```
+
+输入重定向
+
+```shell
+#!/bin/bash
+# substr(fu1,2,5),fu2,fu5,fu7,fip,finsert_time
+# 2A5F8   [3,0,8] ["5486","0","0"]        0,1,0   124.91.9.111    1517673596
+while read line;do
+    infos=($line)
+    echo -e -n "hahh:${infos[0]}\t${infos[1]}\t${infos[2]}\t${infos[3]}\t${infos[4]}"
+    ds=`date -d @${infos[5]} "+%Y-%m-%d"`
+    echo -e -n "${ds}\n"
+done < test.data
+```
+
+###### 输出
+
+标准输出
+
+```shell
+
+```
+
+输出重定向
+
+```shell
+sh xxx.sh > xxx.log 2>&1 
+```
+
 #### 运算符
 
 ##### 算术运算法
@@ -417,11 +486,30 @@ function 函数名 {
 }  
 ```
 
-##### 分离函数体执行函数
+##### 分离函数体
 
 ![分离函数体](http://tuling56.site/imgbed/2018-02-08_133315.png)
 
 #### 应用
+
+##### 字符串
+
+###### 字符串复制
+
+循环拼接的方式
+
+```shell
+# 字符串重复n次
+a="hah"
+res=""
+for i in `seq 10`;do 
+	tmp="$(printf '%s- ' $a)"
+	res="$tmp $res"
+done
+echo $res
+```
+
+
 
 ##### 生成序列
 
@@ -438,7 +526,10 @@ while [[ $start_date -le $end_date ]];do
 done
 
 # 生成不连续的日期序列
-
+while read sdate;do
+	echo -e "\e[1;31mstep:\e[0m"$sdate
+	process ${sdate}
+done<sdate_list
 ```
 
 ###### 整数序列
@@ -450,13 +541,15 @@ seq 1 2 10  # 生成序列：1 3 5 7 9
 for i in {1..10};do echo $i;done  # 生成序列1，2,3,4,....19
 ```
 
-生成随机数
+[生成随机数](https://blog.csdn.net/taiyang1987912/article/details/39997303)
 
 ```shell
 
 ```
 
-##### 文件重命名
+##### 文件目录
+
+###### 文件重命名
 
 ``` sh
 # 第一种实现 find+awk+sh
@@ -471,7 +564,9 @@ rename  .sql  .txt *.sql  //好像不能递归目录,其中最后一个是要修
 # find+xargs+sed
 ```
 
-##### 百分比显示
+##### 数学计算
+
+###### 百分比显示
 
 ```shell
  # 方法1：使用bc
@@ -482,13 +577,23 @@ rename  .sql  .txt *.sql  //好像不能递归目录,其中最后一个是要修
  echo "12 260" | awk '{printf("%4.2f%%",$1*100/$2);}'
 ```
 
-参考：
+###### 数组运算
 
-[Shell脚本批量重命名文件后缀的3种实现](http://www.jb51.net/article/55255.htm)
+一维数组
 
-[Shell重命名（智慧大碰撞）](http://www.oschina.net/question/75009_111550)
+```shell
+array=(111 222 333 444 555 999 888 777 666)
 
-[使用awk进行数字计算](http://www.mamicode.com/info-detail-1187091.html)
+# 求最大值、最小值
+
+# 求和、均值
+```
+
+[多维数组求最大值最小值](https://yq.aliyun.com/ziliao/98637)
+
+```shell
+
+```
 
 ##### 多进程
 
@@ -588,6 +693,26 @@ echo "obase=32;507375"|bc
 echo "obase=32;2667327"|bc 
 ```
 
+##### 时间转换
+
+###### 时间戳和日期
+
+```shell
+date +%s   # 可以得到UNIX的时间戳
+
+# 日期转时间戳
+date -d "2015-08-04 00:00:00" +%s     #输出：1438617600
+
+# 时间戳转日期
+date -d @1438617600  "+%Y-%m-%d" 
+```
+
+###### 日期运算
+
+```shell
+
+```
+
 #### 积累
 
 ##### 参数
@@ -601,6 +726,8 @@ set -e命令用法总结如下
 2.作用范围只限于脚本执行的当前进行，不作用于其创建的子进程
 3.另外，当想根据命令执行的返回值，输出对应的log时，最好不要采用sete选项，而是通过配合ext命令来达到输出log并退出执行的目的
 ```
+
+
 
 ### awk
 
@@ -1372,6 +1499,8 @@ unix2dos xx.txt
 
 - **bash部分**
 
+  [shell脚本检查工具shellcheck](https://github.com/koalaman/shellcheck)
+
   [shell教程(c语言中文网)](http://c.biancheng.net/cpp/view/2740.html)(推荐)
 
   [linux参数太长的换行问题](http://blog.csdn.net/feng27156/article/details/39057773)
@@ -1385,6 +1514,12 @@ unix2dos xx.txt
   [shell单行和多行注释](http://blog.csdn.net/lansesl2008/article/details/20558369/)
 
   [shell生成随机数](https://blog.csdn.net/taiyang1987912/article/details/39997303)
+
+  [Shell脚本批量重命名文件后缀的3种实现](http://www.jb51.net/article/55255.htm)
+
+  [Shell重命名（智慧大碰撞）](http://www.oschina.net/question/75009_111550)
+
+  [shell脚本自动化测试框架shUnit2](https://blog.csdn.net/robertsong2004/article/details/37927287)
 
 - **awk部分**
 
@@ -1403,6 +1538,8 @@ unix2dos xx.txt
   [awk 内置函数详细介绍（实例）](http://blog.jobbole.com/92497/)
 
   [awk运算符介绍](http://blog.csdn.net/gaoming655/article/details/7390207)
+
+  [[使用awk进行数字计算](http://www.mamicode.com/info-detail-1187091.html)](http://www.mamicode.com/info-detail-1187091.html)
 
   [awk中的输入和输出重定向](http://blog.chinaunix.net/uid-10540984-id-356795.html)（推荐）
 
@@ -1428,7 +1565,7 @@ unix2dos xx.txt
 
   //待补充
 
-- **应用部分**
+- **实践部分**
 
   //待补充
 

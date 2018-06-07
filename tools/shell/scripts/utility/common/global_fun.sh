@@ -72,6 +72,19 @@ function calcratio()
     echo ${r_o_ratio}
 }
 
+
+# 计算日期差，注意输入的是hive字段
+function calcdate_diff()
+{
+    local first_d=$1
+    local last_d=$2
+
+    diff_d=datediff(concat_ws('-',substring(${last_d},1,4),substring(${last_d},5,2),substring(${last_d},7,2)),
+		            concat_ws('-',substring(${first_d},1,4),substring(${first_d},5,2),substring(${first_d},7,2)))
+
+    echo ${diff_d}
+}
+
 ######################### 字符串分割 ##########################
 # 分割:pgv3_split_c2.xmp_subproduct_other_20170313_21
 function split_s1_m1()

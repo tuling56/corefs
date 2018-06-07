@@ -346,6 +346,10 @@ git流程和状态图
 | 已commit但未push | git diff master origin/master | git reset --hard origin/master           | master是本地仓库，origin/master是远程仓库 |
 | 已push         |                               | git reset --hard HEAD^ 然后执行git push -f   |                                |
 
+##### 修改commit的内容
+
+//待补充
+
 #### 忽略
 
 .gitignore文件的配置
@@ -361,8 +365,6 @@ git fetch origin
 #然后可以比对
 git diff 本地分支 origin/xxxx
 ```
-
-
 
 ### 高级
 
@@ -576,8 +578,6 @@ remote: error: 'receive.denyCurrentBranch' configuration variable to 'refuse'.
 
 ```
 
-
-
 ## 参考
 
 - 基础
@@ -597,6 +597,8 @@ remote: error: 'receive.denyCurrentBranch' configuration variable to 'refuse'.
 - 进阶
 
   [git四个阶段的撤销更改](https://mp.weixin.qq.com/s/akvB2DO_1dpUrf-ol77MwQ)
+
+  [修改已提交的内容](https://blog.csdn.net/sodaslay/article/details/72948722)
 
 - 高级
 
