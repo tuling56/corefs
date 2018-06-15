@@ -327,6 +327,7 @@ json
 
 ```mysql
 bigint int smallint tinyint
+
 ```
 
 浮点型

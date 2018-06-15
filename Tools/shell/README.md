@@ -1062,6 +1062,18 @@ aaa 125
 bbb 128
 ```
 
+#### 积累
+
+##### 字符串
+
+split( String, A, [Ere] ) 
+
+```shell
+echo '[7,10]d       4724    ["100451440","100594004","100641926"]'|awk '{split($2,c,"[");for (i in dict) print }'
+```
+
+
+
 #### 应用
 
 ##### awk区间统计
@@ -1087,7 +1099,7 @@ awk '{if(1<=$1&& $1<2) dur[1,2]++;else if (2<=$1 && $1<5) dur[2,5]++;else if( 5<
 awk实现行转列
 
 ```shell
-# 利用awk的数组来实现
+# 利用awk的数组来实现(待完成)
 ```
 
 ##### awk多维数组统计
@@ -1179,6 +1191,20 @@ f 6
 awk '{a[$1]=$1;n=length(a);print NR,n; if(n<=3) print $0}END{print n}'  test.data
 
 # 注意此处不要用asort或asorti求数组的长度
+```
+
+##### awk实现行列转换
+
+###### 列转行
+
+```powershell
+
+```
+
+###### 行转列
+
+```shell
+
 ```
 
 ### sed
@@ -1370,10 +1396,26 @@ grep加-E支持扩展正则`？+|（）`,相当于egrep
 #  搜索但跳出指定目录
 #（注意-prune后面的-o不能缺少），另外需要说明的是跳出的是目录内部的内容，但目录本身还是会被包含进去的
 find . -path "./sk" -prune -o -name "*.txt" -print
+
+
+# 搜索指定类型文件的内容
+alias sllua='grep -i -a   -Rl --color `find . -type f -name "*.lua"`'
+alias slpy='grep -i -a   -Rl --color `find . -type f -name "*.py"`'
+alias slsh='grep -i -a   -Rl --color `find . -type f -name "*.sh"`'
+
+
+#搜索文件夹下指定类型的文件并打包
+zip calc_bak.zip $(find xmp_odl -path "*dev*" -prune -o -type f  \( -name "*.py" -o -name "*.sh" -o -name "*.hql" -o -name "*.json" -o -name "*.conf" -o  -name "*.ini" \))
 ```
 
+##### 积累
+
 ```shell
-find . -type f -exec echo "{}" \;  # 为输出的文件名加上双引号
+# 为输出的文件名加上双引号
+find . -type f -exec echo "{}" \;  
+
+# 查看目录中的最新文件
+find . -type f -printf "%T@\t%p\n"|sort -n|cut -f2|xargs ls -lrt
 ```
 
 ##### 问题
