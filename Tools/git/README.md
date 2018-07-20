@@ -354,7 +354,17 @@ git流程和状态图
 
 .gitignore文件的配置
 
-参考`mdotfiles/git/gitignore`仓库
+参考`mdotfiles/git/gitignore`仓库，把该文件放在仓库的根目录里，内容格式如下：
+
+```shell
+cat .gitignore
+.gitignore   # 注意一定要在.gitignore文件中把自身包含进去
+/bin/common/global_var.sh
+/data
+*.log
+*.data
+*.sht
+```
 
 #### 对比
 
@@ -599,6 +609,10 @@ remote: error: 'receive.denyCurrentBranch' configuration variable to 'refuse'.
   [git四个阶段的撤销更改](https://mp.weixin.qq.com/s/akvB2DO_1dpUrf-ol77MwQ)
 
   [修改已提交的内容](https://blog.csdn.net/sodaslay/article/details/72948722)
+
+  [修改commit的内容](https://blog.csdn.net/dong19900415/article/details/70495716)
+
+  [修改git commit信息中的author](https://blog.csdn.net/liang890806/article/details/46813039)
 
 - 高级
 

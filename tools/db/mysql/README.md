@@ -1,4 +1,4 @@
-## MySQL积累
+## MySQL笔记
 
 [TOC]
 
@@ -398,6 +398,13 @@ UPDATE [LOW_PRIORITY] [IGNORE] table_reference
 UPDATE tbl SET col1 = col1 + 1, col2 = col1;
 ```
 
+字段类型转换
+
+```mysql
+#sc.score是decimal(18,1)类型
+avg(cast(sc.score as decimal(18,2)))
+```
+
 #### 索引
 
 索引认知：
@@ -769,6 +776,14 @@ trim函数
 SELECT TRIM(TRAILING ',' FROM ',bar,xxyz,'); 
 ```
 
+substring_index
+
+```mysql
+
+```
+
+
+
 ###### 类型转换
 
 ```mysql
@@ -853,10 +868,16 @@ SELECT NOW()-INTERVAL 24 HOUR  -- 时间比较： 返回 前一天
 将组值多行合并成一列
 
 ```mysql
-select name,GROUP_CONCAT(course SEPARATOR '_') as names,GROUP_CONCAT(score ORDER BY score SEPARATOR '_') as scores from name_course_score group by name;
+select name
+	,GROUP_CONCAT(course SEPARATOR '_') as names
+	,GROUP_CONCAT(score ORDER BY score SEPARATOR '_') as scores 
+from name_course_score 
+group by name;
 ```
 
-演示：
+> 支持自定义分割符，和组内排序
+
+例子：
 
 ```
 张三	语文	66
@@ -1048,30 +1069,52 @@ SELECT name_varchar from study.datatype order by CONVERT(name_varchar USING gbk)
 
 ##### 联合索引
 
-#### 正则
+#### 匹配
 
 mysql[正则](http://www.cnblogs.com/way_testlife/archive/2010/09/17/1829567.html)和模糊匹配的区别:
 
 ##### 正则
+
+[not]regexp、[not]rlike
 
 ```mysql
 # 正则判断（匹配返回1，不匹配返回0）
 select 'JetPack 1000'  regexp '^1000';
 ```
 
-> 注：
->
-> - MySQL中的正则表达式匹配不区分大小写。为区分大小写，可使用BINARY关键字。
+注意：
+
+> - MySQL中的正则表达式匹配不区分大小写。为区分大小写，可使用BINARY关键字（on也不区分大小写）
 >
 >   如：select 'JetPack we2x000'  REGEXP BINARY 'JetPack .000'
+>
+> - 若字段强制[区分大小写](https://www.2cto.com/database/201209/156617.html)，可以在建表的时候指定
+>
+> ```mysql
+> create  table  table_name(    
+>      name varchar (20) binary      
+> );  
+> ```
 
 ##### 模糊匹配
 
-模糊
+[通配字符](https://blog.csdn.net/lisliefor/article/details/6547861)：
+
+_：代表单个字符(相当于正则表达式中的 ?  )
+
+%：代表多个字符(相当于正则表达式中的 * )
+
+[]：用于转义（事实上只有左方括号用于转义，右方括号使用最近优先原则匹配最近的左方括号）
+
+^：用于排除一些字符进行匹配（这个与正则表达式中的一样）
 
 ```mysql
 select * from xx where xx like '%_%'
 ```
+
+###### 特殊字符
+
+//主要处理一些包含元字符的字符串的匹配问题
 
 #### 子查询
 
@@ -1096,8 +1139,6 @@ select * from xx where xx like '%_%'
 ```mysql
 select id-(select pv_int from study.task where id=2) from study.task;
 ```
-
-
 
 ##### 关键字
 
@@ -1134,7 +1175,9 @@ select order_id,customer_id,order_number,order_date from `order` where total_mon
 
 ##### join
 
-###### inner join
+###### [inner] join
+
+inner join 其实等同于join
 
 ```mysql
 #SELECT Persons.LastName, Persons.FirstName, Orders.OrderNo
@@ -1155,7 +1198,35 @@ WHERE
 	Persons.Id_P = Orders.Id_P
 ```
 
-###### left join
+多表连接：
+
+```mysql
+# 方法1：
+select a.ftime,a.dnu,b.dau,c.dcu,d.dpu from 
+(select ftime,sum(dnu) as dnu from xmp_dnu group by ftime) a inner join 
+(select ftime,sum(dau) as dau from xmp_dau group by ftime) b inner join
+(select ftime,dcu from xmp_dcu) c inner join
+(select ftime,total_vod as dpu from complat_xmp_vod_detail where channel='all' and cnt_flag='uv' ) d 
+on a.ftime=b.ftime and a.ftime=c.ftime and a.ftime=d.ftime
+
+# 方法2：
+select a.ftime,a.dnu,b.dau,c.dcu,d.dpu 
+from 
+	(select ftime,sum(dnu) as dnu from xmp_dnu group by ftime) a 
+inner join 
+	(select ftime,sum(dau) as dau from xmp_dau group by ftime) b 
+on a.ftime=b.ftime
+inner join
+	(select ftime,dcu from xmp_dcu) c
+on a.ftime=c.ftime
+inner join
+	(select ftime,total_vod as dpu 
+       from complat_xmp_vod_detail 
+      where channel='all' and cnt_flag='uv' ) d 
+on a.ftime=d.ftime;
+```
+
+###### left [outer] join
 
 ```mysql
 SELECT
@@ -1170,7 +1241,7 @@ ORDER BY
 	Persons.LastName 
 ```
 
-###### right join
+###### right [outer] join
 
 ```mysql
 SELECT
@@ -1184,7 +1255,15 @@ ORDER BY
 	Persons.LastName
 ```
 
-###### union(all)
+###### full [outer] join
+
+mysql本身不支持full join 需要变通解决
+
+```mysql
+# 本身不支持
+```
+
+###### union [all]
 
 ```mysql
 # 请注意，UNION 内部的 SELECT 语句必须拥有相同数量的列。列也必须拥有相似的数据类型。同时，每条 SELECT 语句中的列的顺序必须相同。
@@ -1207,6 +1286,7 @@ where
 
 # 等同于
 #SELECT b.* from student a CROSS JOIN persons b where a.stuno=b.Id_P;
+
 # 总结：
 #1，带where子句的cross join 和inner join(或者join)等效
 #2，不带where子句的产生的查询结果才是笛卡尔积
@@ -1216,16 +1296,6 @@ where
 
 - [join on where的执行顺序](https://www.cnblogs.com/Jessy/p/3525419.html)	
   - join的时候先对两张表做where条件筛选，然后再做join,这样可以减小联表的量
-
-######  full join
-
-mysql本身不支持full join 需要变通解决
-
-```mysql
-# 本身
-```
-
-
 
 ##### exists和in
 
@@ -1256,16 +1326,83 @@ DCL(Data Control Language)：
 是数据库控制功能。是用来设置或更改数据库用户或角色权限的语句，包括(grant,deny,revoke等)语句。在默认状态下，只有sysadmin,dbcreator,db_owner或db_securityadmin等人员才有权力执行DCL
 ```
 
-##### 运行方式技巧
+##### 注释
+
+行注释
+
+```mysql
+# 到该行结束      # 这个注释直到该行结束 
+-- 到该行结束    -- 这个注释直到该行结束（注意断划线后的空格）
+```
+
+块注释
+
+```mysql
+SELECT 1+
+       /* 这是一个
+          多行注释
+          的形式
+      */
+      1;
+```
+
+##### 别名
+
+```mysql
+# 别名只能在select、orderby、having中使用，不能在group中使用
+select 
+	xx as alias_name
+from
+ 	xxxx
+where xxxx
+group by xx
+having alias_name>10
+order by alias_name
+```
+
+##### 结果处理
+
+选取结果添加行号
+
+```mysql
+# 方法1 
+set @mycnt=0;
+select (@mycnt := @mycnt + 1) as ROWNUM , vv from task1_tbl order by vv;
+
+# 方法2
+# #将查询结果写入到某个拥有auto_increment字段的临时表中再做查询
+
+# 方法3
+# #用Python等脚本语言对查询结果进行二次组装
+```
+
+##### 自增列
+
+```mysql
+# 建表的时候指定
+# > // id列为无符号整型，该列值不可以为空，并不可以重复，而且id列从100开始自增.
+create table table_1 ( id int unsigned not null primary key auto_increment, 
+                       name varchar(5) not null ) auto_increment = 100;
+
+# 修改自增列的值
+alter table table_1 auto_increment = 2;
+```
+
+只能修改单机的，集群修改[自增列](http://www.jb51.net/article/42883.htm)无效
+
+#### 技巧
+
+##### 运行技巧
 
 ```shell
 # 方法1
 ${MYSQL10} < xmp_version_active.sql
 #其中MYSQL10是:`/usr/bin/mysql -uroot -phive -N`
 
+
 # 方法2
 MYSQL="/usr/bin/mysql -uxxxx -pxxxx -hxxxx -Pxxxx"
-sql="select movieid,pageurl,posterurl from poster_to_down where image_type='poster' and ts >='${time_start}'"
+sql="select movieid,pageurl from poster where image_type='poster' and ts >='${time_start}'"
 echo "${sql}" | ${MYSQL} media_info |sed '1d' > ${file}
 
 Local_MYSQL="/usr/bin/mysql -uxxxxx -pxxxx -hxxxxx media_info"
@@ -1288,7 +1425,7 @@ source file3.SQL
 
 ##### 插入技巧
 
-一次性多插
+###### 一次性多插
 
 ```mysql
 # 一次性插入多个值
@@ -1298,21 +1435,32 @@ INSERT into task_request(proposer,enddate) values ("鲁丽",'20170611'),("张一
 INSERT into tb2(proposer,enddate) select xx,yy from tb1;
 ```
 
-##### 自增列
+###### 替换插入
 
 ```mysql
-# 建表的时候指定
-# > // id列为无符号整型，该列值不可以为空，并不可以重复，而且id列从100开始自增.
-create table table_1 ( id int unsigned not null primary key auto_increment, 
-                       name varchar(5) not null ) auto_increment = 100;
-
-# 修改自增列的值
-alter table table_1 auto_increment = 2;
+# 主键不存在则插入，主键存在切存在相同的值，则不更新
+replace into table (id,name) values('1′,'aa'),('2′,'bb')
 ```
 
-只能修改单机的，集群修改[自增列](http://www.jb51.net/article/42883.htm)无效
+###### 不存在则插入，存在则更新
 
-##### 信息筛选
+```mysql
+INSERT INTO tablename (field1, field2, field3, ...) VALUES ('value1', 'value2','value3', ...) ON DUPLICATE KEY UPDATE field1='value1', field2='value2', field3='value3', ...
+
+# 这个语句的意思是，插入值，如果没有该记录执行
+INSERT INTO tablename (field1, field2, field3, ...) VALUES ('value1', 'value2','value3', ...)
+# 这一段，如果存在该记录，那么执行
+UPDATE field1='value1', field2='value2', field3='value3', ...
+```
+
+> 一个例子：
+
+```mysql
+INSERT INTO tablea (peerid,new_install_date,new_install_source,new_install_version,new_install_type,insert_date,insert_source,insert_version,insert_type) VALUES("%s","%s","%s","%s","%s","%s","%s","%s","%s") ON DUPLICATE KEY UPDATE new_install_type="%s"' 
+```
+##### 筛选技巧
+
+###### 基础
 
 查询某个字段匹配的的表和所在的数据库
 
@@ -1326,24 +1474,42 @@ SELECT TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME from information_schema.`COLUMNS` whe
 select table_schema,table_name from information_schema.tables where table_type='base table' and engine='innodb' and table_schema!='mysql' and table_name not like '%innodb%';
 ```
 
-##### 注释
-
-行注释
+###### 同一属性多值过滤
 
 ```mysql
-（1） # 到该行结束      # 这个注释直到该行结束 
-（2）-- 到该行结束      -- 这个注释直到该行结束（注意断划线后的空格）
+#选出同时具有fei和bianhua能力的人
+
+# 方法一
+SELECT DISTINCT a.name AS 'feibianren' from nameskills a 
+JOIN  nameskills b on a.name=b.name and b.skills='fei'
+join  nameskills c on a.name=c.`name` and c.skills='bianhua';
+
+# 方法二：
+SELECT
+	a.`name`,
+	b.skills as bskill
+	#c.skills as cskill
+from
+	nameskills_row a
+INNER JOIN join nameskills_row b on a.name = b.name
+and b.skills = 'nianjing';
+#join nameskills_row c on a.name = c.name
+#and c.skills = 'fanren';
 ```
 
-块注释
+##### 删除技巧
+
+###### 删除重复数据
+
+在删除的时候可能会根据某些条件保留其中的一条
 
 ```mysql
-SELECT 1+
-       /* 这是一个
-          多行注释
-          的形式
-      */
-      1;
+# 删除重复邮件地址，重复的多条，只保留其中id最小的
+delete from Person 
+where Id not in (select a.Id from (
+  									select min(Id) as Id from Person group by Email
+									)a
+                );
 ```
 
 #### restful接口
@@ -1393,23 +1559,8 @@ optional arguments:
 
 为mysql数据库快速生成restful api
 
-#### 结果处理
 
-##### 选取结果添加行号
-
-```mysql
-# 方法1 
-set @mycnt=0;
-select (@mycnt := @mycnt + 1) as ROWNUM , vv from task1_tbl order by vv;
-
-# 方法2
-# #将查询结果写入到某个拥有auto_increment字段的临时表中再做查询
-
-# 方法3
-# #用Python等脚本语言对查询结果进行二次组装
-```
-
-#### 日期操作
+#### 日期时间
 
 ##### 上周同期
 
@@ -1441,6 +1592,24 @@ from
 where
 	date='20170309'  and  date<='20170315' and date!='20170313';
 ```
+
+周同期2
+
+```mysql
+# 这周的数据
+tablea="select date,sum(install_end) as s_install_end,sum(install_silence) as s_install_new from xmp_install where date>=date_sub(curdate(),interval 7 day) group by date"
+
+# 上周的数据
+tableb="select date,sum(install_end) as s_install_end,sum(install_silence) as s_install_new from xmp_install where date>=date_sub(curdate(),interval 14 day) group by date"
+
+# 要统计的数据
+whatis="a.date as '当前日期',b.date as '上周同期',a.s_install_end as '总安装量',b.s_install_end as '上周同期总安装量',concat(round((a.s_install_end-b.s_install_end)*100/b.s_install_end,2),'%') as '总装周同比'"
+
+# 展示结果
+sql = "SELECT {whatis} FROM ({tablea}) a INNER JOIN ({tableb}) b on b.date=DATE_FORMAT(DATE_SUB(a.date,INTERVAL 7 day),'%Y%m%d') order by a.date desc".format(whatis=whatis,tablea=tablea,tableb=tableb)
+```
+
+
 
 ##### 选取指定日期
 
@@ -1486,11 +1655,17 @@ select * from `magazine` where concat(ifnull(`title`,''),ifnull(`tag`,''),ifnull
 
 ##### 字符替换
 
+###### 普通字符串替换
+
+```mysql
+select replace('com.pro.xuncle.Download','xuncle','');
+```
+
+> mysql不支持正则替换
+
 ###### 特殊字符替换
 
-char(9) 水平制表符
-char(10)换行键
-char(13)回车键
+char(9)：水平制表符，char(10)：换行键，char(13)：回车键
 
 ```mysql
 1> 回车符  char(13)
@@ -1506,15 +1681,28 @@ SELECT *, REPLACE(detail, CHAR(13) + CHAR(10), '<br>') AS 显示替换后的内�
 UPDATE Test SET detail = REPLACE(detail, CHAR(13) + CHAR(10), '<br><br>');
 ```
 
+##### 字符数组
+
+字符分割的数组长度
+
+```mysql
+# imgName格式：bc9077f6.jpg,073eb23f.jpg
+select if(imgName='',0,1+(length(imgName)-length(replace(imgName,',','')))) as arraycnt from contribute;
+```
+
 #### join问题
 
 ##### 跨库Join
+
+跨库Join的几种方案：
 
 - 字段冗余设计
 - 表复制和同步到一个库中
 - 链接表
 
-> 链接表的使用要求FEDERATED 的打开，默认是关闭的
+###### 链接表
+
+链接表的使用要求FEDERATED 的打开，默认是关闭的
 
 ```mysql
 # 链接表的创建
@@ -1532,13 +1720,16 @@ COMMENT='task.xmp_uninstall－链接表[3306]';
 
 链接表的注意事项：
 
+```
 1.本地的表结构必须与远程的完全一样
-
 2.远程数据库目前仅限MySQL（其它主流数据库暂不支持）
-
 3.不支持事务
-
 4.不支持表结构修改
+```
+
+
+
+
 
 ### 应用
 
@@ -1698,36 +1889,18 @@ group by elt(interval(d.yb, 0, 100, 500, 1000), '1/less100', '2/100to500', '3/50
 
 
 
-#### 同一属性多值过滤
-
-选出同时具有fei和bianhua能力的人
-
-```mysql
-# 方法一
-SELECT DISTINCT a.name AS 'feibianren' from nameskills a 
-JOIN  nameskills b on a.name=b.name and b.skills='fei'
-join  nameskills c on a.name=c.`name` and c.skills='bianhua';
-
-# 方法二：
-SELECT
-	a.`name`,
-	b.skills as bskill
-	#c.skills as cskill
-from
-	nameskills_row a
-INNER JOIN join nameskills_row b on a.name = b.name
-and b.skills = 'nianjing';
-#join nameskills_row c on a.name = c.name
-#and c.skills = 'fanren';
-```
-
 #### 关联更新
 
 根据另一个表的数据，更新当前表的数据:
 
 ```mysql
 # 在a表和b表满足xx条件的时候更新a表的什么内容
-update pgv_stat.xmp_version_active a inner join (select date,version,sum(online_user) user,sum(total_uv) vod from pgv_stat.xmp_total_vod where date='$dt' and channel='all' group by version) b on a.date=b.date and substring_index(a.version,'.',-1)=b.version set a.online_user=b.user,a.total_uv=b.vod where a.date='$dt';
+update pgv_stat.xmp_version_active a 
+inner join 
+(select date,version,sum(online_user) user,sum(total_uv) vod 
+ from pgv_stat.xmp_total_vod where date='$dt' and channel='all' group by version) b 
+on a.date=b.date and substring_index(a.version,'.',-1)=b.version 
+set a.online_user=b.user,a.total_uv=b.vod where a.date='$dt';
 ```
 
 ```mysql
@@ -1738,62 +1911,11 @@ UPDATE downloaddatas a, downloadfee b SET a.ThunderPrice=$PRICE, a.ThunderAMT=(a
 update union_kuaichuan_download_data a,downloaddatas b set b.ThunderQty=b.ThunderQty+a.copdowntimes where a.dayno=$d and b.BalanceDate=_gbk\"${dt}\" and b.CopartnerId=a.copid  and b.ProductNo=4"
 ```
 
-#### 周同期
-
-```python
-# 这周的数据
-tablea="select date,sum(install_end) as s_install_end,sum(install_silence) as s_install_new from xmp_install where date>=date_sub(curdate(),interval 7 day) group by date"
-
-# 上周的数据
-tableb="select date,sum(install_end) as s_install_end,sum(install_silence) as s_install_new from xmp_install where date>=date_sub(curdate(),interval 14 day) group by date"
-
-# 要统计的数据
-whatis="a.date as '当前日期',b.date as '上周同期',a.s_install_end as '总安装量',b.s_install_end as '上周同期总安装量',concat(round((a.s_install_end-b.s_install_end)*100/b.s_install_end,2),'%') as '总装周同比'"
-
-# 展示结果
-sql = "SELECT {whatis} FROM ({tablea}) a INNER JOIN ({tableb}) b on b.date=DATE_FORMAT(DATE_SUB(a.date,INTERVAL 7 day),'%Y%m%d') order by a.date desc".format(whatis=whatis,tablea=tablea,tableb=tableb)
-```
-
-#### 字符分割的数组长度
-
-```mysql
-# imgName格式：bc9077f6.jpg,073eb23f.jpg
-select if(imgName='',0,1+(length(imgName)-length(replace(imgName,',','')))) as arraycnt from contribute;
-```
-
-#### 不存在则插入，存在则更新
-
-```mysql
-INSERT INTO tablename (field1, field2, field3, ...) VALUES ('value1', 'value2','value3', ...) ON DUPLICATE KEY UPDATE field1='value1', field2='value2', field3='value3', ...
-
-# 这个语句的意思是，插入值，如果没有该记录执行
-INSERT INTO tablename (field1, field2, field3, ...) VALUES ('value1', 'value2','value3', ...)
-# 这一段，如果存在该记录，那么执行
-UPDATE field1='value1', field2='value2', field3='value3', ...
-```
-
-一个例子：
-
-```mysql
-INSERT INTO tablea (peerid,new_install_date,new_install_source,new_install_version,new_install_type,insert_date,insert_source,insert_version,insert_type) VALUES("%s","%s","%s","%s","%s","%s","%s","%s","%s") ON DUPLICATE KEY UPDATE new_install_type="%s"' 
-```
-
-#### 删除重复数据
-
-在删除的时候可能会根据某些条件保留其中的一条
-
-```mysql
-# 删除重复邮件地址，重复的多条，只保留其中id最小的
-delete from Person 
-where Id not in (select a.Id from (
-  									select min(Id) as Id from Person group by Email
-									)a
-                );
-```
-
-#### GroupTopN
+#### GTopN
 
 问题描述：先分组，然后在从分组中选取前N个值，比如topN
+
+##### mysql实现
 
 ```mysql
 # 例子1：(遍历所有记录，取每条记录与当前记录做比较，只有当同一版本不超过3个比当前高时，这个才是前三名)。
@@ -1834,7 +1956,25 @@ ORDER BY
 	b.department_name DESC,a.salary DESC;
 ```
 
-> 用awk,python,R,Shell等如何实现
+> 用awk(shell),python,R等如何实现
+
+##### awk实现
+
+```
+
+```
+
+##### python实现
+
+```
+
+```
+
+##### R实现
+
+```
+
+```
 
 ### 调优
 
@@ -2358,6 +2498,12 @@ mysqluserclone     clone a MySQL user account to one or more new users
  mysqldbcopy --source=root:root@localhost --destination=xxx:xxx@xxx study:study
 ```
 
+#### SQL Advisor审核工具
+
+```shell
+
+```
+
 ### 问题
 
 #### 面试
@@ -2443,6 +2589,8 @@ mysqluserclone     clone a MySQL user account to one or more new users
 
   [互联网MySQL规范](https://www.toutiao.com/a6535777088434078211/)
 
+  [我的私藏SQL练习题](https://www.jianshu.com/p/6f9dec217055)
+
 - 调优
 
   [MySQL性能监控](https://www.percona.com/doc/percona-monitoring-and-management/deploy/index.html)
@@ -2492,4 +2640,8 @@ mysqluserclone     clone a MySQL user account to one or more new users
   [MySQL性能指标及计算方法](https://www.toutiao.com/i6504034560555090446/)
 
   [percona toolkit使用系列（推荐）](http://blog.51cto.com/jonyisme/1754250)
+
+  [美图SQLAdvisor审查工具](https://www.toutiao.com/a6572706820882694660/)
+
+  [SQLAdvisor优化工具详解](https://www.cnblogs.com/beliveli/articles/6541936.html)
 

@@ -251,6 +251,108 @@ tar命令和格式.tar.gz和.tar.bz2
     只查看 tar -ztvf xx.tar.gz 只查看
 ```
 
+#### 软件安装
+
+软件安装有三种方式：
+
+- 包安装
+- 源码编译安装
+- 直接解压配置环境
+
+##### 包管理
+
+###### rpm
+
+安装
+
+```shell
+rpm -ivh
+rpm -qa
+```
+
+查看
+
+```shell
+rpm -ql 包名
+```
+
+卸载
+
+```shell
+# 卸载rpm包
+首先通过  rpm -q <关键字> 可以查询到rpm包的名字
+然后 调用 rpm -e <包的名字> 删除特定rpm包
+如果遇到依赖，无法删除，使用 rpm -e --nodeps <包的名字> 不检查依赖，直接删除rpm包
+如果恰好有多个包叫同样的名字，使用 rpm -e --allmatches --nodeps <包的名字> 删除所有相同名字的包， 并忽略依赖
+```
+
+依赖
+
+```
+根据缺少的库名，查对应的包名,网址：https://pkgs.org/
+```
+
+###### yum
+
+yum源的本质是什么？
+
+**编辑配置**
+
+yum的配置一般有两种方式，一种是直接配置/etc/yum.conf文件，另外一种是在/etc/yum.repos.d目录下增加.repo文件。 
+
+yum配置`/etc/yum.conf`
+
+```shell
+cat /etc/yum.conf
+
+[main]
+cachedir=/var/cache/yum          #yum下载的RPM包的缓存目录
+keepcache=0             		#缓存是否保存，1保存，0不保存。
+debuglevel=2                     #调试级别(0-10)，默认为2(具体调试级别的应用，我也不了解)。
+logfile=/var/log/yum.log         #yum的日志文件所在的位置
+exactarch=1          #在更新的时候，是否允许更新不同版本的RPM包，比如是否在i386上更新i686的RPM包。
+obsoletes=1          #这是一个update的参数,简单的说就是相当于upgrade，允许更新陈旧的RPM包。
+gpgcheck=1           #是否检查GPG(GNU Private Guard)，一种密钥方式签名。
+plugins=1            #是否允许使用插件，默认是0不允许，但是我们一般会用yum-fastestmirror这个插件。
+installonly_limit=3  #允许保留多少个内核包。
+exclude=selinux*     #屏蔽不想更新的RPM包，可用通配符，多个RPM包之间使用空格分离。
+# PUT YOUR REPOS HERE or IN separate files named file.repo
+# in /etc/yum.repos.d
+```
+
+yum源编辑`/etc/yum.repos.d/`
+
+```shell
+/etc/yum.repos.d
+[root@local122 yum.repos.d]# ls -lh
+total 32K
+-rw-r--r--. 1 root root  166 Nov 24  2016 docker.repo
+-rw-r--r--. 1 root root 1.3K May 19  2015 fedora.repo
+-rw-r--r--. 1 root root 1.3K May 19  2015 fedora-updates.repo
+-rw-r--r--. 1 root root 1.3K May 19  2015 fedora-updates-testing.repo
+-rw-r--r--. 1 root root 2.5K Sep 22  2014 percona-release.repo
+-rw-r--r--. 1 root root  241 Sep 30  2015 virtualbox.repo
+```
+
+> yum仓库分为 网络yum源（http、ftp等）和本地yum源（file://)
+
+**命令**
+
+```shell
+yum repolist enabled  # 查看所有已安装的yum源
+yum repolist          # 列出所有可用的yum仓库
+yum clean all         # 清理yum缓存
+yum makecache         # 缓存yum仓库
+```
+
+##### 源码编译
+
+```shell
+./configure --prefix=/usr/local/xxx
+make
+make test & make install
+```
+
 #### 服务管理
 
 ##### 系统启动
@@ -384,7 +486,43 @@ htop
 
 #### 网络管理
 
-##### 查询网络服务和端口
+##### 命令
+
+###### telnet
+
+测试远程端口是否打开
+
+```shell
+telent ip port
+```
+
+###### netstat
+
+```shell
+
+```
+
+###### [ss](https://segmentfault.com/a/1190000007946958)
+
+```
+
+```
+
+###### [nc](https://www.toutiao.com/i6561586650239992334/)
+
+```shell
+
+```
+
+###### nmap
+
+```shell
+
+```
+
+##### 实战
+
+###### 查询网络服务和端口
 
 ```shell
 # 列出所有端口
@@ -406,7 +544,7 @@ lsof -i:7902
 ps -ef|grep pid
 ```
 
-##### 网络路由
+###### 网络路由
 
 ```shell
 # 查看路由状态
@@ -427,7 +565,11 @@ host ip
 
 #### 性能监控
 
-//待补充
+##### htop/top
+
+```shell
+
+```
 
 #### 其它
 
@@ -510,14 +652,24 @@ yum autoremove kernel-3.10.0-327.13.1.el7.x86_64
 # 获得当前时间戳
 date +%s 可以得到UNIX的时间戳;
 
-#shell将时间字符串与时间戳互转：
+#时间字符串转时间戳：
 date -d "2010-10-18 00:00:00" +%s 输出形如：1287331200
 
-#时间戳转换为字符串可以这样做：
+#时间戳转换为字符串：
 date -d @1287331200 "+%Y-%m-%d" 输出形如：2010-10-18
 ```
 
-#### 网络
+#### 网络传输
+
+Apache开源四大镜像站点：
+
+[**http://mirror.bit.edu.cn/apache/**](http://mirror.bit.edu.cn/apache/)   
+
+[**http://mirrors.hust.edu.cn/apache/**](http://mirrors.hust.edu.cn/apache/)   
+
+[**http://mirrors.shu.edu.cn/apache/**](http://mirrors.shu.edu.cn/apache/)   
+
+[**http://mirrors.tuna.tsinghua.edu.cn/apache/**](http://mirrors.tuna.tsinghua.edu.cn/apache/)  
 
 ##### curl
 
@@ -546,6 +698,8 @@ curl -XPOST 'http://localhost:9200/indexdb/fulltext/_mapping' -d '
 ```shell
 curl -u yjm:123 http://localhost:8066/?search=%E5%BC%A0
 ```
+
+> curl工具的更好替代是Postman
 
 ##### wget
 
@@ -577,9 +731,10 @@ if [ "$#" -ne 1 ]
       echo "/root/sh/ $0" 请您输入一个网址  
       exit 1  
 fi  
+
 #no.2  
 wget --spider -q -o /dev/null --tries=1 -T 3 $1  
-if [ "$?" -eq 0 ]  
+if [ "$?" -eq 0 ]  # 根据返回值进行判断
   then  
     echo "$1 检测是成功的！"  
   else  
@@ -588,13 +743,17 @@ if [ "$?" -eq 0 ]
 fi  
 ```
 
+#####  [axel](http://man.linuxde.net/axel)
 
+多线程命令行下载工具
 
-#####  axel
+```
 
 ```
 
-```
+##### aria2
+
+//待补充
 
 #### 文件传输
 
@@ -877,43 +1036,6 @@ inotify-tools安装完成后，会生成inotifywait和inotifywatch两个指令�
 
 //看门狗模块
 
-#### 包管理
-
-##### rpm
-
-安装
-
-```shell
-rpm -ivh
-rpm -qa
-```
-
-查看
-
-```shell
-rpm -ql 包名
-```
-
-卸载
-
-```shell
-# 卸载rpm包
-首先通过  rpm -q <关键字> 可以查询到rpm包的名字
-然后 调用 rpm -e <包的名字> 删除特定rpm包
-如果遇到依赖，无法删除，使用 rpm -e --nodeps <包的名字> 不检查依赖，直接删除rpm包
-如果恰好有多个包叫同样的名字，使用 rpm -e --allmatches --nodeps <包的名字> 删除所有相同名字的包， 并忽略依赖
-```
-
-##### yum
-
-yum源的本质是什么？
-
-查看所有已安装的yum源
-
-```shell
-yum repolist enabled
-```
-
 #### 邮件发送
 
 ##### sendEmail
@@ -1100,6 +1222,33 @@ export PATH=$JAVA_HOME/bin:$PATH
 #验证安装是否成功: java -version
 ```
 
+#### GLIBC
+
+glibc是gnu发布的libc库，即c运行库，是linux系统中最底层的api，分散在`/lib`和`/usr/lib`等目录下
+
+##### 升级GLIBC
+
+```shell
+#下载源码
+wget -c http://ftp.gnu.org/gnu/glibc/glibc-2.17.tar.gz
+tar -xf glibc-2.17.tar.gz
+
+# 编译安装
+cd glibc-2.17 
+mkdir build && cd build
+../configure --prefix=/usr --disable-profile --enable-add-ons --with-headers=/usr/include --with-binutils=/usr/bin
+
+make -j 8
+make  install
+
+# 验证
+strings /lib64/libc.so.6 | grep GLIBC
+```
+
+### 程序编译
+
+makefile文件的编写
+
 ### 软件使用
 
 linux下软件安装的方式：
@@ -1232,9 +1381,11 @@ ssh xxx@xxxx < test.sh
 
 ```
 
+> 远程执行的另一个命令参考[rsh](http://man.linuxde.net/rsh)
+
 #### jq
 
-json格式化筛选和查询工具
+json格式化筛选和查询工具,可以在shell streaming流里使用
 
 ##### 安装
 
@@ -1247,10 +1398,153 @@ make
 sudo make install
 ```
 
+> jq处理的json格式必须是标准的json格式
+
 ##### 使用
 
+```json
+{
+  "error": 0,
+  "status": "success",
+  "date": "2016-02-02",
+  "results": [{
+       "currentCity": "shanghai",
+      "pm25": "170",
+      "index": [
+        {
+          "title": "穿衣",
+          "zs": "较冷",
+          "tipt": "穿衣指数",
+          "des": "建议着厚外套加毛衣等服装。年老体弱者宜着大衣、呢外套加羊毛衫。"
+        },
+        {
+          "title": "旅游",
+          "zs": "适宜",
+          "tipt": "旅游指数",
+          "des": "天气较好，气温稍低，微有点凉，不过也是个好天气哦。适宜旅游，可不要错过机会呦！"
+        },
+        {
+          "title": "感冒",
+          "zs": "易发",
+          "tipt": "感冒指数",
+          "des": "昼夜温差很大，易发生感冒，请注意适当增减衣服，加强自我防护避免感冒。"
+        }
+      ],
+      "weather_data": [
+        {
+          "date": "周二 02月02日 (实时：3℃)",
+          "dayPictureUrl": "http://api.map.baidu.com/images/weather/day/qing.png",
+          "nightPictureUrl": "http://api.map.baidu.com/images/weather/night/qing.png",
+          "weather": "晴",
+          "wind": "微风",
+          "temperature": "5 ~ 0℃"
+        },
+        {
+          "date": "周三",
+          "dayPictureUrl": "http://api.map.baidu.com/images/weather/day/qing.png",
+          "nightPictureUrl": "http://api.map.baidu.com/images/weather/night/duoyun.png",
+          "weather": "晴转多云",
+          "wind": "微风",
+          "temperature": "7 ~ 2℃"
+        }
+      ] //weather_data
+     }
+   ] //results
+}
+```
+
+获取特定字段
+
 ```shell
-# jq的使用
+cat test.json | jq '.status'
+```
+
+ 获取数组中的元素
+
+```shell
+# 获取特定元素
+cat test.json | jq '.results[0].currentCity'
+
+# 获取所有的数组元素
+cat test.json | jq '.results[0].index'
+```
+
+重新组合
+
+```shell
+ # input中.title,.des做为biaoti，miaoshu的value。
+ cat test.json |jq '.results[] | .index[] | {biaoti: .title, miaoshu: .des}'
+```
+
+> 其中`.results[]`:返回results数组所有数据 ，相当于遍历数组，需要注意以下命令并不能将字符串转数组：
+>
+> ```shell
+> cat test.json |jq '.results[] | .index[] | [{biaoti: .title, miaoshu: .des}]|map(select(.biaoti=="穿衣"))'
+>
+> [
+>   {
+>     "biaoti": "穿衣",
+>     "miaoshu": "建议着厚外套加毛衣等服装。年老体弱者宜着大衣、呢外套加羊毛衫。"
+>   }
+> ]
+> []
+> []
+> []
+> []
+> []
+> ```
+
+获取多个结果
+
+```shell
+#多个结果之间用','分割
+cat test.json|jq '.error, .date'
+```
+
+函数
+
+> length命令判断字符串、数组、对象的长度
+
+```shell
+# 对象的长度
+cat test.json |jq '.| length'
+
+# 数组中的每个元素的长度
+cat test.json |jq '.results[] | .index[]|length'
+
+# 数组的长度
+cat test.json |jq '.results[] | .index|length'
+
+# 字符串的长度
+cat test.json | jq '.results[0].currentCity|length'
+```
+
+> keys函数获取对象中的所有key,返回的是key列表
+
+```shell
+cat test.json|jq -S '.|keys'
+# 加-S参数是对key进行排序
+```
+
+> map对数组中的每个元素进行操作
+
+```shell
+echo '[1,5,3,0,7]' | jq 'map(.+11)'
+```
+
+> select返回满足条件的数据
+
+```shell
+echo '[1,5,3,0,7]' | jq 'map(select(.<2))'
+
+# 数组筛选
+cat test.json |jq '.results[] | .index|map(select(.title=="运动"))'
+```
+
+> if then else end判断
+
+```shell
+cat test.json|jq 'if .error==0 then "ok" elif .error==1 then "false" else "null" end'
 ```
 
 #### q
@@ -1335,9 +1629,21 @@ q -H -d, "SELECT myfiles.c8,emails.c2
 
 无界面浏览器
 
+##### [lynx](http://man.linuxde.net/lynx)
+
 ```shell
 
 ```
+
+##### w3m
+
+```
+
+```
+
+#### pandoc
+
+[pandoc](http://pandoc.org/demos.html)是文档格式转换，尤其是在md和各种格式之间，其中typero导出成其它格式的引擎就是pandoc,但是感觉进行了很多的美化参数，比直接使用pandoc导出的效果好了很多，具体优化未知。
 
 ## 参考
 
@@ -1354,6 +1660,10 @@ q -H -d, "SELECT myfiles.c8,emails.c2
   [Linux crontab定时任务管理](http://www.imooc.com/video/10979)
 
   [linux系统的7种运行级别](http://blog.chinaunix.net/uid-22746363-id-383989.html) 
+
+  [Linux速查手册(强烈推荐)](https://segmentfault.com/u/vvpale/articles?page=1)
+
+  [yum配置与使用(推荐)](https://www.cnblogs.com/xiaochaohuashengmi/archive/2011/10/09/2203916.html)
 
 - 技能积累
 
@@ -1381,9 +1691,19 @@ q -H -d, "SELECT myfiles.c8,emails.c2
 
   [手把手教你使用sftp进行文件传输](https://www.tuicool.com/articles/FZRF7v)
 
+  [axel文件下载利器使用说明](https://www.2daygeek.com/axel-command-line-downloader-accelerator-for-linux/#)
+
 - 环境配置
 
   [Linux下安装Sun JDK（删除Open JDK）](http://www.toutiao.com/i6416458864656384514/)
+
+  [Linux升级GLIBC](https://blog.csdn.net/wyl9527/article/details/78256066/)
+
+  [Centos6.5升级Glibc2.17](https://blog.csdn.net/wyl9527/article/details/78256066/)
+
+- 程序编译
+
+  [Linux下Makefile文件的快速编写](https://www.toutiao.com/i6554183936396755464/)
 
 - 软件使用
 

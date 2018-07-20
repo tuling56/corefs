@@ -3,6 +3,8 @@
 
 ### 基础
 
+hexo和github的关系，hexo能否单独使用呢
+
 #### 安装
 
 ```shell

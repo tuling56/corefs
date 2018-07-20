@@ -4,6 +4,8 @@
 
 ### bash
 
+shell的分类，zsh和bash的区别
+
 #### 基础
 
 目录和文件判断
@@ -366,6 +368,29 @@ done < test.data
 sh xxx.sh > xxx.log 2>&1 
 ```
 
+##### 命令
+
+###### 参数
+
+set -e
+
+```shell
+set -e命令用法总结如下
+
+1.当命令的返回值为非零状态时，则立即退出脚本的执行
+2.作用范围只限于脚本执行的当前进行，不作用于其创建的子进程
+3.另外，当想根据命令执行的返回值，输出对应的log时，最好不要采用sete选项，而是通过配合ext命令来达到输出log并退出执行的目的
+```
+
+###### shift
+
+```shell
+for i in `seq 1 6`;do
+	echo "$1 $2 $3 $4 $5 $6"
+	shift
+done
+```
+
 #### 运算符
 
 ##### 算术运算法
@@ -397,7 +422,7 @@ str	检测字符串是否为空，不为空返回 true。		[ $a ] 返回 true。
 
 ```
 
-#### 语句
+#### 控制结构
 
 ##### 条件语句
 
@@ -441,7 +466,41 @@ case 变量名 in
 esac  
 ```
 
-##### 循环语句
+###### select
+
+  制作一个选择表，在列表中选择一个选项执行命令行。如果选择的变量不在列表序列中，则返回一个空值。需要用break退出循环。 
+
+```shell
+select 变量 in 列表;do
+	命令行（通常用到循环变量）
+done
+```
+
+```shell
+echo "a is 5 ,b is 3. Please select your method: "
+
+a=5
+b=3
+
+select var in "a+b" "a-b" "a*b" "a/b";do
+        break
+done
+
+case $var in
+    "a+b")
+            echo 'a+b= '`expr $a + $b`;;
+    "a-b")
+            echo 'a-b= '`expr $a - $b`;;
+    "a*b")
+            echo 'a*b= '`expr $a \* $b`;;
+    "a/b")
+            echo 'a/b= '`expr $a / $b`;;
+    *)
+            echo "input error"
+esac
+```
+
+##### [循环语句](https://blog.csdn.net/fansongy/article/details/6724228)
 
 ###### while
 
@@ -449,18 +508,33 @@ esac
 
 ```
 
+###### until
+
+```shell
+sum=0
+num=10
+
+until test $num -eq 0;do
+        sum=`expr $sum + $num`
+        num=`expr $num - 1`
+    done
+echo "sum = $sum"
+```
+
 ###### for
 
 ```shell
-for((i=0;i<10;i++));do
-for i in {0..10};do
-for i in `seq 10`;do
+for((i=0;i<10;i++));do xx done
+
+for i in {0..10};do xx done
+
+for i in `seq 10`;do xx done
+
 for i in $(seq 10);do
 	echo "$i"
 	j=$(echo "$i*12.6-1.5"|bc)
 	echo $j
 done
-
 ```
 
 #### 函数
@@ -490,6 +564,102 @@ function 函数名 {
 
 ![分离函数体](http://tuling56.site/imgbed/2018-02-08_133315.png)
 
+##### 函数妙用
+
+复杂逻辑封装函数，调用时展开
+
+###### sql语句封装
+
+```shell
+# 定义函数
+function tag_shoulei_active() 
+{
+	# 注意此处map里的映射顺序对结果有直接影响
+	sql="xl_map_tag($1,
+            map(
+                'push_pop','1',
+                'app_on_desk','1',
+                '(?!auto).*(login|register).*success','2'  # map支持正则
+            ))"
+	echo "$sql"
+}
+
+function tag_shoulei_action_type() # 语句封装
+{
+	# 注意此处when的顺序对结果有直接的影响
+	sql="case 
+	   		when $1 rlike '(android|ios)_advertise' then 'advertise'
+        	when $1 rlike '(android|ios)_.*(homehannel).*' and $1!='andrideo' then 'video'
+        	when $1 rlike '(android|ios)_(download|dl_center_action)' then 'download'
+        	when $1 rlike '(android|ios)_(launch|forground)' then 'launch'
+        	when $1 rlike '(android|ios)_play.*' then 'play'
+		else 'other' end"
+	
+	echo "$sql"
+}
+
+
+# hql中调用（字段名作为参数传递进去的，并不是字段的内容，内部的判断还是字段名）
+hql="select 
+		`tag_shoulei_active extdata[\'attribute1\']` as is_active
+		`tag_shoulei_action_type eventid` as type
+		`tag_trans para1` as test1
+	from 
+		tblxxx
+	where xxx;
+	"
+echo "$hql"  # 在展开过程中会进行展开
+${HIVE} -e "$hql"
+```
+
+> 注意函数的格式，此外还要考虑输入的参数带空格的话如何完整的传递进去呢
+
+###### shell处理封装
+
+示例1：
+
+```mysql
+function tag_trans()  #函数处理
+{
+	proc="$1 这是附加的内容"
+	echo "$proc"
+}
+
+# hql中调用
+hql="select 
+		`tag_trans para1` as test1
+	from 
+		tblxx
+	where xxx;
+	"
+echo "$hql"  # 在展开过程中会进行展开
+${HIVE} -e "$hql"
+
+```
+
+示例2：
+
+```shell
+function chql()
+{
+    local start_date=$1
+    local end_date=$2
+
+    sql="select ds,pv,uv from xxx 
+    	where ds>='${start_date}' and ds<='${end_date}'"
+    echo $sql
+}
+
+function main()
+{
+    hql=$(chql 20180712 20180716)
+    echo "$hql"
+}
+
+# 执行main函数的输出结果是
+select ds,pv,uv from xxx where ds>='20180712' and ds<='20180716'
+```
+
 #### 应用
 
 ##### 字符串
@@ -508,8 +678,6 @@ for i in `seq 10`;do
 done
 echo $res
 ```
-
-
 
 ##### 生成序列
 
@@ -549,7 +717,9 @@ for i in {1..10};do echo $i;done  # 生成序列1，2,3,4,....19
 
 ##### 文件目录
 
-###### 文件重命名
+###### 文件操作
+
+文件重命名
 
 ``` sh
 # 第一种实现 find+awk+sh
@@ -564,17 +734,42 @@ rename  .sql  .txt *.sql  //好像不能递归目录,其中最后一个是要修
 # find+xargs+sed
 ```
 
-##### 数学计算
-
-###### 百分比显示
+###### 目录操作
 
 ```shell
+ mkdir -p parent/child/grandson
+ mkdir -p ./sub/{1,2,3,4}
+ mkdir -p ./sub/{1/{11,12,13},2/{21,22,23},3/{31,32,33}}  # 也即意味着支持多级嵌套
+```
+
+##### 数学计算
+
+###### 混合运算
+
+浮点运算
+
+```shell
+ #百分比显示
+ 
  # 方法1：使用bc
  r_o_ratio="`echo "scale=2;${remain_i}*100/${odl_i}"|bc`%"
  # 方法2：使用awk（注意此语句中的BEGIN不能省略）
  r_o_ratio=$(awk -v a=12 -v b=260 'BEGIN{printf("%4.2f%%",a*100/b);}')
  # 方法2.1(注意通过管道传递过来的数据不能在begin中使用，可以在前面加上END)
  echo "12 260" | awk '{printf("%4.2f%%",$1*100/$2);}'
+```
+
+[加减乘除(整数)](https://blog.csdn.net/hu_wen/article/details/52930806)
+
+```shell
+# let
+let num=num+1
+
+# expr
+expr 30 / 3 / 2 
+expr $num/ 2 
+
+# $(())
 ```
 
 ###### 数组运算
@@ -590,6 +785,45 @@ array=(111 222 333 444 555 999 888 777 666)
 ```
 
 [多维数组求最大值最小值](https://yq.aliyun.com/ziliao/98637)
+
+```shell
+
+```
+
+###### 集合运算
+
+交差并补
+
+```shell
+#交集
+sort A.txt B.txt |uniq -d 
+
+#并集
+sort A.txt B.txt |uniq
+
+# 差集（A-B）
+sort A.txt B.txt  B.txt|uniq -u
+```
+
+> 目前只处理了单列的情况，多列的情况要再完善
+
+文件差异
+
+```shell
+diff A.txt B.txt
+cdiff A.txt B.txt
+```
+
+###### 连接运算
+
+comm
+
+```shell
+comm  -f1 -f2 -f3 A_sort.txt B_sort.txt
+#第一列为只出现在文件A中的，第二列为只出现在文件B中的，第三列为AB中共同出现的
+```
+
+[join](http://www.cnblogs.com/mfryf/p/3402200.html)
 
 ```shell
 
@@ -655,7 +889,6 @@ let num=0x12;echo $num   --18
 # base64转十进制
 ((num=64#abc_));echo $num 
 
-
 ```
 
 ###### 十进制转其它进制
@@ -710,24 +943,18 @@ date -d @1438617600  "+%Y-%m-%d"
 ###### 日期运算
 
 ```shell
-
+# 见linux手册
 ```
 
 #### 积累
 
-##### 参数
+##### 传递带空格参数
 
-set -e
+需要将参数用[双引号括起来](https://blog.csdn.net/victor0127/article/details/47314619)
 
 ```shell
-set -e命令用法总结如下
-
-1.当命令的返回值为非零状态时，则立即退出脚本的执行
-2.作用范围只限于脚本执行的当前进行，不作用于其创建的子进程
-3.另外，当想根据命令执行的返回值，输出对应的log时，最好不要采用sete选项，而是通过配合ext命令来达到输出log并退出执行的目的
+get_browser "$line"
 ```
-
-
 
 ### awk
 
@@ -1062,17 +1289,31 @@ aaa 125
 bbb 128
 ```
 
-#### 积累
+#### 进阶
 
 ##### 字符串
 
-split( String, A, [Ere] ) 
+字符串分割
+
+> split( String, A, [Ere] ) 
 
 ```shell
 echo '[7,10]d       4724    ["100451440","100594004","100641926"]'|awk '{split($2,c,"[");for (i in dict) print }'
 ```
 
+字符串长度
 
+```shell
+
+```
+
+##### 内容抽取
+
+抽取指定位置的内容
+
+```shell
+
+```
 
 #### 应用
 
@@ -1209,7 +1450,7 @@ awk '{a[$1]=$1;n=length(a);print NR,n; if(n<=3) print $0}END{print n}'  test.dat
 
 ### sed
 
-[sed](http://man.linuxde.net/sed)是一种流编辑器，它是文本处理中非常中的工具，能够完美的配合正则表达式使用，功能不同凡响。处理时，把当前处理的行存储在临时缓冲区中，称为“模式空间”（pattern space），接着用sed命令处理缓冲区中的内容，处理完成后，把缓冲区的内容送往屏幕。接着处理下一行，这样不断重复，直到文件末尾。文件内容并没有 改变，除非你使用重定向存储输出。Sed主要用来自动编辑一个或多个文件；简化对文件的反复操作；编写转换程序等。
+[sed](http://man.linuxde.net/sed)是一种流编辑器（Streaming Editor），它是文本处理中非常中的工具，能够完美的配合正则表达式使用，功能不同凡响。处理时，把当前处理的行存储在临时缓冲区中，称为“模式空间”（pattern space），接着用sed命令处理缓冲区中的内容，处理完成后，把缓冲区的内容送往屏幕。接着处理下一行，这样不断重复，直到文件末尾。文件内容并没有 改变，除非你使用重定向存储输出。Sed主要用来自动编辑一个或多个文件；简化对文件的反复操作；编写转换程序等。
 
 sed的处理流程如下：
 
@@ -1259,7 +1500,7 @@ anime   6645    3776
 sed -n '/6645/{=;p}' awk.data |sed 'N;s/\n/\t/' 
 ```
 
-删除匹配行的下一行、
+删除匹配行的下一行
 
 ```shell
 sed -n '/root/{n;d}'  /etc/passwd 		#将匹配root行的下一行删除 
@@ -1289,7 +1530,9 @@ sed '/hrwang/{s/hrwang/HRWANG/;q;}' datafile  #匹配到hrwang的行处理后就
 
 sed添加-r才支持扩展正则
 
-
+```shell
+sed -nr '/^xxx(.*)a$/s/vvv/xxx/gp'   
+```
 
 ##### 模式空间
 
@@ -1313,6 +1556,7 @@ sed添加-r才支持扩展正则
 
 ```shell
 ststr=`date +%d\\\/%b\\\/%Y:%H`	# 这个日期的转换，在脚本内要使用三个\才能代表一个\，脚本外可使用两个
+
 sed -n "/${ststr}/p" ${log_path}/${log} > ${log_path_bak}/${log}_${datehour}
 # 注意使用双引号，而不是单引号，这样变量才能传递过去
 ```
@@ -1333,7 +1577,7 @@ sed -f sedscript.sh
 > s/bash/csh/p
 > ```
 
-Sed对于脚本中输入的命令非常挑剔，在命令的末尾不能有任何空白或文本，如果在一行中有多个命令，要用分号分隔。以#开头的行为注释行，且不能跨行
+sed对于脚本中输入的命令非常挑剔，在命令的末尾不能有任何空白或文本，如果在一行中有多个命令，要用分号分隔。以#开头的行为注释行，且不能跨行
 
 **直接运行脚本**
 
@@ -1344,15 +1588,93 @@ chmod u+x
 
 sed命令如何接收外部参数
 
+#### 进阶
+
+##### 整行处理
+
+```shell
+# a命令插入行
+sed '1,5a 这是追加的第五行' test.txt
+
+# i命令插入行
+sed '1,5i 这是插入的第五行' test.txt
+
+# c命令替换行(注意是将1~5整体替换成替换后的，不是每一行替换成替换后的)
+sed '1,5c 这是替换后的' test.txt
+
+# d命令删除行
+sed '1,5d 删除1~5行' test.txt
+```
+
+##### 行内处理
+
+```shell
+# s命令替换（其中原来的部分支持正则\w）
+sed 's/原来的/现在的/g' test.txt
+
+echo -e "inet addr:172.17.54.137  Bcast:172.17.63.255 \n  Mask:255.255.240.0" |
+sed -n '/inet / s/inet.*:$?//'
+
+# &命令替换固定字符串
+sed -n 's/dog/&&xa/p' pets.txt
+```
+
+> 利用&命令进行大小写转换
+>
+> ```shell
+> #\u\U\l\L
+> echo -e "inet addr:172.17.54.137  Bcast:1 \n  Mask:40.0" |sed -n 's/inet/\u&/p'
+> ```
+
+##### 其它
+
+```shell
+# {}代表命令组合
+echo -e "inet addr:172.17.54.137  Bcast:1 \n  Mask:40.0" | sed -n '/inet / {p;s/inet/xxx/p}'
+
+# r命令读取特定的文件内容到文件(读取pets.txt的内容追加到test.txt的第一行后)
+sed '1r pets.txt' test.txt  
+
+
+# w命令匹配特定的文件内容写入到文件
+sed '1w pets.txt' test.txt
+```
+
 #### 应用
 
-##### 包含指定内容的行替换为新行
+##### 特定行
+
+输出特定行
+
+```shell
+#输出偶数行
+sed -n '{n;p}' test.txt
+sed -n '2~1p' test.txt
+
+#输出奇数行
+sed -n '{p;n}' test.txt
+sed -n '1~1p' test.txt
+```
+
+> 备注：{}代表命令组合
+
+替换特定行
 
 ```shell
  sed -i '/g_tool_hive=/c g_tool_hive="/usr/local/complat/cdh5.10.0/hive/bin/hive"' `sl 'g_tool_hive'`
 ```
 
+##### 特定内容
+
+输出满足条件部分的行的部分内容
+
+```shell
+# 比如：/usr/local/complat/cdh5.10.0/hive/bin/hive，要抽取complat那个位置的内容
+```
+
 ### grep
+
+全局正则表达式匹配
 
 ####  基础
 
@@ -1368,7 +1690,7 @@ grep查找指定类型文件的内容
 
 ```shell
 find . -name *.py |xargs grep xxxx
-find . -name *.py -exec grep xhh {} \;  # 问题修正，注意{}和 \;之间的空格，不然给提示exec缺少参数
+find . -name *.py -exec grep xhh {} \;  # 问题修正，注意{}和 \;之间的空格，不然提示exec缺少参数
 ```
 
 grep和sed结合使用
@@ -1380,7 +1702,44 @@ sed -i 's/oldstr/newstr/g' `grep oldstr -rl odlstr $datadir`
 
 ##### 正则
 
-grep加-E支持扩展正则`？+|（）`,相当于egrep
+grep支持BRE、ERE、PRE，默认支持BRE
+
+grep -F快速正则，相当于fgrep,不使用任何正则匹配的时候使用，不会解析任何正则元字符，均当成默认字符.
+
+###### **基本正则BRE**
+
+在使用基本正则表达式的时候，必须在下列符号前加上转义字符`\`才能代表正则的意义，否则只代表该字符的默认意义:
+
+```shell
+? + | () {}
+```
+
+###### **扩展正则ERE**
+
+grep加-E支持扩展正则`？+|（）{}`,相当于egrep
+
+###### **Perl正则**PRE
+
+grep加-P选项支持Perl格式的正则，注意此处不能缩写为pgrep
+
+#### 进阶
+
+##### 抽取匹配的内容
+
+```shell
+# 例如抽取16
+echo "zhangshaohan:16" |grep -oP '(?<=zhangshaohan:).*$'
+```
+
+> 此处使用了到[正则的断言](http://deerchao.net/tutorials/regex/regex.htm)和grep的Perl风格正则(参考全栈数据之路部分)
+
+##### 按文件后缀过滤
+
+```shell
+egrep '\.mp4$|\.rmvb$|\.avi$' test.txt
+# 当匹配的规则较多的时候使用-f
+egrep -f pattern.file text.txt
+```
 
 #### 应用
 
@@ -1390,7 +1749,7 @@ grep加-E支持扩展正则`？+|（）`,相当于egrep
 
 #### 基础
 
-##### 排除
+##### 排除   
 
 ```shell
 #  搜索但跳出指定目录
@@ -1408,7 +1767,9 @@ alias slsh='grep -i -a   -Rl --color `find . -type f -name "*.sh"`'
 zip calc_bak.zip $(find xmp_odl -path "*dev*" -prune -o -type f  \( -name "*.py" -o -name "*.sh" -o -name "*.hql" -o -name "*.json" -o -name "*.conf" -o  -name "*.ini" \))
 ```
 
-##### 积累
+#### 进阶
+
+输出处理
 
 ```shell
 # 为输出的文件名加上双引号
@@ -1418,9 +1779,17 @@ find . -type f -exec echo "{}" \;
 find . -type f -printf "%T@\t%p\n"|sort -n|cut -f2|xargs ls -lrt
 ```
 
-##### 问题
+搜索指定类型文件
 
-###### 文件名空格
+```shell
+# 搜索py类型文件中包含xhsn的
+find . -type f -name "*.py" -print0|xarags grep 'xhsn'
+
+grep 'xhsn' $(find . -type f -name "*.py")
+grep 'xhsn' `find . -type f -name "*.py"`
+```
+
+##### 文件名空格
 
 文件名中存在空格的时候无法处理，解决方式如下：
 
@@ -1562,6 +1931,10 @@ unix2dos xx.txt
   [Shell重命名（智慧大碰撞）](http://www.oschina.net/question/75009_111550)
 
   [shell脚本自动化测试框架shUnit2](https://blog.csdn.net/robertsong2004/article/details/37927287)
+
+  [Shell速查手册(强烈推荐)](https://segmentfault.com/u/vvpale/articles?page=1)
+
+  [Shell join命令详解](http://www.cnblogs.com/mfryf/p/3402200.html)
 
 - **awk部分**
 
