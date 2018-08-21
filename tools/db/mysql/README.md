@@ -2,9 +2,9 @@
 
 [TOC]
 
-### 基本
+### 基础
 
-#### 基础
+#### 基本
 
 ##### 安装
 
@@ -43,7 +43,38 @@ chkconfig --add mysqld
 chkconfig mysqld on
 ```
 
-##### 账号
+##### 配置
+
+mysql的配置文件默认是`/etc/my.cnf`,其内容主要如下：
+
+```mysql
+[mysqld]
+datadir=/var/lib/mysql
+socket=/var/lib/mysql/mysql.sock
+user=mysql
+# Disabling symbolic-links is recommended to prevent assorted security risks
+symbolic-links=0
+default-storage-engine=MyISAM
+
+# 开启bin-log
+log-bin=/var/lib/mysql/mysql-bin
+
+[mysqld_safe]
+log-error=/var/log/mysqld.log
+pid-file=/var/run/mysqld/mysqld.pid
+
+# 配置客户端，似乎可以直接登录使用
+[client]
+host=localhost
+user=rxxx
+password='xxxx'
+```
+
+
+
+
+
+###### 账号
 
 创建新用户并设置密码
 
@@ -98,7 +129,7 @@ mysql -uroot -pxxx -P3316 -h127.0.0.1 -Ddb1
 # 其中-P3316是本机的转发端口（如果不转发的话，直接是远程机器的端口），注意在cmder中输入命令，不要在GitBash中输入，后者正确之后无响应
 ```
 
-##### 编码
+###### 编码
 
 查看字符数据库的字符集
 
@@ -205,7 +236,7 @@ tips:
  conn = MySQLdb.connect(host="localhost", user="xxxx", passwd="xxx",use_unicode=True, charset="utf8",unix_socket='/tmp/mysql_3309.sock')
 ```
 
-##### 变量
+###### 变量
 
 类型转换
 
@@ -317,36 +348,34 @@ fields=$(echo "desc media_info.${TABLE_NAME};"| ${LOCAL_MYSQL} | grep -v Field |
 
 json
 
-> [json类型](http://www.jb51.net/article/89219.htm)是在mysql5.7及之后的版本中添加的
-
 ```mysql
-
+mysql不支持map类型，
 ```
+
+> [json类型](http://www.jb51.net/article/89219.htm)是在mysql5.7.8及之后的版本中添加的,函数[参考](https://blog.csdn.net/jiangyu1013/article/details/78917425)
 
 整型
 
 ```mysql
 bigint int smallint tinyint
-
 ```
 
 浮点型
 
 ```shell
 float decimal
-
 ```
 
 字符串
 
 ```shell
-char vachar
+char vachar text
 ```
 
 日期时间
 
 ```shell
-
+datetime timestamp
 ```
 
 ==综合测试==
@@ -374,6 +403,7 @@ alter table newexample add address varchar(110) after stu_id;
 修改字段
 
 ```mysql
+# 修改字段类型
 alter table table_name change old_field_name new_field_name field_type;
 
 #例子：
@@ -398,7 +428,9 @@ UPDATE [LOW_PRIORITY] [IGNORE] table_reference
 UPDATE tbl SET col1 = col1 + 1, col2 = col1;
 ```
 
-字段类型转换
+> 注意执行顺序
+
+类型转换
 
 ```mysql
 #sc.score是decimal(18,1)类型
@@ -506,9 +538,9 @@ CREATE TABLE `user_follow` (
 ) ENGINE=MyISAM AUTO_INCREMENT=13912 DEFAULT CHARSET=utf8;
 ```
 
-注意`PRIMARY KEY`,`UNIQUE KEY`,	`KEY`的区别
+注意`PRIMARY KEY`,`UNIQUE KEY`,`KEY`的区别
 
-**索引和约束**
+##### 索引和约束
 
 `UNIQUE KEY`和`PRIMARY KEY`约束均为列或列集合提供了唯一性的保证，`PRIMARY KEY `拥有自动定义的 `UNIQUE` 约束,一个表可以有多个`UNIQUE KEY`约束，但是只能有一个`PRIMARY KEY`约束。
 
@@ -613,8 +645,84 @@ CSV（Comma-Separated Values逗号分隔值）
 - 替代方式
 - 具体化方式（中间表方式） 
 
+##### 创建视图
 
-#### 执行顺序
+```mysql
+ create or replace view v1(书名,价格) as
+```
+
+##### 删除视图
+
+删除视图是指删除数据库中已存在的视图，删除视图时候，只能删除视图的定义，不会删除数据
+
+```mysql
+drop view if exists v1;
+```
+
+##### 修改视图
+
+插入
+
+```mysql
+
+```
+
+更新
+
+```
+
+```
+
+删除
+
+```mysql
+
+```
+
+#### 子句
+
+##### select
+
+select子句
+
+```mysql
+
+```
+
+##### where
+
+```mysql
+# 等原始字段的逻辑组合判断
+where a='xx' 
+	and a>b 
+	and a like '%xx%'  
+```
+
+##### group by
+
+group by子句是对where子句过滤后的数据按某些字段进行聚合操作,其聚合字段需要和select子句中严格一致
+
+```mysql
+group by xxx
+```
+
+##### having
+
+having子句一般是伴随group by子句使用，对select子句中的聚合结果进行条件判断
+
+```mysql
+having sum(xx)>xx 
+	and sum(xx)<sum(xx)
+	and xxx like '%vv%'
+	and (xxx in ('xxx','xxx') or xxx in ('xxx'))
+	and ('a' in xx or 'b' in xx)  # 注意此处xx是使用group_concat等聚合之后的序列(待验证)
+```
+
+> having子句中可以使用别名
+
+##### 执行顺序
+
+理解这个执行顺序真的很重要
 
 ```mysql
 (7)     SELECT
@@ -629,11 +737,13 @@ CSV（Comma-Separated Values逗号分隔值）
 (10)    LIMIT <limit_number>
 ```
 
-> 此处牵涉到别名的使用地点问题，只有在select和orderby 中才能使用
+> 此处牵涉到别名的使用地点问题，只有在select和order by 中才能使用
 
 ### 高级
 
 #### 锁
+
+数据库锁定机制是数据库为了保证数据的一致性而是各种共享资源在被并发访问变得有序所设计的一种规则。
 
 引擎和锁类型的对应关系
 
@@ -668,9 +778,15 @@ MyISAM表的读和写是串行的，即在读操作时不能写操作，写操�
 
 //待添加
 
-##### 死锁解决
+##### 死锁
 
-//待添加
+###### 原因
+
+为什么会发生死锁
+
+###### 解决
+
+怎样解决死锁
 
 #### 存储过程
 
@@ -954,8 +1070,8 @@ interval:
 			DAY_MINUTE |DAY_SECOND | HOUR_MINUTE |HOUR_SECOND | MINUTE_SECOND}
 ```
 
-> 参数详细说明：
->
+参数详细说明：
+
 > DEFINER: 定义事件执行的时候检查权限的用户。
 >
 > ON SCHEDULE schedule: 定义执行的时间和时间间隔。
@@ -977,6 +1093,14 @@ alter ...
 ```mysql
 DROP EVENT [IF EXISTS] event_name
 ```
+
+#### 事务
+
+//mysql的事务是如何处理的
+
+#### 外键
+
+//外键的作用
 
 #### 触发器
 
@@ -1043,31 +1167,62 @@ SELECT name_varchar from study.datatype order by CONVERT(name_varchar USING gbk)
 
 #### 索引
 
-单索引和联合索引，单索引有以下的类型:
+从索引所使用的列的可区分为单索引和联合索引
 
-索引类型是基于索引方法的，有各自的特点 
+从使用的索引方法可以分为以下几种： 
 
-- 唯一索引
+- 唯一索引：数据列不允许重复，允许为NULL值，一个表允许多个列创建唯一索引。
 
 
-- 普通索引
-- 主键索引
+- 普通索引：基本的索引类型，没有唯一性的限制，允许为NULL值。
+- 主键索引：:数据列不允许重复，不允许为NULL.一个表只能有一个主键。
 
-区别在于：
+索引的创建部分参考基础知识部分
+
+##### 单索引
+
+###### 主键索引
+
+```mysql
 
 ```
-主键索引:数据列不允许重复，不允许为NULL.一个表只能有一个主键。
-唯一索引:数据列不允许重复，允许为NULL值，一个表允许多个列创建唯一索引。
-普通索引:基本的索引类型，没有唯一性的限制，允许为NULL值。
+
+###### 唯一索引
+
+```mysql
+
 ```
 
-##### 主键索引
+###### 普通索引
 
-##### 唯一索引
-
-##### 普通索引
+```mysql
+create table `ftbl_clean_channel_front_remain` (
+  `ftime` varchar(20) default null,
+  `fdim_channelid` varchar(50) default null,
+  `fstart_date` varchar(20) default null,
+  `fend_date` varchar(20) default null,
+  `ffact_cnt` int(11) default null,
+  key `index_time` (`ftime`),
+  key `index_channelid` (`fdim_channelid`),
+  key `index_start` (`fstart_date`),
+  key `index_end` (`fend_date`),
+  key `ins_startdate` (`fstart_date`)  # 索引重复
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+```
 
 ##### 联合索引
+
+创建联合索引
+
+```mysql
+
+```
+
+联合索引的注意事项
+
+```shell
+
+```
 
 #### 匹配
 
@@ -1137,7 +1292,11 @@ select * from xx where xx like '%_%'
 例子：
 
 ```mysql
+# 内层不和外层联系
 select id-(select pv_int from study.task where id=2) from study.task;
+
+# 内层和外层联系
+select price-(select amount from study.test where articleid=t.articleid) from study.test t;
 ```
 
 ##### 关键字
@@ -1160,22 +1319,67 @@ select * from ecs_goods a where EXISTS(select cat_id from ecs_category b where a
 只要满足内存查询语句返回结果中的任意一个，就可以执行外层查询语句
 
 ```mysql
-#这个就是查询所有购买数量大于49的订单的信息！
+# 这个就是查询所有购买数量大于49的订单的信息！
 select order_id,customer_id,order_number,order_date from `order` where order_id = any(select order_id from order_detail where buy_number>49);
 ```
 
 ###### all关键字
 
 ```mysql
-#所有满足订单的总金额大于单价*10的订单的信息
+# 所有满足订单的总金额大于单价*10的订单的信息
 select order_id,customer_id,order_number,order_date from `order` where total_money > all(select price*10 from order_detail);
 ```
 
+==exists和in区别==
+
+这两者的使用条件
+
+```mysql
+#这条语句适用于a表比b表大的情况
+select * from ecs_goods a where cat_id in(select cat_id from ecs_category);
+
+#这条语句适用于b表比a表大的情况
+select * from ecs_goods a where EXISTS(select cat_id from ecs_category b where a.cat_id = b.cat_id);
+```
+
+##### 实战
+
+基础
+
+```mysql
+use study;
+SELECT article,author,(select price from test where author=t.author and article=t.article)pre from test t;
+```
+
+升级
+
+```mysql
+SELECT ftime,item_id,seq_id, user_cnt,order_amt,
+    (
+        SELECT
+            user_cnt
+        FROM
+            hubble_vip_xl9_funnel_new_day
+        WHERE
+            ftime = t.ftime AND item_id = t.item_id
+        AND seq_id = (
+            SELECT
+                pre_seq_id
+            FROM
+                v_d_funnel_process_new
+            WHERE
+                item_id = t.item_id AND seq_id = t.seq_id
+        )
+    )pre_user_cnt  # 这个查询的结果作为一个类似字段返回
+FROM
+    hubble_vip_xl9_funnel_new_day t
+```
+
+> 这个技巧可用于漏斗分析
+
 #### 连接
 
-##### join
-
-###### [inner] join
+#####  inner join
 
 inner join 其实等同于join
 
@@ -1226,6 +1430,8 @@ inner join
 on a.ftime=d.ftime;
 ```
 
+##### outer join
+
 ###### left [outer] join
 
 ```mysql
@@ -1263,7 +1469,7 @@ mysql本身不支持full join 需要变通解决
 # 本身不支持
 ```
 
-###### union [all]
+##### union join
 
 ```mysql
 # 请注意，UNION 内部的 SELECT 语句必须拥有相同数量的列。列也必须拥有相似的数据类型。同时，每条 SELECT 语句中的列的顺序必须相同。
@@ -1273,7 +1479,9 @@ UNION All
 SELECT	* from	persons;
 ```
 
-###### cross join
+##### cross join
+
+笛卡尔积
 
 ```mysql
 SELECT
@@ -1292,24 +1500,86 @@ where
 #2，不带where子句的产生的查询结果才是笛卡尔积
 ```
 
-==连接tips==:
+#####  join注意事项
 
 - [join on where的执行顺序](https://www.cnblogs.com/Jessy/p/3525419.html)	
   - join的时候先对两张表做where条件筛选，然后再做join,这样可以减小联表的量
 
-##### exists和in
+````mysql
+# 在on条件中过滤
+select
+	a.x,a.z,b.y
+from 
+	tbla a
+inner join 
+	tblb b
+on a.x=b.x and a.y='vvv' and b.z="vwew";  # 不加on条件相当于交叉积
+
+# where中条件过滤
+select
+	a.x,a.z,b.y
+from 
+(select x,z from tbla where y='vvv')a
+inner join 
+(select x.y from tblb where z='vwer') b
+on a.x=b.x 
+where xxx; # 此处也可再进行过滤 
+````
+
+> on中单表条件的过滤是在join之前进行的,还是在join之后进行的，这个要进行测试
+
+###### on多条件
+
+直接把on的单表筛选条件放在on中，可以减少子查询这一环，但带来的性能消耗暂时不知
+
+> 表1：study.t_join_a
+
+| id   | amount |
+| ---- | ------ |
+| 1    | 100    |
+| 2    | 200    |
+| 3    | 300    |
+| 4    | 400    |
+
+> 表2：study.t_join_b
+
+| id   | weight | exist |
+| ---- | ------ | ----- |
+| 2    | 22     | 0     |
+| 4    | 44     | 1     |
+| 5    | 55     | 0     |
+| 6    | 66     | 1     |
+
+
+**left join muti on**
 
 ```mysql
-#这条语句适用于a表比b表大的情况
-select * from ecs_goods a where cat_id in(select cat_id from ecs_category);
+# left join on多条件支持(把on的所有条件作为匹配条件，不符合的右表都为null)
+select * from t_join_a a left t_join_b b on a.id=b.id and a.amount=200;
+select * from t_join_a a left t_join_b b on a.id=b.id;
+```
 
-#这条语句适用于b表比a表大的情况
-select * from ecs_goods a where EXISTS(select cat_id from ecs_category b where a.cat_id = b.cat_id);
+![on多条件](http://tuling56.site/imgbed/2018-07-30_201552.png)
+
+
+
+**inner join muti on**
+
+```mysql 
+select * from t_join_a a join t_join_b  b on a.id=b.id and a.amount=200;
+# 等效于
+select * from t_join_a a left join t_join_b  b on a.id=b.id where a.amount=200;
+```
+
+**right join muti on**
+
+```mysql
+
 ```
 
 ### 积累
 
-#### 基础
+#### 基本
 
 ##### 语句类型
 
@@ -1326,7 +1596,9 @@ DCL(Data Control Language)：
 是数据库控制功能。是用来设置或更改数据库用户或角色权限的语句，包括(grant,deny,revoke等)语句。在默认状态下，只有sysadmin,dbcreator,db_owner或db_securityadmin等人员才有权力执行DCL
 ```
 
-##### 注释
+##### 注释和别名
+
+###### 注释
 
 行注释
 
@@ -1346,21 +1618,36 @@ SELECT 1+
       1;
 ```
 
-##### 别名
+###### 别名
+
+使用位置
 
 ```mysql
-# 别名只能在select、orderby、having中使用，不能在group中使用
+# 别名只能在select、order by、group by、having中使用，不能在where中使用
 select 
 	xx as alias_name
 from
  	xxxx
 where xxxx
-group by xx
+group by alias_name
 having alias_name>10
 order by alias_name
 ```
 
-##### 结果处理
+> 例子：
+>
+> ```mysql
+> select version cv,count(*) as cnt
+> from ad_funnel
+> where version in ('v1','v2','v3')
+> GROUP BY cv
+> having cnt>2
+> order by cnt;
+> ```
+
+##### 特殊处理
+
+###### 结果处理
 
 选取结果添加行号
 
@@ -1376,7 +1663,7 @@ select (@mycnt := @mycnt + 1) as ROWNUM , vv from task1_tbl order by vv;
 # #用Python等脚本语言对查询结果进行二次组装
 ```
 
-##### 自增列
+###### 自增列
 
 ```mysql
 # 建表的时候指定
@@ -1390,9 +1677,20 @@ alter table table_1 auto_increment = 2;
 
 只能修改单机的，集群修改[自增列](http://www.jb51.net/article/42883.htm)无效
 
+###### NULL处理
+
+```mysql
+# NULL和任何值运算都是NULL，NULL是假
+select 1=1,NULL=1,NULL=NULL,NULL in (1,2),if(NULL in (1,2),'12','e'); #结果：1 NULL NULL e
+```
+
+
+
 #### 技巧
 
 ##### 运行技巧
+
+###### 重定向和管道
 
 ```shell
 # 方法1
@@ -1412,6 +1710,8 @@ echo "alter table media_relation_search_pc rename media_relation_search_pc_old_$
 cat /data/rsync_data/kk_sql/videos.sql |$mysql video
 echo "show tables;"| mysql -uroot -proot -Dsnh48
 ```
+
+###### source方法
 
 一次运行多个sql文件
 
@@ -1435,14 +1735,9 @@ INSERT into task_request(proposer,enddate) values ("鲁丽",'20170611'),("张一
 INSERT into tb2(proposer,enddate) select xx,yy from tb1;
 ```
 
-###### 替换插入
+###### 更新插入
 
-```mysql
-# 主键不存在则插入，主键存在切存在相同的值，则不更新
-replace into table (id,name) values('1′,'aa'),('2′,'bb')
-```
-
-###### 不存在则插入，存在则更新
+方法1：insert into ... values ... [on dubplicate key] update  
 
 ```mysql
 INSERT INTO tablename (field1, field2, field3, ...) VALUES ('value1', 'value2','value3', ...) ON DUPLICATE KEY UPDATE field1='value1', field2='value2', field3='value3', ...
@@ -1453,14 +1748,21 @@ INSERT INTO tablename (field1, field2, field3, ...) VALUES ('value1', 'value2','
 UPDATE field1='value1', field2='value2', field3='value3', ...
 ```
 
-> 一个例子：
+> [一个例子](https://www.cnblogs.com/liaojie970/p/6824773.html)：
 
 ```mysql
 INSERT INTO tablea (peerid,new_install_date,new_install_source,new_install_version,new_install_type,insert_date,insert_source,insert_version,insert_type) VALUES("%s","%s","%s","%s","%s","%s","%s","%s","%s") ON DUPLICATE KEY UPDATE new_install_type="%s"' 
 ```
+方法2：[replace into](https://www.cnblogs.com/c-961900940/p/6197878.html)
+
+```mysql
+# 主键不存在则插入，主键或者唯一索引存在相同的值，则不更新
+replace into table (id,name) values('1′,'aa'),('2′,'bb')
+```
+
 ##### 筛选技巧
 
-###### 基础
+###### 字段和表类型筛选
 
 查询某个字段匹配的的表和所在的数据库
 
@@ -1471,31 +1773,58 @@ SELECT TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME from information_schema.`COLUMNS` whe
 筛选某种类型的表和所在的库
 
 ```mysql
-select table_schema,table_name from information_schema.tables where table_type='base table' and engine='innodb' and table_schema!='mysql' and table_name not like '%innodb%';
+select table_schema,table_name from information_schema.tables 
+where table_type='base table' and engine='innodb' and table_schema!='mysql' and table_name not like '%innodb%';
 ```
 
-###### 同一属性多值过滤
+###### [同一属性多值过滤](https://www.imooc.com/learn/449)
+
+选出同时具有fei和bianhua能力的人
+
+**Join实现**
 
 ```mysql
-#选出同时具有fei和bianhua能力的人
+# 方法1：
+SELECT DISTINCT a.name AS '念经&变化' 
+from t_nameskills a 
+JOIN t_nameskills b 
+on a.name=b.name and b.skills='念经'
+JOIN t_nameskills c 
+on a.name=c.name and c.skills='变化';
 
-# 方法一
-SELECT DISTINCT a.name AS 'feibianren' from nameskills a 
-JOIN  nameskills b on a.name=b.name and b.skills='fei'
-join  nameskills c on a.name=c.`name` and c.skills='bianhua';
-
-# 方法二：
+# 方法1:(解释)
 SELECT
-	a.`name`,
+	a.name,
 	b.skills as bskill
-	#c.skills as cskill
-from
-	nameskills_row a
-INNER JOIN join nameskills_row b on a.name = b.name
-and b.skills = 'nianjing';
-#join nameskills_row c on a.name = c.name
-#and c.skills = 'fanren';
+	c.skills as cskill
+FROM
+	t_nameskills a
+INNER JOIN 
+	t_nameskills b 
+on a.name = b.name and b.skills = 'nianjing';
+INNER JOIN
+	t_nameskills c 
+on a.name = c.name and c.skills = 'fanren';
 ```
+
+**groupby实现：**
+
+```mysql
+# 方法1(待确认)：
+select name,group_concat(skills) as gcs 
+from t_nameskills 
+group by name 
+having  find_in_set('念经',gcs) and find_in_set('变化',gcs); 
+
+
+# 方法2：(效率低，like使得索引失效)
+select name,group_concat(skills) as gcs 
+from t_nameskills 
+group by name 
+having gcs like '%念经%' and gcs like '%变化%'; 
+```
+
+> 此处主要牵涉到集合操作，目前还没有比较好的实现方式
 
 ##### 删除技巧
 
@@ -1511,6 +1840,10 @@ where Id not in (select a.Id from (
 									)a
                 );
 ```
+
+##### [累进税率](https://www.imooc.com/learn/449)
+
+//这个要不断的完善，把相关的技巧融合进实战中
 
 #### restful接口
 
@@ -1918,7 +2251,7 @@ update union_kuaichuan_download_data a,downloaddatas b set b.ThunderQty=b.Thunde
 ##### mysql实现
 
 ```mysql
-# 例子1：(遍历所有记录，取每条记录与当前记录做比较，只有当同一版本不超过3个比当前高时，这个才是前三名)。
+# 例子1：(遍历所有记录，取每条记录与当前记录做比较，只有当同一版本不超过3个比当前高时，才是前三名)。
 SELECT
 	*
 FROM
@@ -1960,8 +2293,10 @@ ORDER BY
 
 ##### awk实现
 
-```
+先分组，分组使用的四关联数组，但是关联数组只能存一个value，是否vlaue类型可支持关联数组，即数组嵌套
 
+```shell
+echo | awk 'BEGIN{arr["a"]=1;arr["b"]="b"";c=arr}{for(k in c) print c,arr[c];}' #error
 ```
 
 ##### python实现
@@ -2027,6 +2362,16 @@ ORDER BY
 
 - 多列索引的设计及什么情况下索引会失效
 
+###### 冗余和重复索引
+
+mysql允许在相同列上创建多个索引，而mysql需要单独维护重复的索引，并且优化器在优化查询的时候也需要逐个地考虑，这会影响性能。
+
+```mysql
+
+```
+
+其他不同类型的索引在[相同列上创建](https://www.cnblogs.com/happyflyingpig/p/7663000.html)（如哈希索引和全文索引）不会是B-Tree索引的冗余索引，而无论覆盖的索引列是什么。 
+
 ##### 慢查询
 
 慢查询日志将日志记录写入文件，也将日志记录写入数据库表。
@@ -2074,7 +2419,6 @@ mysqldumpslow分析工具提供对慢日志查询的分析
 ```
 
 ```mysql
-
 # 得到返回记录集最多的10个SQL。
 mysqldumpslow -s r -t 10 /database/mysql/mysql06_slow.log
 
@@ -2100,7 +2444,9 @@ mysqldumpslow -s r -t 20 /mysqldata/mysql/mysql06-slow.log | more
 
 #### 具体建议
 
-##### 尽可能不使用NULL
+##### 字段属性
+
+###### 尽可能不使用NULL
 
 NULL的缺点：
 
@@ -2110,9 +2456,44 @@ NULL的缺点：
 - 使用`NULL`时和该列其他的值可能不是同种类型，导致问题。（在不同的语言中表现不一样）
 - MySQL难以优化对可为`NULL`的列的查询
 
-##### 整型代替字符串
+###### 字符串的长度
 
-- 可以用整型`tinyint`表示的数据就不要使用字符串类型，
+- 长度类型设置够用就行了，比如能够设置成varchar(10）就不要设置成varchar(100)
+
+###### 整型代替字符串
+
+数值型数据的处理起来的速度要比文本类型快很多
+
+- 可以用整型`tinyint`表示的数据就不要使用字符串类型，例如性别等
+
+##### 查询设计
+
+###### 避免索引失效
+
+- .索引可以加快查询速度但是有的操作却能破坏索引，比如：!=，<>操作符等会使索引失效。
+- 尽量不要在 where 子句中使用 or 来连接条件，这样会破坏索引。
+- 使用LIKE '%ABC'或LIKE '%ABC%'类型的查询也会破坏索引使索引失效，可以尝试使用全文搜索。
+- 避免在 where 子句中对字段进行表达式操作或进行函数操作，这将导致引擎放弃使用索引而进行全表扫描
+
+###### NeverSelect*
+
+用具体的字段代表，不要返回任何使用不到的字段
+
+###### 使用Union
+
+将更多的查询合并到一个查询中，客户短查询结束时，临时表会自动删除
+
+###### 事务
+
+子查询（Sub-Queries）、连接（JOIN）和联合（UNION）来创建各种各样的查询，但不是所有的数据库操作都可以只用一条或少数几条SQL语句完成的。很多时候需要查询多张表，这是如果其中一条语句查询错误那么后面的执行对于需求来说将没有任何意义，这是就造成了不必要的操作，这是可以使用事务进行回滚，不去执行下面的错误语句。
+
+###### 其它
+
+- 避免频繁创建和删除临时表，以减少系统表资源的消耗。
+- 尽量避免向客户端返回大数据量，若数据量过大，应该考虑相应需求是否合理。
+- 尽量避免大事务操作，提高系统并发能力。
+
+
 
 ### 备份
 
@@ -2346,8 +2727,6 @@ log-bin=/var/lib/mysql/mysql-bin
 show variables like '%_log%';
 ```
 
-
-
 ##### 错误日志
 
 ##### 查询日志
@@ -2394,9 +2773,35 @@ SQL语句级别，默认
 
 混合模式，官方推荐
 
+#### 进程/状态/变量
 
+##### 进程
 
-#### 性能指标
+状态查看命令
+
+```mysql
+show processlist;
+```
+
+##### 状态
+
+mysql[状态指标描述](https://www.toutiao.com/i6585469878314992132/)
+
+```mysql
+show global status;
+show global status like '%table%';
+```
+
+##### 变量
+
+```mysql
+show global variables;
+show global variables like '%character%';
+```
+
+#### 指标和监控
+
+##### 指标
 
 性能指标计算和监控，指标关注如下：
 
@@ -2416,9 +2821,9 @@ SQL语句级别，默认
 |           |           |      |
 |           |           |      |
 
-#### 性能监控
+##### 监控
 
-##### explain命令
+###### explain命令
 
 核心优先使用explain一下查问题,对explain基础知识的理解
 
@@ -2428,7 +2833,7 @@ explain format=json select avg(k) from sbtest1 where id between 1000 and 2000 \G
 
 注意查询开销`query_cost`
 
-##### extended-status命令
+###### extended-status命令
 
 ```shell
 # 累计值
@@ -2440,19 +2845,15 @@ mysqladmin -uroot -proot extended-status --relative -i1
 mysqladmin -uroot -proot extended-status --relative --seleep=1
 ```
 
-##### show global status
+#### 辅助工具
 
-```mysql
->show global status;
-```
+##### percona-toolkit
 
-#### percona-toolkit工具箱
+好好掌握
 
-//该工具箱作为重点学习的对象
+#####  MySQL Utilities Client
 
-####  MySQL Utilities Client工具箱
-
-##### 工具一览
+工具一览
 
 ```shell
 mysqluc> help utilities
@@ -2488,7 +2889,7 @@ mysqlslavetrx      skip transactions on slaves
 mysqluserclone     clone a MySQL user account to one or more new users
 ```
 
-##### 具体使用:
+###### 具体使用
 
 ```shell
  # 显示文件使用
@@ -2498,7 +2899,9 @@ mysqluserclone     clone a MySQL user account to one or more new users
  mysqldbcopy --source=root:root@localhost --destination=xxx:xxx@xxx study:study
 ```
 
-#### SQL Advisor审核工具
+##### SQL Advisor审核工具
+
+是一款审核和调试工具
 
 ```shell
 
@@ -2540,11 +2943,15 @@ mysqluserclone     clone a MySQL user account to one or more new users
 
   [关于sql和mysql的语句执行顺序](http://blog.csdn.net/u014044812/article/details/51004754)
 
+  [视图的修改更新和删除](https://www.cnblogs.com/xinwenpiaoxue/p/7278023.html)
+
 - 高级
 
   [SQL的存储过程和函数](http://www.toutiao.com/a6391569028531831041/)
 
   [MySQL行级锁、表级锁和页级锁](http://www.jb51.net/article/50047.htm)
+
+  [mysql锁机制](https://www.toutiao.com/i6586230829708476931/)
 
 
 - 查询
@@ -2591,6 +2998,8 @@ mysqluserclone     clone a MySQL user account to one or more new users
 
   [我的私藏SQL练习题](https://www.jianshu.com/p/6f9dec217055)
 
+  [find_in_set|like|in的区别](https://blog.csdn.net/sunny1660/article/details/78613000)
+
 - 调优
 
   [MySQL性能监控](https://www.percona.com/doc/percona-monitoring-and-management/deploy/index.html)
@@ -2612,6 +3021,8 @@ mysqluserclone     clone a MySQL user account to one or more new users
   [MySQL大表优化方案](https://www.toutiao.com/i6533174790650331655/)
 
   [MySQL优化小建议](http://www.cnblogs.com/youyoui/p/8657331.html)
+
+  [从认识索引到索引优化（推荐）](https://www.toutiao.com/i6586542647928685060/)
 
 - 备份
 

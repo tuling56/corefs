@@ -1,0 +1,47 @@
+--单行
+select * from singlelinedb.tbl where xx!='x';
+select * from (select guid from singlelinedb.tbl )b where b.xx!='x';
+
+-- 多行
+select ds
+    ,last1
+    ,actions
+    ,count(distinct guid)
+from
+(
+    select a.ds as ds
+        ,substr(a.guid,-1) as last1
+        ,a.guid as guid
+        ,sort_array(collect_set(a.attribute1)) as actions
+    from
+    (
+        select ds,guid,attribute1
+        from
+            shoulei_bdl.bl_shoulei_event_fact
+        where ds>='20180801' and ds<='20180801' and appid='45'
+    --      and type not in ('advertise')
+    --      and attribute1 not rlike '^(push_|adv_)'
+    )a
+    inner join
+    (
+        select ds
+            ,guid
+        from
+            shoulei_bdl.bl_shoulei_clean_guid_accum
+        where ds>='20180801' and ds<='20180801' and type='1' and firstdate_active=ds
+    )b
+    on a.ds=b.ds and a.guid=b.guid
+    left join
+    (
+        select ds
+            ,guid
+        from
+            shoulei_bdl.bl_shoulei_event_fact
+        where ds>='20180801' and ds<='20180801' and appid='45' and type in ('video','download')
+            and attribute1 in('home_collect_content_show','dl_center_show')
+    )c
+    on a.ds=c.ds and a.guid=c.guid
+    where c.guid is null
+    group by a.ds,substr(a.guid,-1),a.guid
+)d
+group by ds,last1,actions;

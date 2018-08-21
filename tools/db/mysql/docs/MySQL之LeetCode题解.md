@@ -349,4 +349,6 @@ select (select a.* from stadium a inner join stadium b on b.id=a.id+1 and a.peop
 
  ##参考
 
-[LeetCode题解-MySQL](https://leetcode.com/problemset/database/)
+- 题目
+
+  [LeetCode题解-MySQL](https://leetcode.com/problemset/database/)

@@ -97,6 +97,43 @@
 
 单次搜索的复杂度为log(n)
 
+##### TRIE树
+
+###### 基础
+
+![trie树](http://images.cnitblog.com/blog/183411/201212/30214213-f9256d989b3b45ae8d15da2604ddce71.png)
+
+trie树描述
+
+> 每个单词都是通过character by character的方式进行连接，中文名叫字典树、前缀树，主要用途是将字符串集合整合成树形
+
+trie树的性质
+
+> - （1）根节点不包含字符，除根节点外的每个节点只包含一个字符。
+> - （2）从根节点到某一个节点，路径上经过的字符连接起来，为该节点对应的字符串。
+> - （3）每个节点的所有子节点包含的字符串不相同。
+
+应用场景：
+
+> - 搜索词提示
+>   - 比直接用hash节省存储空间
+> - 词频统计
+> - 其它应用的辅助结构
+
+###### 实现
+
+python实现
+
+```python
+
+```
+
+c++实现
+
+```cpp
+
+```
+
 ##### 伸展树
 
 对于m次连续搜索操作有很好的效率。
@@ -165,13 +202,122 @@
 
 //待补充
 
-## 实践
+## 积累
 
-//待补充的实践算法
+### 串和序列
+
+#### 子串
+
+##### 最长连续子串
+
+问题：
+
+```
+比如[1 2 4 5 6  9 12 13 16],规定两个相邻的数的差值为1则为连续，则该序列的最长子序列为[4 5 6],最长子序列的长度为3
+```
+
+实现：
+
+```
+
+```
+
+##### [最长非重复子串](https://leetcode.com/problems/longest-substring-without-repeating-characters/description/)
+
+问题：
+
+```
+Given a string, find the length of the longest substring without repeating characters.
+# 例如：
+Given "pwwkew", the answer is "wke", with the length of 3. Note that the answer must be a substring, "pwke" is a subsequence and not a substring.
+```
+
+实现：
+
+```cpp
+class Solution {
+	public：
+      	int lengthOfLongestSubstring(string s){
+          
+      	}
+};
+```
+
+##### 最大和子串
+
+问题：
+
+```
+一列数，求和最大的子串
+```
+
+实现：
+
+```
+
+```
+
+#### 子序列
+
+##### [最长递增子序列](http://www.cnblogs.com/lixiaohui-ambition/archive/2012/12/24/2831491.html)
+
+问题：
+
+```
+最长
+```
+
+实现：
+
+```
+
+```
+
+### 数组
+
+数组只是串和序列的一种存储方式而已，其形式依然是串和序列，但有独特部分。
+
+#### 合并有序数组
+
+问题：
+
+```
+合并两个有序数组并求合并之后的第k大的元素
+```
+
+实现：
+
+```python
+
+```
+
+#### 删除重复元素
+
+```shell
+
+```
 
 ## 训练
 
+贵在实践
+
 ### LeetCode
+
+#### 整体参考
+
+[LeetCode题解解题报告(推荐)](http://bookshadow.com/leetcode/)
+
+[LeetCode题解Gitbook(cpp)](https://siddontang.gitbooks.io/leetcode-solution/content/)
+
+[LeetCode题解专栏(Python)](http://blog.csdn.net/column/details/leetcode-with-python.html)
+
+[leetcode题解索引（推荐）](http://blog.csdn.net/hcbbt/article/details/43966331)
+
+[leetcode题解详解（推荐）](https://www.tianmaying.com/tutorials/tag/Leetcode)
+
+[leetcode编程训练（酷壳）](https://coolshell.cn/articles/12052.html)
+
+#### 分类训练
 
 [LeetCode之Array题目汇总](https://link.jianshu.com/?t=https://www.zybuluo.com/Yano/note/250681)
 [LeetCode之Hash Table题目汇总](https://link.jianshu.com/?t=https://www.zybuluo.com/Yano/note/250743)
@@ -194,11 +340,13 @@
 
  ##参考
 
-- 数据结构
+- **数据结构**
 
   [堆的定义](http://blog.csdn.net/wypblog/article/details/8076324)
 
-- 算法
+  [小白详解trie树](https://segmentfault.com/a/1190000008877595)
+
+- **算法**
 
   [算法与数据结构C++精解](http://t.cn/RVHmRYb)
   [Java数据结构与算法](http://t.cn/RtW9dtv) 
@@ -207,16 +355,12 @@
   [面试中的排序算法](http://t.cn/RtW9dth)
   [算法学习笔记](http://t.cn/RtW9d5s) 
 
-- 思想
+- **思想**
 
   //待补充
 
-- 资料
+- **积累**
 
-  [leetcode题解索引（推荐）](http://blog.csdn.net/hcbbt/article/details/43966331)
-
-  [leetcode题解详解（推荐）](https://www.tianmaying.com/tutorials/tag/Leetcode)
-
-  [leetcode编程训练（酷壳）](https://coolshell.cn/articles/12052.html)
+  //待补充
 
 

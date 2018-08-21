@@ -8,30 +8,20 @@ shell的分类，zsh和bash的区别
 
 #### 基础
 
-目录和文件判断
+##### 变量
 
-```shell
--e #filename 如果 filename存在，则为真
--d #filename 如果 filename为目录，则为真 
--f #filename 如果 filename为常规文件，则为真
--L #filename 如果 filename为符号链接，则为真
--r #filename 如果 filename可读，则为真 
--w #filename 如果 filename可写，则为真 
--x #filename 如果 filename可执行，则为真
--s #filename 如果文件长度不为0，则为真
--h #filename 如果文件是软链接，则为真
-filename1 -nt filename2 #如果 filename1比 filename2新，则为真。
-filename1 -ot filename2 #如果 filename1比 filename2旧，则为真。
--eq #等于
--ne #不等于
--gt #大于
--ge #大于等于
--lt #小于
--le #小于等于
-#至于！号那就是取非
-```
+###### 变量命名
+
+- var='harer'   #注意=号两边不能有空格shell变量区分大小写，引用的使用采\$var或者${var}
+- 变量的名称可以包含只有字母（a到z或A到Z），数字（0〜9）或下划线（_）,且必须以字母或者下划线开头，不能以数字开头
+
+###### 变量替换
+
+![变量替换](http://tuling56.site/imgbed/2018-08-02_125729.png)
 
 ##### 字符串
+
+###### 字符串截取
 
 按分割符截取(4种)
 
@@ -77,14 +67,14 @@ echo ${var:0-7}
 
 >  参考:[shell脚本8种字符串截取方法](http://www.jb51.net/article/56563.htm)
 
-字符串替换
+###### 字符串替换
 
 ```shell
 b=${a/123/321}  # 将${a}里的第一个123替换为321
 b=${a//123/321} # 将${a}里的所有123替换为321
 ```
 
-字符串匹配
+###### 字符串匹配
 
 ```shell
 # 方式0（利用第三方匹配）
@@ -108,12 +98,34 @@ if [[ $A =~ $F ]] ; then echo "$A include $F" ;else echo "$A not include $F";fi
 if  echo "aha"|grep "x" &>/dev/null ;then echo "find";else echo "no find";fi
 ```
 
-> 参考：[linux shell中做匹配](https://segmentfault.com/q/1010000000504746)
+> 参考：[linux shell中做匹配](https://segmentfault.com/q/1010000000504746)，可进一步参考awk中的字段匹配
 
-awk中字符串匹配
+###### 字符串分割
+
+如何在一次处理中得到各个分割后的各个字段，shell的默认的数组分割符号是空白字符
+
+方法1:替换空白字符为其它字符
 
 ```shell
-待补充
+str1="hello,ni,nihao"
+# 方法1
+array=(${str1//,/ })
+for s in ${array[@]};do
+	echo "m1:"$s
+done
+```
+
+方法2:替换其它字符为分割符
+
+```shell
+str1="hello,ni,nihao"
+OLD_IFS="$IFS"
+IFS=","
+array=($str1)
+IFS="${OLD_IFS}"
+for s in ${array[@]};do
+	echo "m2:"$s
+done
 ```
 
 ##### 数组
@@ -196,6 +208,11 @@ echo ${a[@]:0:3}  # 结果为 1 2 3
 
 ```shell
 # ${数组名[@或*]/查找字符/替换字符} 该操作不会改变原先数组内容，如果需要修改，可以看上面例子，重新定义数据。
+a=(${a[@]/3/100})
+
+a=(1 2 323 4 5)
+a=(${a[@]/3/100})
+a=(${a[@]//3/100})  # 此处的替换逻辑遵循字符串的替换逻辑
 ```
 
 ###### 关联数组
@@ -297,7 +314,7 @@ function isinkey(){
         return 1  
       fi  
     done  
-	return 0  
+    return 0  
 } 
 ```
 
@@ -368,36 +385,60 @@ done < test.data
 sh xxx.sh > xxx.log 2>&1 
 ```
 
-##### 命令
+##### [运算符](http://c.biancheng.net/cpp/view/2736.html)
 
-###### 参数
+###### 算术运算符
 
-set -e
+| 运算符  | 说明                        | 举例                        |
+| ---- | ------------------------- | ------------------------- |
+| +    | 加法                        | `expr $a + $b` 结果为 30。    |
+| -    | 减法                        | `expr $a - $b` 结果为 10。    |
+| *    | 乘法                        | `expr $a \* $b` 结果为  200。 |
+| /    | 除法                        | `expr $b / $a` 结果为 2。     |
+| %    | 取余                        | `expr $b % $a` 结果为 0。     |
+| =    | 赋值                        | a=$b 将把变量 b 的值赋给 a。       |
+| ==   | 相等。用于比较两个数字，相同则返回 true。   | [ $a == $b ] 返回 false。    |
+| !=   | 不相等。用于比较两个数字，不相同则返回 true。 | [ $a != $b ] 返回 true。     |
+
+例子：
 
 ```shell
-set -e命令用法总结如下
+# expr 是一款表达式计算工具
+a=10
+b=20
+val=`expr $a + $b`  # 表达式和运算符之间要有空格
+echo "a + b : $val"
 
-1.当命令的返回值为非零状态时，则立即退出脚本的执行
-2.作用范围只限于脚本执行的当前进行，不作用于其创建的子进程
-3.另外，当想根据命令执行的返回值，输出对应的log时，最好不要采用sete选项，而是通过配合ext命令来达到输出log并退出执行的目的
+if [ $a != $b ];then  # 注意条件表达式要放在方括号之间，并且要有空格
+   echo "a is not equal to b"
+fi
 ```
 
-###### shift
+###### 关系运算符
+
+关系运算符只支持数字，不支持字符串，除非字符串的值是数字
+
+| 运算符  | 说明                            | 举例                      |
+| ---- | ----------------------------- | ----------------------- |
+| -eq  | 检测两个数是否相等，相等返回 true。          | [ $a -eq $b ] 返回 true。  |
+| -ne  | 检测两个数是否相等，不相等返回 true。         | [ $a -ne $b ] 返回 true。  |
+| -gt  | 检测左边的数是否大于右边的，如果是，则返回 true。   | [ $a -gt $b ] 返回 false。 |
+| -lt  | 检测左边的数是否小于右边的，如果是，则返回 true。   | [ $a -lt $b ] 返回 true。  |
+| -ge  | 检测左边的数是否大等于右边的，如果是，则返回 true。  | [ $a -ge $b ] 返回 false。 |
+| -le  | 检测左边的数是否小于等于右边的，如果是，则返回 true。 | [ $a -le $b ] 返回 true。  |
+
+例子：
 
 ```shell
-for i in `seq 1 6`;do
-	echo "$1 $2 $3 $4 $5 $6"
-	shift
-done
+if [ $a -le $b ]
+then
+   echo "$a -le $b: a is less or  equal to b"
+else
+   echo "$a -le $b: a is not less or equal to b"
+fi
 ```
 
-#### 运算符
-
-##### 算术运算法
-
-##### 关系运算符
-
-##### 布尔运算符
+###### 布尔运算符
 
 | 运算符  | 说明                                | 举例                                   |
 | ---- | --------------------------------- | ------------------------------------ |
@@ -405,21 +446,74 @@ done
 | -o   | 或运算，有一个表达式为 true 则返回 true。        | [ $a -lt 20 -o \$b -gt 100 ] 返回 true |
 | -a   | 与运算，两个表达式都为 true 才返回 true         | [ $a -lt 20 -a \$b -gt 100 ] 返回      |
 
-##### 字符串运算符
+例子：
 
-运算符	说明	举例
-=	检测两个字符串是否相等，相等返回 true。	[ $a = $b ] 返回 false。
-!=	检测两个字符串是否相等，不相等返回 true。	[ $a != $b ] 返回 true。
--z	检测字符串长度是否为0，为0返回 true。		[ -z $a ] 返回 false。
--n	检测字符串长度是否为0，不为0返回 true。	[ -z $a ] 返回 true。
-str	检测字符串是否为空，不为空返回 true。		[ $a ] 返回 true。
+```shell
 
-> 注意字符串运算符的等判断和数字的等判断的区别
+```
 
-##### 文件测试运算符
+###### 字符串运算符
 
-```wiki
+| 运算符  | 说明                      | 举例                    |
+| ---- | ----------------------- | --------------------- |
+| =    | 检测两个字符串是否相等，相等返回 true。  | [ $a = $b ] 返回 false。 |
+| !=   | 检测两个字符串是否相等，不相等返回 true。 | [ $a != $b ] 返回 true。 |
+| -z   | 检测字符串长度是否为0，为0返回 true。  | [ -z $a ] 返回 false。   |
+| -n   | 检测字符串长度是否为0，不为0返回 true。 | [ -z $a ] 返回 true。    |
+| str  | 检测字符串是否为空，不为空返回 true。   | [ $a ] 返回 true。       |
 
+ 注意字符串运算符的等判断和数字的等判断的区别
+
+例子：
+
+```powershell
+if [ $a != $b ]
+then
+   echo "$a != $b : a is not equal to b"
+else
+   echo "$a != $b: a is equal to b"
+fi
+```
+
+###### 文件测试运算符
+
+| 操作符     | 说明                                       | 举例                     |
+| ------- | ---------------------------------------- | ---------------------- |
+| -b file | 检测文件是否是块设备文件，如果是，则返回 true。               | [ -b $file ] 返回 false。 |
+| -c file | 检测文件是否是字符设备文件，如果是，则返回 true。              | [ -b $file ] 返回 false。 |
+| -d file | 检测文件是否是目录，如果是，则返回 true。                  | [ -d $file ] 返回 false。 |
+| -f file | 检测文件是否是普通文件（既不是目录，也不是设备文件），如果是，则返回 true。 | [ -f $file ] 返回 true。  |
+| -g file | 检测文件是否设置了 SGID 位，如果是，则返回 true。           | [ -g $file ] 返回 false。 |
+| -k file | 检测文件是否设置了粘着位(Sticky Bit)，如果是，则返回 true。   | [ -k $file ] 返回 false。 |
+| -p file | 检测文件是否是具名管道，如果是，则返回 true。                | [ -p $file ] 返回 false。 |
+| -u file | 检测文件是否设置了 SUID 位，如果是，则返回 true。           | [ -u $file ] 返回 false。 |
+| -r file | 检测文件是否可读，如果是，则返回 true。                   | [ -r $file ] 返回 true。  |
+| -w file | 检测文件是否可写，如果是，则返回 true。                   | [ -w $file ] 返回 true。  |
+| -x file | 检测文件是否可执行，如果是，则返回 true。                  | [ -x $file ] 返回 true。  |
+| -s file | 检测文件是否为空（文件大小是否大于0），不为空返回 true。          | [ -s $file ] 返回 true。  |
+| -e file | 检测文件（包括目录）是否存在，如果是，则返回 true。             | [ -e $file ] 返回 true。  |
+
+ 例子：
+
+```shell
+-e #filename 如果 filename存在，则为真
+-d #filename 如果 filename为目录，则为真 
+-f #filename 如果 filename为常规文件，则为真
+-L #filename 如果 filename为符号链接，则为真
+-r #filename 如果 filename可读，则为真 
+-w #filename 如果 filename可写，则为真 
+-x #filename 如果 filename可执行，则为真
+-s #filename 如果文件长度不为0，则为真
+-h #filename 如果文件是软链接，则为真
+filename1 -nt filename2 #如果 filename1比 filename2新，则为真。
+filename1 -ot filename2 #如果 filename1比 filename2旧，则为真。
+-eq #等于
+-ne #不等于
+-gt #大于
+-ge #大于等于
+-lt #小于
+-le #小于等于
+#至于！号那就是取非
 ```
 
 #### 控制结构
@@ -500,6 +594,14 @@ case $var in
 esac
 ```
 
+###### &&||
+
+三目运算符
+
+```shell
+[ -z "$res" ]&& echo "true exec" || echo "false exec"
+```
+
 ##### [循环语句](https://blog.csdn.net/fansongy/article/details/6724228)
 
 ###### while
@@ -564,6 +666,23 @@ function 函数名 {
 
 ![分离函数体](http://tuling56.site/imgbed/2018-02-08_133315.png)
 
+##### 返回值
+
+```shell
+#!/bin/sh
+# Define your function here
+Hello(){
+   echo "Hello World $1 $2"
+   return 10
+}
+# Invoke your function
+Hello Zara Al
+i# Capture value returnd by last command
+ret=$?
+echo "Return value is $ret",
+如果有多个返回值的情况，则$?是shell的数组数据类型
+```
+
 ##### 函数妙用
 
 复杂逻辑封装函数，调用时展开
@@ -602,8 +721,9 @@ function tag_shoulei_action_type() # 语句封装
 # hql中调用（字段名作为参数传递进去的，并不是字段的内容，内部的判断还是字段名）
 hql="select 
 		`tag_shoulei_active extdata[\'attribute1\']` as is_active
-		`tag_shoulei_action_type eventid` as type
-		`tag_trans para1` as test1
+	    ,`tag_shoulei_action_type eventid` as type
+	    ,`tag_shoulei_action_type uridecode\(fu1\) id` as type  # 参考:kkclick_flag.sh
+		,`tag_trans para1` as test1
 	from 
 		tblxxx
 	where xxx;
@@ -616,7 +736,7 @@ ${HIVE} -e "$hql"
 
 ###### shell处理封装
 
-示例1：
+示例1：数据加工
 
 ```mysql
 function tag_trans()  #函数处理
@@ -628,16 +748,16 @@ function tag_trans()  #函数处理
 # hql中调用
 hql="select 
 		`tag_trans para1` as test1
+	    ,`tag_trans `
 	from 
 		tblxx
 	where xxx;
 	"
 echo "$hql"  # 在展开过程中会进行展开
 ${HIVE} -e "$hql"
-
 ```
 
-示例2：
+示例2：参数替换
 
 ```shell
 function chql()
@@ -659,6 +779,43 @@ function main()
 # 执行main函数的输出结果是
 select ds,pv,uv from xxx where ds>='20180712' and ds<='20180716'
 ```
+
+示例3：字符映射
+
+```mysql
+#字典替换
+declare -A mdict
+mdict['pos']='ni hao'
+mdict['click']='ni huai'
+
+function thql()
+{
+    local k=$1
+    res="${mdict[$k]}"
+    if [ -z "$res" ];then
+        echo "空"
+    else
+        echo "$res"
+    fi
+
+    # 三目运算符
+    [ -z "${mdict[$k]}" ]&&echo "空"||echo "${mdict[$k]}"
+}
+
+function main()
+{
+    # thql测试
+    thql 'zhang'
+    thql 'pos'
+}
+```
+
+> 备注：
+>
+> - 在hive中使用，必须要结合streaming实现，不然没法获取到这个字段每行的内容
+> - 在shell中用这个映射的话，直接将行内容作为
+>
+>
 
 #### 应用
 
@@ -762,14 +919,19 @@ rename  .sql  .txt *.sql  //好像不能递归目录,其中最后一个是要修
 [加减乘除(整数)](https://blog.csdn.net/hu_wen/article/details/52930806)
 
 ```shell
-# let
-let num=num+1
+a=4;b=8
 
-# expr
-expr 30 / 3 / 2 
-expr $num/ 2 
+# 方法1:let
+let a=a+1  # 或者let a=$a+1
+let a=b+2
 
-# $(())
+# 方法2：expr
+expr 30/3/2 
+expr $num/2 
+c=`expr $a + $b` # ！不能是c=`expr a + b`
+
+# 方法3：$(())
+c=$((a+b)) # 或者 c=$(($a+$b)) 
 ```
 
 ###### 数组运算
@@ -816,18 +978,75 @@ cdiff A.txt B.txt
 
 ###### 连接运算
 
-comm
+**comm**
 
 ```shell
 comm  -f1 -f2 -f3 A_sort.txt B_sort.txt
 #第一列为只出现在文件A中的，第二列为只出现在文件B中的，第三列为AB中共同出现的
 ```
 
-[join](http://www.cnblogs.com/mfryf/p/3402200.html)
+**[join](http://www.cnblogs.com/mfryf/p/3402200.html)**
+
+参数选项
 
 ```shell
+-a FILENUM：除了显示匹配好的行另外将指定序号（1或2）文件里部匹配的行显示出来
+-e EMPTY：将须要显示可是文件里不存在的域用此选项指定的字符取代
+-i :忽略大写和小写
+-j FIELD ：等同于 -1 FIELD -2 FIELD,-j指定一个域作为匹配字段
+-o FORMAT：以指定格式输出
+-t CHAR ：以指定字符作为输入输出的分隔符
+```
 
 ```
+[root@yjmaliecs join]# cat aa.txt 
+aa 1 2
+bb 2 3
+cc 4 6
+dd 3 3
+
+[root@yjmaliecs join]# cat bb.txt 
+aa 2 1
+bb 8 2
+ff 2 4
+cc 4 4
+dd 5 
+```
+
+选择匹配列
+
+```shell
+# 默认以两个文件的第一行作匹配字段，默认以空格（不限个数）作分隔符
+join aa.txt bb.txt
+
+# 用-j选项指定选择哪列字段作为匹配，也可以单独指定，-j 1等同于-1 1 -2 1，
+join -j 1 aa.txt bb.txt
+join -1 2 -2 3 aa.txt bb.txt #以第一个文件的第二列和第二个文件的第三列做匹配字段
+```
+
+选择输出列
+
+```shell
+# -o指定将file1的1,2,3列，file2的1,2,3列都输出。
+# -a指定将file1中不匹配的行也输出，可是file2中沒有与file1后两行相应的字段，因此使用empty补齐。
+join -o 1.1 -o 1.2 -o 1.3 -o 2.1 -o 2.2 -o 2.3 -e 'empty' -a 1 aa.txt bb.txt 
+```
+
+非匹配行
+
+```shell
+# -v 1 将file1中不匹配的行输出
+join -v 1 aa.txt aa.txt 
+```
+
+多输入
+
+```shell
+# 有时我们须要将多个格式同样的文件join到一起，而join接受的是两个文件的指令，此时我们能够使用管道和字符“-"来实现
+join file1 file2 | join - file3 | join - file4 
+```
+
+> join命令和数据库中的join命令很相似。尽管file1和file2都已经排序，可是因为在第三行时開始不匹配因此仅仅匹配上了前两行，后面的行尽管字段也能够相应可是以不能匹配。join命令对文件格式的要求很强，假设想要更灵活的使用，可用AWK命令，參加AWK实例
 
 ##### 多进程
 
@@ -926,39 +1145,195 @@ echo "obase=32;507375"|bc
 echo "obase=32;2667327"|bc 
 ```
 
-##### 时间转换
+##### 日期时间
+
+###### 显示
+
+```shell
+date "+%Y-%m-%d %H:%M:%S"  # 2018-08-07 21:25:58
+date "+%F %T"   # 2018-08-07 21:25:58
+```
 
 ###### 时间戳和日期
 
+日期转时间戳
+
+```shell
+date -d "2015-08-04 00:00:00" +%s     #输出：1438617600
+```
+
+时间戳转日期
+
 ```shell
 date +%s   # 可以得到UNIX的时间戳
-
-# 日期转时间戳
-date -d "2015-08-04 00:00:00" +%s     #输出：1438617600
-
-# 时间戳转日期
 date -d @1438617600  "+%Y-%m-%d" 
 ```
 
 ###### 日期运算
 
+[自加减](https://www.douban.com/note/582106990/)
+
 ```shell
-# 见linux手册
+#其中的day可以更换为week、month、year
+date -d "2012-04-10 -1 day " +%Y-%m-%d
+date -d "20120410 -1 day " +%Y-%m-%d
+```
+
+相差
+
+```shell
+# 相差秒
+diff_second=$(($(date +%s -d '2010-01-01') - $(date +%s -d '2009-01-01 11:11:11')));
 ```
 
 #### 积累
 
-##### 传递带空格参数
+##### 公共抽取
 
-需要将参数用[双引号括起来](https://blog.csdn.net/victor0127/article/details/47314619)
+抽取公共变量或者公共方法到global_tool.sh、global_var.sh、gloab_fun.sh文件中，然后在.bashrc，.bash_profile等文件中使用source引入，这样就可以在shell的任何地方使用公共变量或者公共方法。
+
+###### 变量和别名
+
+global_var.sh
+
+```shell
+$ cat global_var.sh
+#########################################################################
+# File Name: global_var.sh
+# Description:shell全局变量配置
+# Author:tuling56
+# State:全局变量
+# Created_Time: 2017-05-26 14:07
+# Last modified: 2017-10-26 03:01:39 PM
+#########################################################################
+#!/bin/bash
+
+# 文件和目录
+sl='grep -i --exclude-dir=\.svn --exclude-dir=".git" -Rl --color'
+sn='grep -i --exclude-dir=\.svn --exclude-dir=".git"  -Rn --color'
+ld='find . -maxdepth 1 -type d|grep -v "^.$"'
+lf='find . -maxdepth 1 -type f'
+
+MYSQL="/usr/bin/mysql -uroot -proot -N"
+
+# 工具
+SENDMAIL="/usr/sbin/sendemail -s mail.cc.sandai.net -f monitor@cc.sandai.net -xu monitor@cc.sandai.net -xp 121212 -o message-charset=utf8 "
+```
+
+###### 公共方法
+
+global_fun.sh
+
+```shell
+$ cat global_fun.sh
+#########################################################################
+# File Name: global_fun.sh
+# Description:shell全局函数
+# Author:tuling56
+# State:
+# Created_Time: 2017-05-09 17:12
+# Last modified: 2018-03-26 09:05:16 PM
+#########################################################################
+#!/bin/bash
+
+# 计算百分比
+function calcratio()
+{
+    local num=$1
+    local total=$2
+
+    # 方法1
+    #r_o_ratio="`echo "scale=2;${num}*100/${total}"|bc`%"
+    # 方法2：使用awk（注意此语句中的BEGIN不能省略）
+    #r_o_ratio=$(awk -v a=$num -v b=$total 'BEGIN{printf("%4.2f%%",a*100/b);}')
+    # 方法2.1(注意通过管道传递过来的数据不能在begin中使用，可以在前面加上END)
+    r_o_ratio=$(echo "$num $total" | awk '{printf("%4.2f%%",$1*100/$2);}')
+
+    echo ${r_o_ratio}
+}
+
+
+# 计算日期差，注意输入的是hive字段
+function calcdate_diff()
+{
+    local first_d=$1
+    local last_d=$2
+
+    diff_d=datediff(concat_ws('-',substring(${last_d},1,4),substring(${last_d},5,2),substring(${last_d},7,2)),
+                            concat_ws('-',substring(${first_d},1,4),substring(${first_d},5,2),substring(${first_d},7,2)))
+
+    echo ${diff_d}
+}
+
+```
+
+注意事项：
+
+- 在牵涉到目录处理的情况下慎用，因为提升到公共.sh中的方法获取的是公共.sh所在的目录，并不能获取到运运行公共方法的目录，这个问题可以通过传递真实的操作目录来解决。
+
+##### 参数
+
+###### 调试参数
+
+set -e 命令
+
+```shell
+set -e命令用法总结如下:
+
+1.当命令的返回值为非零状态时，则立即退出脚本的执行
+2.作用范围只限于脚本执行的当前进行，不作用于其创建的子进程
+3.当想根据命令执行的返回值输出对应的log时，最好不要采用set -e选项，而是通过配合exit命令来达到输出log并退出执行的目的
+```
+
+例子：
+
+```shell
+#!/bin/bash
+set -e
+
+echo "xxxx"
+ret=$?
+# 方式1
+[ $ret -ne 0 ]&& echo "fail" || echo "succ"
+
+# 方式2
+if [ $ret -ne 0 ];then 
+	echo "fail" 
+else
+	echo "succ"
+fi
+```
+
+> 对比下这两种方式之间的区别，验证-e选项
+
+###### 传递带空格参数
+
+需要将参数用[双引号括起来](https://blog.csdn.net/victor0127/article/details/47314619)，而且要养成好习惯，变量的引用都用双引号括起来
 
 ```shell
 get_browser "$line"
 ```
 
+##### 命令
+
+###### shift
+
+```shell
+for i in `seq 1 6`;do
+	echo "$1 $2 $3 $4 $5 $6"
+	shift
+done
+```
+
+###### paste/cat/zcat
+
+```shell
+# paste命令
+```
+
 ### awk
 
-> awk由模式和操作组成，主要用于列式文本处理，进行列的分割，判断处理。
+awk由模式和操作组成，主要用于列式文本处理，进行列的分割，判断处理。
 
 ```shell
 awk 'BEGIN{ print "start" } pattern{ commands } END{ print "end" }' file
@@ -975,12 +1350,13 @@ awk 'BEGIN{ print "start" } pattern{ commands } END{ print "end" }' file
 
 ##### 变量
 
-内置变量
+###### 内置变量
+
 ```
 NR：表示awk开始执行程序后所读取的数据行数。
 FNR：awk当前读取的记录数，其变量值小于等于NR（比如当读取第二个文件时，FNR是从0开始重新计数，而NR不会）。
 ```
-变量传递
+###### 变量传递
 
 ```shell
 # 向awk命令行程序传递变量
@@ -1025,9 +1401,112 @@ awks='BEGIN{
 
 > awk中的注释用`#`号
 
-##### 模式和正则
+##### [数组](http://blog.csdn.net/beyondlpf/article/details/7024730)
 
-awk本身支持扩展正则，不需要加额外的参数, 模式是用来对行进行筛选的,常见的模式筛选规则举例：
+###### 基本数组
+
+```shell
+# 数组的长度
+length(a)
+
+# 数组遍历
+awk 'BEGIN{a[1]="c";a[2]="d";a[3]="e";n=length(a);for(i=1;i<=n;i++) print a[i]}' # 按长度遍历
+awk 'BEGIN{a[1]="c";a[2]="d";a[3]="e";for(k in a) print k,a[k]}'  # 按key遍历
+```
+
+###### 多维数组
+
+```shell
+awk 'BEGIN{a[0,0]=12;a[1,1]=13;}
+	 END{
+	 	for(k in a) {
+	 	   	print k,a[k];
+	 	    split(k,idx,SUBSEP);
+	 	    print idx[1],idx[2],a[idx[1],idx[2]]
+	 	}
+	 }' </dev/null
+```
+
+> 建议：对于复杂的awk程序，直接写在awk脚本里更方便
+>
+> ```shell
+> [root@yjmaliecs shell]# cat t.awk 
+> #!/usr/bin/awk -f
+> BEGIN{a[0,0]=12;a[1,1]=13;}
+> END{
+>     for(k in a) {
+>         print k,a[k];  # 原始输出，把多维数组当成一个
+>         split(k,idx,SUBSEP);
+>         print idx[1],idx[2],a[idx[1],idx[2]]  # 对维度进行分解
+>     }
+> }
+> [root@yjmaliecs shell]# ./t.awk /dev/null
+> 00 12
+> 0 0 12
+> 11 13
+> 1 1 13
+> ```
+
+多维数组构建
+
+```shell
+
+```
+
+> 判断key是否在数组中：
+>
+> ```shell
+> #普通数组
+> if(k in arra) # 注意，此处否定的使用不能是if(k not in arra)
+> print (k in a)
+> 
+> # 关联数组
+> awk -F"," 'BEGIN{s="1,2,15,22";split(s,a,",");print (3 in a)}'
+> ```
+>
+
+###### 数组排序
+
+```shell
+$ cat sortd.txt
+aaa 125
+ddd 123
+bbb 128
+ccc 120
+```
+
+**asort**
+
+对key进行文本排序，不能保存key-value的映射关系(这大部分还存在问题)
+
+```  
+$ awk '{a[$2]=$0}END{for(i=1;i<=asort(a);i++)print a[i]}' sortd.txt
+aaa 125
+bbb 128
+ccc 120
+ddd 123
+```
+
+**asorti**
+
+对value进行数字排序，可以保存key-value的映射关系
+
+```shell
+$ awk '{a[$2]=$0}END{for(i=1;i<=asorti(a,b);i++)print a[b[i]]}' sortd.txt
+ccc 120
+ddd 123
+aaa 125
+bbb 128
+```
+
+
+##### 正则模式
+
+###### 基础
+
+awk本身支持扩展正则，不需要加额外的参数, 模式是用来对行进行筛选的，操作的基本单位是行。
+
+常见的模式筛选规则举例：
 
 ```shell
 # 正则表达式(输出以字符T开头的行)  
@@ -1042,13 +1521,63 @@ result=`awk '$2~/^K/ && $2 > 80 { print }' scores.txt`
 result=`awk '/^Nancy/, $2==92 { print }' scores.txt` 
 ```
 
-正则否定：
+正则否定
 
-> ```shell
-> awk '{if($3!~/total/) print $0}' xxx.data 
-> ```
+```shell
+awk '{if($3!~/total/) print $0}' xxx.data 
+```
 
-##### awk运算符
+跳过执行
+
+```shell
+BEGIN{
+    FS=",";
+    if(jtype !~ /^(inner|left|right|full)$/) {print "error join type,exit .....";exit_flag=1;}
+}
+{}
+END{
+    if(exit_flag==1) break;
+}
+```
+
+###### 高级
+
+多行处理
+
+```shell
+$ cat mutiline.data
+张三
+男
+30岁
+韩国
+邮编:xwew
+电话:xhwew
+
+李四
+女
+32岁
+日本
+邮编:aaad
+电话:bbb
+```
+
+```shell
+awk 'BEGIN{FS="\n";RS="";OFS=",";ORS=";"}{print $1,$2,$3,$5,$NF}' mutiline.data
+```
+
+跨行匹配
+
+```shell
+
+```
+
+多匹配
+
+```shell
+
+```
+
+##### 运算符
 
 | 运算符                     | 描述               |
 | ----------------------- | ---------------- |
@@ -1102,15 +1631,27 @@ awk 'BEGIN{a=1;b=2;print (a>5 && b<=2),(a>5 || b<=2);}'
 ~!  不匹配正则表达式
 ```
 
-##### awk语句
+##### 控制语句
+
+###### 条件控制
+
+```shell
+awk条件控制语句如何实现
+```
 
 ###### [循环和退出](http://blog.sina.com.cn/s/blog_551d7bff0100umkv.html)
+
+循环语句
 
 ```shell
 # while,for循环语句
 awk '{ i = 1; while ( i <= NF ) { print NF,$i; i++}}' test
 awk '{for (i = 1; i<NF; i++) print NF,$i}' test
+```
 
+退出语句
+
+```shell
 # break语句
 用于在满足条件的情况下跳出循环；
 
@@ -1122,43 +1663,28 @@ next语句从输入文件中读取一行，然后从头开始执行awk脚本
 
 # exit语句
 exit语句用于结束awk程序，但不会略过END块。退出状态为0代表成功，非零值表示出错。
+
+# getline 语句
+getline实现两个文件的同步读取，当然另一种方法是利用字典实现
 ```
 
-```
-getline 语句
+> 如何在BEGIN模块里实现直接退出呢?
+>
+> ```shell
+> BEING{
+>     if(xxx) {exit_flag=1;}
+> }
+> {}
+> END{
+>     if(exit_flag==1) exit;
+> }
+> ```
 
-实现两个文件的同步读取，当然另一种方法是利用字典实现
-```
+##### 程序
 
-##### awk脚本
+###### 脚本
 
-###### awk脚本传参
-
-```shell
-#!/bin/bash
-
-awk -f stat.awk	"para1=value1" "para2=value2" inputfile
-#或者
-./stat.awk "para1=value1" "para2=value2" inputfile
-
-#其中stat.awk的脚本中引用变量可以采用如下的方式：
-#!/usr/bin/awk -f 
-BEGIN{
-    a=0;
-}
-{
-    a++;   
-}
-END{
-    print para1"\t"a;
-}
-```
-
-参考：
-
-[shell中调用awk脚本传递参数问题](http://www.2cto.com/os/201507/412860.html)
-
-###### awk脚本
+awk脚本示例如下：
 
 ```shell
 #!/usr/bin/awk -f
@@ -1229,83 +1755,110 @@ END{  # 这个括号不能移到下一行
 }
 ```
 
-##### [awk数组](http://blog.csdn.net/beyondlpf/article/details/7024730)
+###### [脚本传参](https://www.cnblogs.com/chengmo/archive/2010/10/03/1841753.html)
 
-基础
-
-```shell
-# 数组的长度
-length(a)
-
-# 数组遍历
-awk 'BEGIN{a[1]="c";a[2]="d";a[3]="e";n=length(a);for(i=1;i<=n;i++) print a[i]}'
-awk 'BEGIN{a[1]="c";a[2]="d";a[3]="e";for(k in a) print k,a[k]}'
-```
-
-多维数组
+- shell中运行awk脚本,如何在shell程序中向awk脚本传参：[shell中调用awk脚本传递参数问题](http://www.2cto.com/os/201507/412860.html)
 
 ```shell
-awk 'BEGIN{a[0,0]=12;a[1,1]=13;}
-	 END{for(k in a) 
-	 	   {
-	 	   	print k,a[k];
-	 	    split(k,idx,SUBSEP);
-	 		print idx[1],idx[2],a[idx[1],idx[2]]
-	 	   }
-	 }' </dev/null
+#!/bin/bash
+
+# 方法1：在awk脚本后面（此处方法BEGIN模块里获取不到）
+awk -f stat.awk	"para1=value1" "para2=value2" inputfile # 或者
+./stat.awk "para1=value1" "para2=value2" inputfile
+
+# 方法2：
+awk -v "para1=value1"  -v "para2=value2" -f stat.awk inputfile
 ```
 
-###### 排序
+> stat.awk脚本的内容如下：
+>
+> ```shell
+> #其中stat.awk的脚本中引用变量可以采用如下的方式：
+> #!/usr/bin/awk -f 
+> BEGIN{
+>     a=0;
+> }
+> {
+>     a++;   
+> }
+> END{
+>     print para1"\t"a;
+> }
+> ```
+
+- awk命令行传参
 
 ```shell
-$ cat sortd.txt
-aaa 125
-ddd 123
-bbb 128
-ccc 120
+name="76868&5676&435&43526&334&12312312&12321"
+
+# 方法1：（awk规定引用系统变量必须使用单引号加双引号，即'"$sysvar"'这样的格式，但是split函数也需要双引号来定界，但这个双引号又不能让sh解释，而应留给awk来解释，所以使用了\"和\"组成的双引号）
+awk 'BEGIN {print split('"\"$name\""', filearray, "&")；for}'
+
+# 方法2：(注意：这种方式BEGIN的action不能获得变量)
+awk  '{print test}' test="$name"
+
+# 方法3：
+awk -v test="name" 'BEGIN{print test}{print test}'     
+
+# 方法4：(通过设置环境变量的方式获取)
+export test=xxxx
+#awk 'BEGIN{for (i in ENVIRON) {print i"="ENVIRON[i];}}'  # 遍历环境变量
+awk 'BEGIN{print ENVIRON["test"];}{print ENVIRON["test"];}END{print ENVIRON["test"];}'
 ```
 
-**asort**
 
-对key进行文本排序，不能保存key-value的映射关系(这大部分还存在问题)
-
-```  
-$ awk '{a[$2]=$0}END{for(i=1;i<=asort(a);i++)print a[i]}' sortd.txt
-aaa 125
-bbb 128
-ccc 120
-ddd 123
-```
-
-**asorti**
-
-对value进行数字排序，可以保存key-value的映射关系
-
-```shell
-$ awk '{a[$2]=$0}END{for(i=1;i<=asorti(a,b);i++)print a[b[i]]}' sortd.txt
-ccc 120
-ddd 123
-aaa 125
-bbb 128
-```
 
 #### 进阶
 
-##### 字符串
+##### [字符串](https://www.cnblogs.com/anny-1980/articles/3616086.html)
 
-字符串分割
+| 函数                             | 说明                                                         | 备注 |
+| -------------------------------- | ------------------------------------------------------------ | ---- |
+| gsub(r,s)                        | 在整个$0中用s替代r                                           |      |
+| gsub(r,s,t)                      | 在整个t中用s替代r                                            |      |
+| index(s,t)                       | 返回s中字符串t的第一位置                                     |      |
+| length(s)                        | 返回s长度                                                    |      |
+| match(s,r)                       | 测试s是否包含匹配r的字符串                                   |      |
+| split(s,a,fs)                    | 在fs上将s分成序列a                                           |      |
+| sprint(fmt,exp)                  | 返回经fmt格式化后的exp                                       |      |
+| sub(r,s)                         | 用$0中最左边最长的子串代替s                                  |      |
+| substr(s,p)                      | 返回字符串s中从p开始的后缀部分                               |      |
+| substr(s,p,n)                    | 返回字符串s中从p开始长度为n的后缀部分                        |      |
+| gensub(/123/,"x",1,$1)           | 替换\$1中 第一次匹配到的123为字符x，返回值为\$1替换后的内容，且$1的内容并没有改变 |      |
+| gensub(/a(.*)b/,"\\1",1)         | 返回值为匹配正则第1对()内的内容                              |      |
+| gensub(/a(.\*)b(.\*)c/,"\\\2",1) | 返回值为匹配正则第2对()内的内容                              |      |
+| gensub(a,b,c[,d])                | 全局替换，匹配正则a， 用b替换，c为指定替换目标是第几次匹配，d为指定替换目标是哪个域如\$1,\$2，若无d指$0，返回值为target替换后内容(未替换还是返回 target原内容)，与sub、gsub不同的是，target内容替换后不改变。 |      |
 
-> split( String, A, [Ere] ) 
+###### 字符串分割
+
+split( String, A, [Ere] ) 
+
+> split(字符串，数组，字段分隔符) ,返回的是分割之后的 数组长度
 
 ```shell
-echo '[7,10]d       4724    ["100451440","100594004","100641926"]'|awk '{split($2,c,"[");for (i in dict) print }'
+# 例子1：
+echo '[7,10]d  4724 ["10","14","1926"]'|awk '{split($2,c,"[");for (i in dict) print }'
+
+# 例子2
+name="76868&5676&435&43526&334&12312312&12321"
+awk 'BEGIN {print split('"\"$name\""', filearray, "&")；for}'
 ```
 
-字符串长度
+###### [字符串拼接](https://blog.csdn.net/hipop/article/details/1089998)
+
+```shell
+echo |awk '{a="abc";var=1 2 a 3 4;print var}'  #equivlent to: "1" "2" "abc" "3" "4"
+echo "1 2"|awk '{print $1 $2;print $1,$2}'
+echo | awk '{jfc1="1,3";print split(jfc1,fc1,","); for(c in fc1) c1=c1"$"c","; print substr(c1,1,length(c1)-1);}'
+```
+
+###### 字符串截取
 
 ```shell
 
 ```
+
+
 
 ##### 内容抽取
 
@@ -1315,9 +1868,45 @@ echo '[7,10]d       4724    ["100451440","100594004","100641926"]'|awk '{split($
 
 ```
 
+##### 输出修饰
+
+###### 单行修饰
+
+输入：
+
+```data
+# ttt.txt
+a
+b
+c
+```
+
+输出
+
+```
+# 输出1
+("a","b","c")
+
+# 输出2
+('a','b','c')
+```
+
+实现
+
+```shell
+# 输出1
+awk '{printf("\"%s\",",$1);}' ttt.txt
+
+#输出２
+awk '{printf("'\''%s'\'',",$1);}' ttt.txt
+awk 'BEGIN{printf("%s", "(");}{printf("'\''%s'\'',",$1);}END{printf("%s",")");}' ttt.txt
+```
+
+参考：[awk中输出单引号和双引号](https://www.cnblogs.com/emanlee/p/3620785.html)
+
 #### 应用
 
-##### awk区间统计
+##### 区间统计
 
 问题描述，给出一堆数据，然后将该堆数据进行分组（分组区间自己指定），然后统计每个分组内的个数
 
@@ -1343,7 +1932,7 @@ awk实现行转列
 # 利用awk的数组来实现(待完成)
 ```
 
-##### awk多维数组统计
+##### 多维数组统计
 
 ```shell
 # 数据格式（按第一列汇总，求第二列和第三列的和）
@@ -1365,14 +1954,14 @@ zhibo	2332	1447
 awk '{if (a in arr) {split(arr[a],puv,"\t");pv=puv[1]+$2;uv=puv[2]+$3;} else arr[$1]=$2"\t"$3;}END{ for(a in arr) print a,arr[a]|"sort -rn -k2"}' 
 ```
 
-##### awk计算文件重合度
+##### 文件重合度
 
 ```shell
 # 同时会给出两个文件各自的行数
 awk '{if(NR==FNR){a[$1]=$1;overlap_num=0;f1num=f1num+1;}else{if($1 in a) overlap_num++;}}END{print ARGV[1]"\t"f1num"\n"ARGV[2]"\t"FNR"\noverlap\t"overlap_num}' file1 file2  
 ```
 
-##### awk计算时间差
+##### 计算时间差
 
 ``` shell
 awk -v s="20110510" -v t="20110605" 'BEGIN{"date +%s -d "s|getline a;"date +%s -d "t|getline b;print (b/3600-a/3600)/24}'
@@ -1382,7 +1971,7 @@ awk -v s="20110510" -v t="20110605" 'BEGIN{"date +%s -d "s|getline a;"date +%s -
 
 [awk计算时间差](http://bbs.chinaunix.net/forum.php?mod=viewthread&tid=2316841&page=1#pid15618823)
 
-##### awk输入输出重定向
+##### 输入输出重定向
 
 > 输出重定向：
 
@@ -1415,7 +2004,7 @@ awk '{getline j<"b";for(i=1;i<=NF;i++){$i>j?$i=$i-j:$i=j-$i}}1' a|column -t
 # columnt -t的作用是让结果列对齐，该程序还有些问题
 ```
 
-##### awk选取某列不同的n个
+##### 选取某列不同的n个
 
 选取第一列不同的n个，其它列可以重复
 
@@ -1434,7 +2023,7 @@ awk '{a[$1]=$1;n=length(a);print NR,n; if(n<=3) print $0}END{print n}'  test.dat
 # 注意此处不要用asort或asorti求数组的长度
 ```
 
-##### awk实现行列转换
+##### 行列转换
 
 ###### 列转行
 
@@ -1443,6 +2032,12 @@ awk '{a[$1]=$1;n=length(a);print NR,n; if(n<=3) print $0}END{print n}'  test.dat
 ```
 
 ###### 行转列
+
+```shell
+
+```
+
+##### 实现join
 
 ```shell
 
@@ -1531,7 +2126,10 @@ sed '/hrwang/{s/hrwang/HRWANG/;q;}' datafile  #匹配到hrwang的行处理后就
 sed添加-r才支持扩展正则
 
 ```shell
-sed -nr '/^xxx(.*)a$/s/vvv/xxx/gp'   
+sed -nr '/^xxx(.*)a$/s/vvv/xxx/gp' 
+
+# 将日期格式替换成当前日期
+cat bugbuffer.hql|sed -r 's/201[678]{1}[0-9]{2}[0-9]{2}/99999999/g'
 ```
 
 ##### 模式空间
@@ -1552,7 +2150,11 @@ sed -nr '/^xxx(.*)a$/s/vvv/xxx/gp'
 
 ![img](http://coolshell.cn//wp-content/uploads/2013/02/sed_demo_00.jpg)
 
-##### 向sed传递变量
+#### 进阶
+
+##### 变量传递
+
+向sed命令行传递变量
 
 ```shell
 ststr=`date +%d\\\/%b\\\/%Y:%H`	# 这个日期的转换，在脚本内要使用三个\才能代表一个\，脚本外可使用两个
@@ -1563,14 +2165,14 @@ sed -n "/${ststr}/p" ${log_path}/${log} > ${log_path_bak}/${log}_${datehour}
 
 ##### sed脚本
 
-**从文件读入命令**
+###### 从文件读入命令
 
 ```shell
 sed -f sedscript.sh
 ```
 
-> sedscript.sh的内容如下：
->
+sedscript.sh的内容如下：
+
 > ```shell
 > !/bin/sed -f
 > s/root/yerik/p  
@@ -1579,7 +2181,7 @@ sed -f sedscript.sh
 
 sed对于脚本中输入的命令非常挑剔，在命令的末尾不能有任何空白或文本，如果在一行中有多个命令，要用分号分隔。以#开头的行为注释行，且不能跨行
 
-**直接运行脚本**
+###### 直接运行脚本
 
 ```shell
 chmod u+x
@@ -1588,7 +2190,7 @@ chmod u+x
 
 sed命令如何接收外部参数
 
-#### 进阶
+#### 实践
 
 ##### 整行处理
 
@@ -1608,6 +2210,8 @@ sed '1,5d 删除1~5行' test.txt
 
 ##### 行内处理
 
+###### 替换
+
 ```shell
 # s命令替换（其中原来的部分支持正则\w）
 sed 's/原来的/现在的/g' test.txt
@@ -1619,12 +2223,28 @@ sed -n '/inet / s/inet.*:$?//'
 sed -n 's/dog/&&xa/p' pets.txt
 ```
 
-> 利用&命令进行大小写转换
->
-> ```shell
-> #\u\U\l\L
-> echo -e "inet addr:172.17.54.137  Bcast:1 \n  Mask:40.0" |sed -n 's/inet/\u&/p'
-> ```
+###### 插入
+
+在行内指定位置插入,其本质是通过替换实现的
+
+```shell
+# 行数行尾插入' 
+echo -e 'a\nb\nc' |sed -e "s/^/'&/" -e "s/$/'&/" -e "s/\r/,/"
+
+# 指定位置插入(在c后面插入xx)
+echo -e 'a\ncoy\nc' |sed -e "s/c/&xx/"
+```
+
+###### 转换
+
+利用&命令进行大小写转换
+
+```shell
+#\u\U\l\L
+echo -e "inet addr:172.17.54.137  Bcast:1 \n  Mask:40.0" |sed -n 's/inet/\u&/p'
+```
+
+
 
 ##### 其它
 
@@ -1706,21 +2326,55 @@ grep支持BRE、ERE、PRE，默认支持BRE
 
 grep -F快速正则，相当于fgrep,不使用任何正则匹配的时候使用，不会解析任何正则元字符，均当成默认字符.
 
-###### **基本正则BRE**
+###### 分类
 
-在使用基本正则表达式的时候，必须在下列符号前加上转义字符`\`才能代表正则的意义，否则只代表该字符的默认意义:
+**基本正则BRE**
+
+在使用基本正则表达式的时候，`? + | () {}`这些符号前加上转义字符`\`才能代表正则的意义，否则只代表该字符的默认意义:
 
 ```shell
-? + | () {}
+
 ```
 
-###### **扩展正则ERE**
+**扩展正则ERE**
 
-grep加-E支持扩展正则`？+|（）{}`,相当于egrep
+grep加-E支持扩展正则`？+ |（）{}`,相当于egrep
 
-###### **Perl正则**PRE
+```shell
 
-grep加-P选项支持Perl格式的正则，注意此处不能缩写为pgrep
+```
+
+**Perl正则PRE**
+
+grep加-P选项支持Perl格式的正则，注意此处不能缩写为pgrep,断言等高级使用是Perl正则才有的
+
+```shell
+
+```
+
+###### 应用
+
+精确匹配多个的一个
+
+```shell
+# 精确匹配push_pop、push_click、push_error
+grep -E -w 'push_pop|push_click|push_error' new.data
+```
+
+抽取指定条件范围里的内容
+
+```shell
+ # 抽取同一行内from和where之间的内容(注意懒惰匹配)，并剔除空格
+ grep -P -o '(?<=from)(.*?)(?=where)' a.txt |sed -n 's/ //gp' 
+```
+
+匹配指定条件后的第一个单词
+
+```shell
+grep -P -o '(?<=from)\s+\b[.\w]+\b' a.txt |sed -n 's/ //gp'
+```
+
+
 
 #### 进阶
 
@@ -1743,7 +2397,7 @@ egrep -f pattern.file text.txt
 
 #### 应用
 
-//待补充
+
 
 ### find
 
@@ -1840,13 +2494,11 @@ zip calc_bak.zip.$date $(find xmp_odl -path "*dev*" -prune -o -type f  \( -name 
 
 ```
 
-
-
 ### 实践
 
 #### 文件转换
 
-##### 转置
+##### 行列转置
 
 行转列，实现方法如下：
 
@@ -1885,25 +2537,75 @@ awk '{i=1;
 	}' $inputf
 ```
 
-##### tab和空格
+##### 格式转换
+
+###### tab&space
 
 tab转space
 
 ```shell
 expand -t4 xxx.txt > yyy.txt
+# 或者
+alias t2s="sed -i 's/\t/    /g' "  # tab替换为4个空格
+
 ```
 
 space转tab
 
 ```shell
 unexpand -t4 xxx.txt >yyy.txt
+# 或者
+alias s2t="sed -i 's/    /\t/g' "  # 4个空格替换为tab
 ```
 
-##### Linux和DOS格式
+###### linux&dos
+
+格式说明：
+
+- Unix系统里，每行结尾只有“<换行>”，即“\n”
+- Windows系统里面，每行结尾是“<换行><回 车>”，即“\n\r”
+
+一个直接后果是:
+
+- Unix系统下的文件在Windows里打开的话，所有文字会变成一行；
+- Windows里的文件在Unix下打开的话，在每行的结尾可能会多出一个^M符号。
 
 ```shell
-dos2unix xx.txt
+# dos转linux
+dos2unix xx.txt  # 或者sed -i 's/\r$//g' ttt.txt
+
+# linux转dos
 unix2dos xx.txt
+```
+
+#### 输出修饰
+
+输入：
+
+```shell
+# ttt.txt
+a
+b
+c
+```
+
+输出
+
+```
+('a','b','c')
+```
+
+实现：
+
+```shell
+# 方法1
+awk '{printf("\"%s\",",$1)}' ttt.txt |sed -n "s/\"/'/gp"
+
+# 方法2
+awk '{printf("'\''%s'\'',",$1);}' ttt.txt
+
+# 方法3
+while read line;do echo -n "'$line',";done < ttt.txt
 ```
 
 ## 参考
@@ -1918,7 +2620,9 @@ unix2dos xx.txt
 
   [shell关联数组](http://blog.csdn.net/mm_bit/article/details/48417157)
 
-  [<Shell 编程范例>面向操作对象学Shell(推荐)](https://github.com/tinyclub/open-shell-book)
+  <Shell 编程范例>面向操作对象学Shell(推荐)
+
+  [数据工程师常用shell命令](https://www.jianshu.com/p/1ea90c81b659)
 
   [bash中set命令的使用（阮一峰推荐）](http://www.ruanyifeng.com/blog/2017/11/bash-set.html)
 
@@ -1946,7 +2650,7 @@ unix2dos xx.txt
 
   [awk处理多维数组](http://blog.csdn.net/ithomer/article/details/8478716)
 
-  [awk常见数组处理技巧](http://www.cnblogs.com/lixiaohui-ambition/archive/2012/12/11/2813419.html)
+  [awk常见数组处理技巧(强烈推荐)](http://www.cnblogs.com/lixiaohui-ambition/archive/2012/12/11/2813419.html)
 
   [awk 内置变量使用介绍](http://blog.jobbole.com/92494/)
 

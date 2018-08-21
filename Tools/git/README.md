@@ -4,6 +4,13 @@
 
 ### 基础
 
+集中式版本控制工具:CVS、SVN、VSS等，分布式版本控制工具：git、merucrial、bazarr等，选择git的原因：
+
+- 大部分操作在本地完成，不需要联网（待有网之后一次性提交）
+- 完整性保证
+- 分支操作非常快捷流畅
+- 与Linux命令全面兼容
+
 #### 配置
 
 三层配置文件:
@@ -103,7 +110,7 @@ git config --list
 # 待补充
 ```
 
-###### 其它
+###### 其它配置
 
 日志配置
 
@@ -157,15 +164,16 @@ C-->D
 创建版本库之后会在当前目录下生成`.git`文件夹
 
 ```shell
-# 说明git_pro1可以是已有的目录
+# 说明git_pro1可以是已有的目录（空目录或者非空目录均可）
 mkdir git_pro1
 cd git_pro1
 
+# 初始化仓库
 git init
 ```
 
-> 创建之后可选择修改仓库的配置:
->
+设置签名：创建之后可选择修改仓库的配置(仓库级别):
+
 > ```shell
 > git config user.name "xx"
 > git config user.email "xxx@xx.com"
@@ -174,10 +182,16 @@ git init
 ###### 添加远程仓库
 
 ```shell
+#查看当前所有远程仓库
+get remote -v
+
+# 添加远程仓库
 git remote add [reponame] [repoaddress]
 ```
 
-> 其中reponame自取，repoaddress是远程仓库的地址，例如`https://tuling56@bitbucket.org/tuling56/tutorial.git` 或者`git@github.com:tuling56/CPP.git`
+> 其中reponame是远程仓库的别名(自取)，repoaddress是远程仓库的地址，支持http[s]/git等协议格式，例:
+>
+> `https://tuling56@bitbucket.org/tuling56/tutorial.git` 或者`git@github.com:tuling56/CPP.git`
 
 可以添加多个远程仓库，在推送的时候选择要推送的仓库即可
 
@@ -190,19 +204,21 @@ git push [reponame] [repobranch]
 git push origin dev
 ```
 
-> 其中reponame是远程仓库名，repobranch是远程仓库的分支（默认是master）,若不指定reponame和repobranch则推送到origin仓库的master分支，即`git pust origin master`
+> - 其中reponame是远程仓库名，repobranch是远程仓库的分支（默认是master）,若不指定reponame和repobranch则推送到origin仓库的master分支，即`git push origin master`
+
+若推送的远程仓库是https协议的，在推送的时候可能会弹出登录框，输入账号和密码，即可。
+
+
 
 ##### 命令解释
 
 ######  clone
 
-克隆仓库，可以在clone时候指定分支，clone指定分支
+克隆仓库，可以在clone时候指定分支，若不指定，默认克隆master分支
 
 ```shell
 git clone -b 仓库地址  [本地仓库名]
 ```
-
-
 
 ###### commit
 
@@ -306,9 +322,9 @@ git commit -m "comment"
 git push
 ```
 
-1. git add .把所有文件放入暂存区；
-2. git commit把所有文件从暂存区提交进本地仓库；
-3. git push把所有文件从本地仓库推送进远程仓库。
+1. git add .       把所有文件放入暂存区；
+2. git commit  把所有文件从暂存区提交进本地仓库；
+3. git push       把所有文件从本地仓库推送进远程仓库。
 
 ##### 4个区
 
@@ -329,11 +345,22 @@ git push
 - 已提交(Committed)
 - 已推送(Pushed)
 
+查看状态
+
+```shell
+git status
+# 查看的是工作区和暂存区的状态，另外一个相似的命令是查看提交的历史
+git log --pretty=online
+git reflog
+```
+
+
+
 #### 贮藏
 
 贮藏可以获取工作目录中的中间状态，
 
-#### 撤销
+#### 回退
 
 git流程和状态图
 
@@ -346,7 +373,7 @@ git流程和状态图
 | 已commit但未push | git diff master origin/master | git reset --hard origin/master           | master是本地仓库，origin/master是远程仓库 |
 | 已push         |                               | git reset --hard HEAD^ 然后执行git push -f   |                                |
 
-##### 修改commit的内容
+##### 修改commit
 
 //待补充
 
@@ -376,6 +403,21 @@ git fetch origin
 git diff 本地分支 origin/xxxx
 ```
 
+#### 冲突
+
+##### 冲突情景
+
+1. 在A分支上修改了文件f1的内容，并提交到了本地的A分支上；
+2. 在B分支上也修改了文件f1的内容，并提交到本地的B分支桑；
+3. 要把B分支合并到A分支上，冲突在文件f1上产生
+
+[冲突解决](https://www.imooc.com/article/35753)：
+
+1. 提示冲突后，手动编辑冲突文件，保存退出，然后git add 冲突文件
+2. git commit -m "解决冲突"(注意commit的实验一定不要带具体的文件名)
+
+
+
 ### 高级
 
 #### 工作区
@@ -389,7 +431,9 @@ git status
 
 #### [分支](https://git-scm.com/book/zh/v1/Git-%E5%88%86%E6%94%AF-%E5%88%86%E6%94%AF%E7%9A%84%E6%96%B0%E5%BB%BA%E4%B8%8E%E5%90%88%E5%B9%B6)
 
-本地有dev和master分支，远程也有dev和master分支，如何对应
+![分支原理](https://img2.mukewang.com/5b2883210001ae8405540207.jpg)
+
+分支可以同时推进多个功能开发，提高效率，分支之间不会影响，失败的分组删除重新开始即可。
 
 ##### 查看分支
 
@@ -397,11 +441,11 @@ git status
 
 ```shell
 # 查看本地分支
-git branch
+git branch -v
 
 # 查看所有分支
 git branch -a
-* dev   # 标注出当前的分支所在
+* dev   # 星号标注出当前的分支所在
   master
   remotes/origin/HEAD -> origin/master
   remotes/origin/branch1
@@ -417,7 +461,7 @@ git branch -a
 查看本地分支
 
 ```shell
-$git branch
+$git branch -v
 * dev
   master
 ```
@@ -436,7 +480,7 @@ git push origin test
 
 ##### 切换分支
 
-切换分支的时候要留心工作目录和暂存区，那些还没有提交的修复，将会和检出的分支产生冲突从而阻止git为你切换分支。
+切换分支前要留心工作区和暂存区，那些还没有提交的修复，将会和检出的分支产生冲突从而阻止git为你切换分支。
 
 ```shell
 git checkout test
@@ -446,16 +490,26 @@ git checkout test
 
 ##### 合并分支
 
+分支的合并的主要步骤如下：
+
+```shell
+# 1. 先切换到准备合并到的分支上
+git checkout [准备合并到的分支]
+# 2. 合并要合并的分支到本分支上
+git merge [待合并的分支]
+```
+
 合并到master
 
 ```shell
 #先切换到master分支，然后执行以下命令，将test分支合并到master分支上
+git checkout master
 git merge test  # 合并分支的时候总是加上--no-ff，即git merge --no-ff test
 ```
 
 master合并到指定分支
 
-```
+```shell
 # 如果主分支在子分支a之后进行了修改，想将修改后的内容合并到子分支a上，则先切换到子分a上
 git merge master
 
@@ -557,13 +611,44 @@ git tag -a v1.4 xxxxx(校验和)
 > git show v1.4
 > ```
 
-### 应用
+### 积累
+
+#### 仓库
 
 //待补充
 
+### 应用
+
+#### 协同开发
+
+协同开发需要远程仓库上进行设置（以github为例），添加协同人员的github账号地址，待协同人员接受邀请后，就可以进行协同开发了。
+
+![协同开发](https://img2.mukewang.com/5b2882f80001b18708620425.jpg)
+
+#### 托管中心
+
+github，码云，gitlab等
+
 ### 问题
 
-#### 推送到非空仓库的问题
+#### 仓库
+
+##### 裸仓库和非裸仓库
+
+###### 裸仓库
+
+可以之间作为服务器仓库供开发push和pull,实现数据文件共享和同步，不保存文件，至保存历史提交的版本信息
+
+###### 非裸仓库
+
+向非裸仓库push会报错，需要在.git文件夹的config文件后加
+
+```shell
+[receive]
+denyCurrentBranch = ignore
+```
+
+才能提交数据，非裸仓库使用git reset --hard命令可以看到提交文件，否则推送到裸仓库的问题
 
 ```shell
 remote: error: refusing to update checked out branch: refs/heads/master
@@ -582,15 +667,17 @@ remote: error: To squelch this message and still keep the default behaviour, set
 remote: error: 'receive.denyCurrentBranch' configuration variable to 'refuse'.
 ```
 
-#### Rebase和Merge的区别
+#### 其它
+
+Rebase和Merge的区别
 
 ```shell
-
+#待补充
 ```
 
 ## 参考
 
-- 基础
+- **基础**
 
   [Git入门参考手册(推荐)](https://git-scm.com/book/zh/v1/%E8%B5%B7%E6%AD%A5-%E5%88%9D%E6%AC%A1%E8%BF%90%E8%A1%8C-Git-%E5%89%8D%E7%9A%84%E9%85%8D%E7%BD%AE)
 
@@ -604,7 +691,9 @@ remote: error: 'receive.denyCurrentBranch' configuration variable to 'refuse'.
 
   [git查看远程仓库](http://blog.csdn.net/wanghuihui02/article/details/48155627)
 
-- 进阶
+  [13条git命令，满足你的工作需求（推荐）](https://www.imooc.com/article/12473)
+
+- **进阶**
 
   [git四个阶段的撤销更改](https://mp.weixin.qq.com/s/akvB2DO_1dpUrf-ol77MwQ)
 
@@ -614,12 +703,15 @@ remote: error: 'receive.denyCurrentBranch' configuration variable to 'refuse'.
 
   [修改git commit信息中的author](https://blog.csdn.net/liang890806/article/details/46813039)
 
-- 高级
+- **高级**
 
   [git post-receive钩子部署服务端代码立即重启生效](https://yq.aliyun.com/ziliao/25682)
 
   [http方式push失败的疑似解决方案](https://stackoverflow.com/questions/25312542/git-push-to-nginxgit-http-backend-error-cannot-access-url-http-return-code-2)
 
-- 问题
+  [在sourcetree中使用gitflow](https://www.jianshu.com/p/8a3988057d0f)
+
+- **问题**
 
   //待补充
+

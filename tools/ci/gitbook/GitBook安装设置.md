@@ -10,17 +10,23 @@
 
 从 [https://nodejs.org/#download](https://nodejs.org/#download) 下载 安装node.js，自带npm软件包管理器
 
-> 测试：npm -v
+```shell
+npm -v
+```
 
 #### 安装gitbook-cli
 
-> npm install -g gitbook-cli
+```shell
+npm install -g gitbook-cli
+```
 
 gitbook-cli是gitbook的命令行，可以方便的管理多个gitbook版本
 
 #### 安装gitbook
 
-> gitbook -v 
+```shell
+gitbook -v 
+```
 
 若没有安装gitbook，则会选择最新的gitbook版本进行安装，使用其他的命令
 
@@ -51,7 +57,7 @@ gitbook-cli是gitbook的命令行，可以方便的管理多个gitbook版本
 
 2. 执行`gitbook init` 
 
-   该步骤会自动创建书籍的目录和对应的章节文档
+   该步骤会根据SUMMARY.md自动创建书籍的目录和对应的章节文档
 
 3. 生成书籍`gitbook build`
 
@@ -103,7 +109,7 @@ search_index.json	# 搜索数据
 
 #### 多人协作
 
-​	若使用GitBook官方，可以在设置中找到协作这，进行添加。对于绑定GitHub repo的GitBook项目，其协作方式和普通的项目没有差异，插件 [edit-link](https://github.com/rtCamp/gitbook-plugin-edit-link)可以在每个页面生成指向 GitHub repo 相应文件的链接，十分方便！但需要版本库支持web编辑的方式，若搭建本地的，要自己实现。
+​	若使用GitBook官方，可以在设置中找到协作进行添加。对于绑定GitHub repo的GitBook项目，其协作方式和普通的项目没有差异，插件 [edit-link](https://github.com/rtCamp/gitbook-plugin-edit-link)可以在每个页面生成指向 GitHub repo 相应文件的链接，十分方便！但需要版本库支持web编辑的方式，若搭建本地的，要自己实现。
 
 ###  扩展
 
@@ -141,7 +147,7 @@ search_index.json	# 搜索数据
         },
         "ad": {
       		  "contentTop": "<div>Ads at the top of the page</div>",
-      		  "contentBottom": "%3Cdiv%3EAds%20at%20the%20bottom%20of%20the%20page%3C/div%3E"
+      		  "contentBottom": "this is bottom"
     	},
         "chart":{
              "type": "c3"
@@ -269,8 +275,6 @@ git clone https://gitweb.me/go_web.git
 git config http.sslVerify false
 ```
 
-
-
 #### 自建发布
 
 ​	在要发布的机器上，构建gitbook文档，并使用git进行管理（非裸仓库），远程机器可以git clone该版本库，但不能git push,所有的修改只能在发布的机器上进行，修改完文档后重启gitbook服务，重新构建文档，对应协同操作，按如下的方式：
@@ -283,7 +287,11 @@ git config http.sslVerify false
 git init --bare sample_pure.git
 ```
 
-然后配置版本仓库的`.git/hooks/post-receive`钩子如下：
+###### 钩子配置
+
+钩子的配置主要是将仓库里的内容clone出来，切换到clone的工作区，然后编译生成书籍，钩子配置方式如下：
+
+编辑版本仓库的`.git/hooks/post-receive`，内如如下：
 
 ```shell
 vim hooks/post-receive
@@ -307,6 +315,40 @@ exit 0
 
 > - 需要先把gitbook用到的node插件的目录(node_modules/ ) 拷贝到生成的当前git的工作目录内，最后会生成文件到_book/gitbook的目录内，避免重复的插件下载和安装，或者使用`gitbook install`命令，该命令会根据`book.json`中使用到的插件进行安装
 > - 注意修改post-receive文件的权限为755
+
+改进版的钩子
+
+```shell
+vim hooks/post-receive
+
+#!/bin/bash
+dir=`dirname $0` && dir=`cd $dir && pwd`
+GITB_HOME=/usr/local/nginx/site/gitbook
+
+# 获取父目名
+fpath=$(echo "$dir" |awk -F'/' '{print $(NF-1);}')
+fdir=${fpath//.git//}
+
+GITBOOK=${GITB_HOME}/${fdir}
+[ ! -d $GITBOOK ]&&mkdir -p ${GITBOOK}
+
+# 设置工作区
+set GIT_INDEX_FILE
+GIT_WORK_TREE=${GITBOOK} git checkout -f
+
+# 切换到工作区(clone并编译)
+cd ${GITBOOK}
+[ ! -L node_modules ]&& ln -s ../node_modules node_modules
+
+gitbook build #&& gitbook serve  这部分启动的代码暂时不需要
+
+#附加的其它信息
+#echo "`date +%F\ %T`" >>timettt
+#sh ${gitbook_home}/run.sh
+
+
+exit 0
+```
 
 ##### 添加内容
 
@@ -358,7 +400,7 @@ git push lorigin
 
 ##### web访问
 
-​	通过http://localhost:4000来web访问修改的内容(若要支持在线编辑，需要通过web服务器来实现，暂时没有)
+通过http://localhost:4000来web访问修改的内容(若要支持在线编辑，需要通过web服务器来实现，暂时没有)
 
 **增强**：通过配置nginx的服务器的方式来实现gitbook内容的访问，这样就不必再启动gitbook serve了
 
@@ -470,12 +512,6 @@ https://github.com/tuling56/shared_common_libs.git
 git clone https://127.0.0.1/home/yjm/Documents/gitrepo/gitbook.git
 ```
 
-参考：
-
-[搭建git https服务器](http://www.cnblogs.com/clcvampire/p/6290471.html)
-
-[利用Nginx搭建HTTP访问的Git服务器](http://www.tuicool.com/articles/bAZvEz3)
-
 ### 测试
 
 本测试是针对上文发布部分的，匿名http方式、非匿名http方式:
@@ -488,31 +524,41 @@ git clone http://host:port/xxx.git
 git clone http://username@host:port/xxx.git
 ```
 
+裸仓库和非裸仓库克隆到本地之后：
+
+![裸和非裸仓库](http://tuling56.site/imgbed/2018-08-20_200050.png)
+
 #### pure仓库
 
 git仓库配置在阿里云上,sample仓库是裸仓库，没有工作区，建立方式如下：
 
 ```shell
-git init --bare sample.git
+git init --bare sample_pure.git
 ```
 
-- git clone http://47.95.195.31/gitrepo/sample.git
+##### http
+
+- git clone http://47.95.195.31/gitrepo/sample_pure.git
 
 ```shell
-#存在的问题是可以clone但无法提交,提示错误：
+# 存在的问题是可以clone但无法提交,提示错误：
 fatal: git-http-push failed return code 22
-error: failed to push some refs to 'http://47.95.195.31/gitrepo/sample.git'
+error: failed to push some refs to 'http://47.95.195.31/gitrepo/sample_pure.git'
 ```
 
-- git clone https://47.95.195.31/gitrepo/sample.git
+##### https
+
+- git clone https://47.95.195.31/gitrepo/sample_pure.git
 
 ```shell
-#存在的问题是可以clone但无法提交，提示错误：
+# 存在的问题是可以clone但无法提交，提示错误：
 fatal: git-http-push failed
-error: failed to push some refs to 'https://47.95.195.31/gitrepo/sample.git'
+error: failed to push some refs to 'https://47.95.195.31/gitrepo/sample_pure.git'
 ```
 
-- git clone root@47.95.195.31:/usr/local/nginx/site/gitrepo/sample.git
+##### ssh
+
+- git clone root@47.95.195.31:/usr/local/nginx/site/gitrepo/sample_pure.git
 
 ```shell
 # 可以clone也可以提交，但是找不到工作区是啥回事
@@ -520,31 +566,42 @@ error: failed to push some refs to 'https://47.95.195.31/gitrepo/sample.git'
 
 #### nopure仓库
 
-nopure仓库的建立方式如下:
+norpure仓库的建立方式如下:
 
 ```shell
 git init sample_nopure.git
 ```
 
+非裸仓库不能push,需要先设置.git/config文件，添加如下：
+
+```shell
+[receive]
+denyCurrentBranch = ignore
+```
+
+##### http
+
 - git clone http://47.95.195.31/gitrepo/sample_nopure_.git  sample_nopure_http
 
 ```shell
-#存在的问题是可以clone但无法提交
+# 可以clone,但无法push
 ```
+
+##### https
 
 - git clone https://47.95.195.31/gitrepo/sample_nopure_.git   sample_nopure_https
 
 ```shell
-#存在的问题是可以clone但无法提交
+# 可以clone,但无法push
 ```
+
+##### ssh
 
 - git clone root@47.95.195.31:/usr/local/nginx/site/gitrepo/sample_nopure.git  sample_nopure_ssh 
 
 ```shell
-# 可以正常克隆
+# 可以clone，但无法push
 ```
-
-
 
 ## 参考
 
@@ -571,4 +628,10 @@ git init sample_nopure.git
 - 发布
 
   [git配置本地、ssh、git协议和http协议传输（推荐）](http://blog.csdn.net/jixiuffff/article/details/5969174)
+
+  [gitbook集成github仓库](https://www.jianshu.com/p/9b1d805fa36d)
+
+  [搭建git https服务器](http://www.cnblogs.com/clcvampire/p/6290471.html)
+
+  [利用Nginx搭建HTTP访问的Git服务器](http://www.tuicool.com/articles/bAZvEz3)
 

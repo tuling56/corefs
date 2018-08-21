@@ -120,6 +120,8 @@ chgrp -v -R dirOrFile
 
 ##### 文件
 
+###### 文件信息
+
 文件的时间
 
 ```shell
@@ -158,13 +160,140 @@ else
 fi
 ```
 
+###### 文件内容
+
+查看文件内容
+
+```shell
+less/more/head/tail xxx
+
+head -n20 xxx
+tail -n20 xxx
+tail -f xxxx
+```
+
+读取文件内容
+
+```shell
+# 将xxx.txt文件的内容读取到a,b两个变量中取(以空格分割，例如1 2 3 4 会被赋值为a="1" b="2 3 4" )
+while read a b;do
+	# do something
+done < xxx.txt
+
+for line in $(cat xxx.txt);do
+	echo "$line"
+done
+```
+
+文件内容进度显示加判断
+
+```shell
+#lianmeng_mobile2.data 内容格式为 xxx|xxx|xxx
+function proces()
+{
+    total=0;cur=1;
+    echo -n > total_mobile.data
+    while read line;do
+        os=$(echo $line|awk -F'|' '{print $1}')  # 字段抽取（shell字段分割不强大）
+        ua=$(echo $line|awk -F'|' '{print $2}')
+        num=$(echo $line|awk -F'|' '{print $3}')
+        #ua=${line%%|*}
+        #num=${line##*|}
+        #echo "$os"
+        #echo "$ua"
+        #echo "$num"
+        cur=$((cur+1))
+        total=$((total+num))
+
+        if [ $((cur%30)) == 0 ];then   # 每30行处理一下
+            sleep 2
+            echo "===========kill process=========="
+            ps -ef|grep detector |awk '{print "kill -9 " $2}'|sh
+        fi
+
+        if [ $num -gt 100 ];then   # 条件判断
+            browser=$(detector "\'${ua}\'" | grep -oP '(?<=Browser: ).*(?=@)')
+            echo -e "${cur}/293115:${os}|${ua}|${browser}|${num}"
+            echo -e "${os}|${ua}|${browser}|${num}" >> total_mobile.data
+        fi
+    done< lianmeng_mobile2.data
+
+    echo "total:$total" >> total_mobile.data
+}
+```
+
+###### 重命名
+
+文件批量重命名
+
+```shell
+for d in 201603??;do echo ${d}; cd ${d}; rename -n 's/\*\.log\.gz//' *.log.gz ; cd ..;done
+```
+
+> 参考[rename](http://man.linuxde.net/rename)命令，此外注意rename支持和sed一样的语法：
+>
+> ```shell
+> 三个参数：
+> - 原字符串：将文件名需要替换的字符串；
+> - 目标字符串：将文件名中含有的原字符替换成目标字符串；
+> - 文件：指定要改变文件名的文件列表。
+> ```
+
 ##### 目录
+
+###### 创建
 
 一次性创建多级目录
 
 ```shell
 mkdir -p ./application/{controllers,models,static,static/css,static/js,templates}
 ```
+
+###### 跳转
+
+linux的目录快捷跳转可以通过以下两种方式：
+
+别名
+
+```shell
+alias mgb='cd xxx & ls -lh'
+alias c1='cd ../ && ll'
+alias c2='cd ../../ && ll'
+```
+
+软件-[autojump](https://blog.csdn.net/caojinlei_91/article/details/80502753)
+
+```
+
+```
+
+软件-z.sh
+
+```shell
+
+```
+
+###### 重命名
+
+批量命名
+
+```shell
+
+```
+
+###### 获取目录
+
+获取当前运行文件所在的目录
+
+```shell
+# 当前目录完整路径
+dir=`dirname $0` && dir=`cd $dir && pwd`
+
+# 当前目录(父目录)
+fpath=$(echo $dir|awk -F'/' '{print $(NF-1);}')
+```
+
+
 
 ##### 权限
 
@@ -187,6 +316,8 @@ umask 0022
 ```
 
 ##### 解压缩
+
+###### 压缩和解压
 
 zip 命令（zip格式）
 
@@ -249,6 +380,21 @@ tar命令和格式.tar.gz和.tar.bz2
 
     补充：
     只查看 tar -ztvf xx.tar.gz 只查看
+```
+
+###### 压缩文件的内容
+
+查看压缩文件的内容
+
+```shell
+zcat xxx.tar.gz
+```
+
+搜索内容
+
+```shell
+zgrep --binary-files=text 'ssss' xxx.tar.gz # 或者
+zcat xxx.tar.gz |grep --binary-files=text 'ssss'
 ```
 
 #### 软件安装
@@ -379,6 +525,8 @@ chkconfig --list
 chkconfig --level 345 mysql on
 ```
 
+快捷命令：`systemctl enable mysqld.service`
+
 ##### 定时任务
 
 ###### crontab
@@ -401,9 +549,13 @@ file：file是命令文件的名字,表示将file做为crontab的任务列表文
 
 在crontab中使用命令和变量牵涉到%的时候要用“\”转义
 
-```
+```shell
 00 01 * * * mysqldump -u root --password=passwd-d mustang > /tmp/mustang_$(date +\%Y\%m\%d_\%H\%M\%S).sql
 ```
+
+crontab最小单位是分
+
+
 
 ###### anacron
 
@@ -412,6 +564,37 @@ file：file是命令文件的名字,表示将file做为crontab的任务列表文
 ```
 
 ```
+
+##### 应用服务
+
+###### 服务配置
+
+//有哪些应用服务，这些服务是如何配置的
+
+###### 启动/停止
+
+**service命令**
+
+```shell
+service nginx start
+service nginx restart
+service nginx stop
+service nginx reload
+```
+
+**[systemctl命令](http://man.linuxde.net/systemctl)**
+
+systemctl命令是系统服务管理器指令，它实际上将 [service](http://man.linuxde.net/service) 和 [chkconfig](http://man.linuxde.net/chkconfig) 这两个命令组合到一起。
+
+| 任务                 | 旧指令                                                       | 新指令                                                       |
+| -------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| 使某服务自动启动     | chkconfig --level 3 [httpd](http://man.linuxde.net/httpd) on | systemctl [enable](http://man.linuxde.net/enable) httpd.service |
+| 使某服务不自动启动   | chkconfig --level 3 httpd off                                | systemctl disable httpd.service                              |
+| 检查服务状态         | service httpd status                                         | systemctl status httpd.service （服务详细信息） systemctl is-active httpd.service （仅显示是否 Active) |
+| 显示所有已启动的服务 | chkconfig --list                                             | systemctl list-units --[type](http://man.linuxde.net/type)=service |
+| 启动某服务           | service httpd start                                          | systemctl start httpd.service                                |
+| 停止某服务           | service httpd stop                                           | systemctl stop httpd.service                                 |
+| 重启某服务           | service httpd restart                                        | systemctl restart httpd.service                              |
 
 #### 进程管理
 
@@ -432,6 +615,9 @@ ps -lu username
 
 # 查询进程名中包含re的进程
 pgrep re
+
+# 查找僵尸进程
+ps -A -o stat,ppid,pid,cmd | grep -e '^[Zz]'
 ```
 
 lsof
@@ -467,14 +653,18 @@ kill -9 pid
 pkill -9 pname
 ```
 
-> 批量杀死进程
->
-> ```shell
-> ps -ef |grep mysql2hdfs |awk '{print $2}' |xargs kill -9
-> #或者
-> ps -ef  | grep mysql2hdfs |awk '{print "kill -9 " $2}'|sh
-> ```
->
+批量杀死进程
+
+```shell
+ps -ef |grep mysql2hdfs |awk '{print $2}' |xargs kill -9
+# 或者
+ps -ef |grep mysql2hdfs |awk '{print "kill -9 " $2}'|sh
+# 或者
+pgrep mysql2hdfs |awk '{print $2}' |xargs kill -9
+# 或者
+pkill -9 mysql2hdfs
+```
+
 > 详细参考：[使用awk批量杀死进程](http://blog.csdn.net/hi_kevin/article/details/17024107),其功能等效于pkill 进程名称
 
 ##### 进程监控
@@ -515,6 +705,14 @@ telent ip port
 ```
 
 ###### nmap
+
+```shell
+
+```
+
+###### [ngrep](http://man.linuxde.net/ngrep)
+
+ngrep命令是grep命令的网络版，他力求更多的grep特征，用于搜寻指定的数据包。正由于安装ngrep需用到libpcap库， 所以支持大量的操作系统和网络协议。能识别TCP、UDP和ICMP包，理解bpf的过滤机制。
 
 ```shell
 
@@ -568,7 +766,7 @@ host ip
 ##### htop/top
 
 ```shell
-
+yum install htop
 ```
 
 #### 其它
@@ -592,6 +790,37 @@ service iptables start/stop/restart
 ```shell
 vim /etc/sysconfig/iptables-config
 vim /etc/sysconfig/iptables
+```
+
+##### 命令积累
+
+###### 随机数
+
+[shuf命令](https://mp.weixin.qq.com/s/frlombQOFGhLRfAReq5Fpw)
+
+```shell
+#随机生成和随机抽选文件的内容
+shuf xxx.txt
+shuf -n2 xxx.txt
+
+# -e 标志传入输入，而不是从文件中读取行
+shuf -e 1 2 3 4 5
+shuf -n2 -e 1 2 4
+shuf -e `seq 1 2 5`
+
+# 随机生成指定范围内的数字
+shuf -n2 -i 1-10
+```
+
+###### 其它
+
+sleep
+
+```shell
+sleep 1    # 睡眠1秒
+sleep 1s   # 睡眠1秒
+sleep 1m   # 睡眠1分
+sleep 1h   # 睡眠1小时
 ```
 
 ##### 内核升级
@@ -753,7 +982,9 @@ fi
 
 ##### aria2
 
-//待补充
+```shell
+# 待补充
+```
 
 #### 文件传输
 
@@ -770,43 +1001,48 @@ fi
 
 ###### 传输方式
 
-| 源地址（分为目录的方式和数据库的方式）                    | 目的地址                                     | 备注                                      |
-| -------------------------------------- | ---------------------------------------- | :-------------------------------------- |
-| rsync  -av -P    root1@xxx:/data/xxx*  | /data/pgv_stat/                          | shell 方式，主机名与资源之间使用单个冒号“:”作为分隔符         |
-| rsync  -av -P    tw07012:data/xmp*     | data/pgv_stat/                           | shell 方式， 若本地登录用户与远程主机上的用户一致，可以省略 USER@ |
-| rsync  -av -P    xmp@tw07562::pgv_stat | /data/pgv_stat/   --password-file=/etc/rsync.pass.xmp | rsync服务器的方式                             |
+| 源地址                                 | 目的地址                                              | 备注                                                         |
+| -------------------------------------- | ----------------------------------------------------- | :----------------------------------------------------------- |
+| rsync  -av -P    root1@xxx:/data/xxx*  | /data/pgv_stat/                                       | shell 方式，主机名与资源之间使用单个冒号“:”作为分隔符        |
+| rsync  -av -P    tw07012:data/xmp*     | data/pgv_stat/                                        | shell 方式， 若本地登录用户与远程主机上的用户一致，可以省略 USER@ |
+| rsync  -av -P    xmp@tw07562::pgv_stat | /data/pgv_stat/   --password-file=/etc/rsync.pass.xmp | rsync服务器的方式                                            |
 
-> 注释：如执行命令的用户名和ssh远程连接到服务器的用户名相同，则可以省略用户名
+注释：
 
-###### 命令格式
+> - 源地址分为目录的方式和数据库的方
+> - 如执行命令的用户名和ssh远程连接到服务器的用户名相同，则可以省略用户名
+
+rsync的命令格式可以为以下六种:
 
 ```
-Rsync的命令格式可以为以下六种：
-　　rsync [OPTION]... SRC DEST				（本地文件复制方式）
-　　rsync [OPTION]... SRC [USER@]HOST:DEST    （ssh方式远程上传模式）
-　　rsync [OPTION]... [USER@]HOST:SRC DEST    （ssh方式远程拉取模式）【远程机器到本地】
+rsync [OPTION]... SRC DEST				（本地文件复制方式）
+rsync [OPTION]... SRC [USER@]HOST:DEST    （ssh方式远程上传模式）
+rsync [OPTION]... [USER@]HOST:SRC DEST    （ssh方式远程拉取模式）【远程机器到本地】
 　　
-　　rsync [OPTION]... [USER@]HOST::SRC DEST   （rsync服务器的方式，拷贝文件到本地）
-　　rsync [OPTION]... SRC [USER@]HOST::DEST   （rysnc服务的方式，将本地文件拷贝到远程服务器）
-　　rsync [OPTION]... rsync://[USER@]HOST[:PORT]/SRC [DEST]   （rysnc列远程机的文件列表，不常见）
+rsync [OPTION]... [USER@]HOST::SRC DEST   （rsync服务器的方式，拷贝文件到本地）
+rsync [OPTION]... SRC [USER@]HOST::DEST   （rysnc服务的方式，将本地文件拷贝到远程服务器）
+rsync [OPTION]... rsync://[USER@]HOST[:PORT]/SRC [DEST]   （rysnc列远程机的文件列表，不常见）
+```
 
 对应于以上六种命令格式，rsync有六种不同的工作模式：
-　　1)拷贝本地文件。当SRC和DES路径信息都不包含有单个冒号":"分隔符时就启动这种工作模式。
+
+```
+1)拷贝本地文件。当SRC和DES路径信息都不包含有单个冒号":"分隔符时就启动这种工作模式。
 　　如：rsync -a /data /backup
 　　
-　　2)使用一个远程shell程序(如rsh、ssh)来实现将本地机器的内容拷贝到远程机器。当DST路径地址包含单个冒号":"分隔符时启动该模式。
+2)使用一个远程shell程序(如rsh、ssh)来实现将本地机器的内容拷贝到远程机器。当DST路径地址包含单个冒号":"分隔符时启动该模式。
 　　如：rsync -avz *.c foo:src
 　　
-　　3)使用一个远程shell程序(如rsh、ssh)来实现将远程机器的内容拷贝到本地机器。当SRC地址路径包含单个冒号":"分隔符时启动该模式。
+3)使用一个远程shell程序(如rsh、ssh)来实现将远程机器的内容拷贝到本地机器。当SRC地址路径包含单个冒号":"分隔符时启动该模式。
 　　如：rsync -avz foo:src/bar /data
 　　
-　　4)从远程rsync服务器中拷贝文件到本地机。当SRC路径信息包含"::"分隔符时启动该模式。
+4)从远程rsync服务器中拷贝文件到本地机。当SRC路径信息包含"::"分隔符时启动该模式。
 　　如：rsync -av root@172.16.78.192::www /databack
 　　
-　　5)从本地机器拷贝文件到远程rsync服务器中。当DST路径信息包含"::"分隔符时启动该模式。
+5)从本地机器拷贝文件到远程rsync服务器中。当DST路径信息包含"::"分隔符时启动该模式。
 　　如：rsync -av /databack root@172.16.78.192::www
 　　
-　　6)列远程机的文件列表。这类似于rsync传输，不过只要在命令中省略掉本地机信息即可。
+6)列远程机的文件列表。这类似于rsync传输，不过只要在命令中省略掉本地机信息即可。
 　　如：rsync -v rsync://172.16.78.192/www
 ```
 
@@ -827,10 +1063,10 @@ rsync  -aSz  --exclude-from=/home/exclude.txt 	/home/mnt/ 	 ser@server1:/mnt/dat
 - include和exclude
 
 ```shell
-# --exclude/--include=PATTERN	指定排除/包含传输的文件匹配模式
+--exclude / --include=PATTERN	指定排除/包含传输的文件匹配模式
 ```
 
-- 附录(适用于[include-from和include之后pattern规则](https://stackoverflow.com/questions/19296190/rsync-include-from-vs-exclude-from-what-is-the-actual-difference))
+备注：适用于[include-from和include之后pattern规则](https://stackoverflow.com/questions/19296190/rsync-include-from-vs-exclude-from-what-is-the-actual-difference)
 
 > PATTERN 的书写规则如下：
 >
@@ -847,20 +1083,20 @@ rsync  -aSz  --exclude-from=/home/exclude.txt 	/home/mnt/ 	 ser@server1:/mnt/dat
 
 ```shell
 #同步指定类型的文件(单文件夹下，不嵌套目录)
-rsync.exe -u -avP --include="bash.bashrc" --include="vimrc" --exclude="*" "$local_conf" "$remote_conf"
+rsync -u -avP --include="bash.bashrc" --include="vimrc" --exclude="*" "$src" "$target"
 
 #同步指定类型的文件(嵌套目录)
-rsync.exe -u -avP --include="*/" --include="bash.bashrc" --include="vimrc" --exclude="*" "$local_conf" "$remote_conf"
+rsync -u -avP --include="*/" --include="bash.bashrc" --include="vimrc" --exclude="*" "$src" "$target"
 ```
 
 **删除**
-
-> --delete参数删除目标目录比源目录多余的文件
 
 ```shell
 # 将dirA的所有文件同步到dirB内，并删除dirB内多余的文件
 rsync -avz --delete  dirA/ dirB/
 ```
+
+> --delete参数删除目标目录比源目录多余的文件
 
 **访问设置**
 
@@ -874,9 +1110,11 @@ rsync.exe -e "ssh -i /usr/rsync_id_dsa" /tmp/testfile csdn@remotehost:/tmp/
 
 问题：
 
-> 问题1:It is required that your private key files are NOT accessible by others.
+> - It is required that your private key files are NOT accessible by others.
 >
-> > chmod  600  id_rsa
+> ```shell
+> chmod  600  id_rsa
+> ```
 
 ##### scp
 
@@ -997,6 +1235,15 @@ lftp -f lftp_collection.ini
 > mv ./collection.html ./index.html
 > ```
 
+##### lrzsz
+
+Linux/Unix同Windows进行ZModem文件传输的命令行工具， windows端需要支持ZModem的telnet/ssh客户端，例如：SecureCRT，XShell等 
+
+优点：比ftp命令方便，而且服务器不用打开FTP服务。 
+
+```shell
+sudo apt-get install lrzsz
+```
 
 ##### 自建方案
 
@@ -1040,7 +1287,7 @@ inotify-tools安装完成后，会生成inotifywait和inotifywatch两个指令�
 
 ##### sendEmail
 
-sendEmail是一个轻量级，命令行的SMTP邮件客户端。其本身是一个perl脚本编写的可执行文件，如果你需要使用命令行发送邮件，那么sendEmail是非常完美的选择:使用简单并且功能强大
+sendEmail是一个轻量级，命令行的SMTP邮件客户端。其本身是一个perl脚本编写的可执行文件，如果你需要使用命令行发送邮件，那么sendEmail是非常完美的选择,使用简单并且功能强大
 
 ###### 安装
 
@@ -1566,12 +1813,12 @@ rpm -U q-text-as-data-1.7.1-1.noarch.rpm
 
 ```shell
 # 输入参数
--H	输入是否包含头部
+-H	输入是否包含头部（加—H代表有头部）
 -d	输入分割符
 -t	输入分割符为tab
 -q	从指定的输入分割符文件列表中读取
 
-#输出参数
+# 输出参数
 -O	输出头
 -D	输出分割符
 -T	输出分割符为tab
@@ -1597,7 +1844,6 @@ q -H -d, "select cyl,count(*) from ./mtcars.csv group by cyl"
 # 读取多个文件
 SELECT * FROM datafile1+datafile2+datefile3;
 SELECT * FROM mydata*.dat;
-
 ```
 
 ###### 高级
@@ -1610,11 +1856,14 @@ sudo find /tmp -ls | q "SELECT c5,c6,sum(c7)/1024.0/1024 AS total FROM - GROUP B
 
 # 读取文件的标注输入
 cat ./mtcars.csv |q -H -d, "select cyl,count(*) from - group by cyl"
+
+# 序列计算
+seq 1 1000 | q "select avg(c1),sum(c1) from -"
 ```
 
 > 像mysql一样使用，若没有列则直接用c1,c2来表示
 
-文件关联
+文件关联join实现
 
 ```shell
 q -H -d, "SELECT myfiles.c8,emails.c2 
@@ -1624,6 +1873,37 @@ q -H -d, "SELECT myfiles.c8,emails.c2
 	WHERE myfiles.c8 = 'ppp'
 	"
 ```
+
+> 支持join的使用：表必须起别名，不能直接使用原始的表名
+
+例子:
+
+```shell
+[root@yjmaliecs join]# cat aa bb
+f1,f2,f3
+aa,1,2
+bb,2,3
+cc,4,6
+dd,3,3
+
+f1,f2,f3
+aa,2,1
+bb,8,2
+ff,2,4
+cc,4,4
+dd,5,5
+
+
+q -d, -H -T  "select a.f1,a.f2,b.f3 from aa a join bb b on (a.f1=b.f1)"
+aa      1       1
+bb      2       2
+cc      4       4
+dd      3       5
+
+q -d, -H -T  "select a.f1,a.f2,b.f3 from aa a left join bb b on (a.f1=b.f1)"
+```
+
+> 注意：RIGHT and FULL OUTER JOINs are not currently supported
 
 #### lynx/w3m 
 
@@ -1647,7 +1927,11 @@ q -H -d, "SELECT myfiles.c8,emails.c2
 
 ## 参考
 
-- 基础知识
+- **基础知识**
+
+  [Linux命令大全(强烈推荐)](http://man.linuxde.net/)
+
+  [书籍:Linux就该这么学](https://download.csdn.net/download/wqte45/10220346)
 
   [每天一个Linux命令(强烈推荐)](http://blog.jobbole.com/109781/)
 
@@ -1665,7 +1949,11 @@ q -H -d, "SELECT myfiles.c8,emails.c2
 
   [yum配置与使用(推荐)](https://www.cnblogs.com/xiaochaohuashengmi/archive/2011/10/09/2203916.html)
 
-- 技能积累
+  [一张图掌握基本的iptables操作](https://www.toutiao.com/i6581300820061454855/)
+
+  [linux权限控制基本原理](https://mp.weixin.qq.com/s/NOmUGsozkWF1IExo8OKC0g)
+
+- **技能积累**
 
   [详解rsync好文（推荐）](http://blog.csdn.net/lianzg/article/details/24817087)
 
@@ -1693,7 +1981,7 @@ q -H -d, "SELECT myfiles.c8,emails.c2
 
   [axel文件下载利器使用说明](https://www.2daygeek.com/axel-command-line-downloader-accelerator-for-linux/#)
 
-- 环境配置
+- **环境配置**
 
   [Linux下安装Sun JDK（删除Open JDK）](http://www.toutiao.com/i6416458864656384514/)
 
@@ -1701,11 +1989,13 @@ q -H -d, "SELECT myfiles.c8,emails.c2
 
   [Centos6.5升级Glibc2.17](https://blog.csdn.net/wyl9527/article/details/78256066/)
 
-- 程序编译
+- **程序编译**
 
   [Linux下Makefile文件的快速编写](https://www.toutiao.com/i6554183936396755464/)
 
-- 软件使用
+  [程序员的自我修养:链接、装载与库](xxx)
+
+- **软件使用**
 
   [linux下安装编译ffmpeg](http://www.toutiao.com/a6348252505277841666/)
 
@@ -1716,5 +2006,3 @@ q -H -d, "SELECT myfiles.c8,emails.c2
   [命令行下json处理工具:jq](http://blog.csdn.net/neven7/article/details/50626153)
 
   [CSV统计工具:q](http://harelba.github.io/q/install.html)
-
-

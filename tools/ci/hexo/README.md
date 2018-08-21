@@ -26,8 +26,8 @@ hexo deploy
 命令一览：
 
 ```shell
-hexo new "postName" 		# 新建文章
-hexo new page "pageName" 	# 新建页面
+hexo new "postName" 		 # 新建文章
+hexo new page "pageName" 	 # 新建页面
 hexo generate 				# 生成静态页面至public目录
 hexo server					# 开启预览访问端口（默认端口4000，'ctrl + c'关闭server）
 hexo deploy 				# 将.deploy目录部署到GitHub
@@ -43,11 +43,13 @@ hexo version 				# 查看Hexo的版本
 
 #### 主题
 
+### 实践
 
+//待补充
 
  ##参考
 
-- 基础
+- **基础**
 
   [hexo官方参考](https://hexo.io/docs/)
 
@@ -56,4 +58,8 @@ hexo version 				# 查看Hexo的版本
   [今日头条:hexo搭建私人博客](http://www.toutiao.com/i6467864285803446798/)
 
   [今日头条:hexo搭建私人博客2](https://www.toutiao.com/i6493409693451420173/)
+
+- **进阶**
+
+- **实践**
 

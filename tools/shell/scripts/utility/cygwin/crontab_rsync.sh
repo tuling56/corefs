@@ -53,8 +53,8 @@ function rsync_complat()
 	local target='/cygdrive/e/OneDrive - std.uestc.edu.cn/Work/Platform/gitserver/hubble_ios/'
 	rsync.exe -u -avP "$src" "$target"
 	
-	local src="/cygdrive/e/Platform/gitserver/online/code"
-	local target='/cygdrive/e/OneDrive - std.uestc.edu.cn/Work/Platform/gitserver/code'
+	local src="/cygdrive/e/Platform/gitserver/online/code/"
+	local target='/cygdrive/e/OneDrive - std.uestc.edu.cn/Work/Platform/gitserver/code/'
 	rsync.exe -u -avP --exclude=".git/" "$src" "$target"
 
 }
@@ -96,9 +96,10 @@ function rsync_studydb()
 	local local_db='/cygdrive/c/ProgramData/MySQL/MySQL Server 5.5/data/study/'
 	local remote_db='/var/lib/mysql/study/'
 
-	rsync.exe -u -og -e 'ssh -i /cygdrive/c/Users/xl/.ssh/id_rsa' -avP --include="*/" --include="*.frm" --include="*.MYD" --include="*.MYI" --exclude='*' "$local_db" root@47.95.195.31:$remote_db
+	#rsync.exe -u -og -e 'ssh -i /cygdrive/c/Users/xl/.ssh/id_rsa' -avP --include="*/" --include="*.frm" --include="*.MYD" --include="*.MYI" --exclude='*' "$local_db" root@47.95.195.31:$remote_db
+	rsync.exe -u -avP -e 'ssh -i /cygdrive/c/Users/xl/.ssh/id_rsa' -avP --include="*/" --include="*.frm" --include="*.MYD" --include="*.MYI" --exclude='*' "$local_db" root@47.95.195.31:$remote_db
 	# 修补方案更改文件的所属主 
-	#ssh -i /cygdrive/c/Users/xl/.ssh/id_rsa root@47.95.195.31 "cd /var/lib/mysql;chown -R mysql:mysql study;"
+	ssh -i /cygdrive/c/Users/xl/.ssh/id_rsa root@47.95.195.31 "cd /var/lib/mysql;chown -R mysql:mysql study;"
 
 }
 
@@ -136,7 +137,7 @@ function rsync_gitconf()
 #################################### 主程序入口
 # rsync_pipeline
 rsync_shell
-rsync_studydb
+#rsync_studydb
 rsync_query
 rsync_complat
 #rsync_docimg

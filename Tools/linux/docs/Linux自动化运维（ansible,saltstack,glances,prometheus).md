@@ -1,4 +1,4 @@
-# 自动化运维
+# 自动化运维笔记
 
 [TOC]
 
@@ -176,7 +176,7 @@ Ansible是属于Extra Packages for Enterprise Linux (EPEL)库的一部分，因�
 >         ```
 >
 >         ```
->   ----
+> ----
 >   最终在界面显示的规则是：
 >   test:prometheus_target_interval_length_seconds
 
@@ -840,7 +840,7 @@ cp sample.config.inc.php config.inc.php
 
 # 参考
 
-- Ansible
+- **Ansible**
 
   [Python自动化运维之ansible的介绍以及运行原理](http://www.toutiao.com/a6363987359403344130/)
 
@@ -856,11 +856,11 @@ cp sample.config.inc.php config.inc.php
 
   [Ansible-tower官网申请](https://www.ansible.com/tower-trial)
 
-- SaltStack
+- **SaltStack**
 
   待定
 
-- Prometheus
+- **Prometheus**
 
   [官方文档参考](https://prometheus.io/docs/querying/basics/)
 
@@ -874,17 +874,17 @@ cp sample.config.inc.php config.inc.php
 
   [Fedroa安装Docker](https://docs.docker.com/engine/installation/linux/fedora/)
 
-- Ganglia
+- **Ganglia**
 
   [使用 Ganglia 对 Linux 网格和集群服务器进行实时监控](http://www.toutiao.com/i6381744290002895362/)
 
   [Prometheus 和 Grafana 监控系统指南](https://blog.eood.cn/prometheus-grafana-monitoring?utm_source=tuicool&utm_medium=referral)（这个讲到mysql的配置）
 
-- nmon
+- **nmon**
 
   [监控Linux系统性能的工具--nmon(一)](http://toutiao.com/user/3163731884/pin/)
 
-- glances
+- **glances**
 
   [四个Linux服务器监控工具htop,iotop,apachetop,glances](http://blog.jobbole.com/58003/)
 
@@ -896,11 +896,11 @@ cp sample.config.inc.php config.inc.php
 
   [系统监控glances以及其中用到的python](http://www.toutiao.com/a6358639873155219714/)
 
-- netdata
+- **netdata**
 
   [Netdata安装和使用（Linux 性能实时监测工具）](http://soluck.iteye.com/blog/2291618)
 
-- linfo
+- **linfo**
 
   [Linfo：实时显示你的 Linux 服务器运行状况](http://www.toutiao.com/i6425010590959272449/)
 
