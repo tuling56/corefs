@@ -1973,13 +1973,17 @@ awk -v s="20110510" -v t="20110605" 'BEGIN{"date +%s -d "s|getline a;"date +%s -
 
 ##### 输入输出重定向
 
-> 输出重定向：
+###### 输出重定向
 
 ```shell
 awk '$1=100{print $1 > "output_file"}' file
+
+# 根据变量进行重定向
+head imei_filters.log |awk '{g=substr($2,15,1);print $2,g >g"_file";}'
+head imei_filters.log |awk '{l1=substr($2,15,1);l2=substr($2,14,1);print $2,l1,l2 >"data/"l1"_"l2".file";}'
 ```
 
-> 输入重定向：
+###### 输入重定向
 
 输入重定向需用到getline函数。getline从标准输入、管道或者当前正在处理的文件之外的其他输入文件获得输入。它负责从输入获得下一行的内容，并给NF,NR和FNR等内建变量赋值。如果得到一条记录，getline函数返回1，如果到达文件的末尾就返回0，如果出现错误，例如打开文件失败，就返回-1。如：
 
@@ -2040,7 +2044,99 @@ awk '{a[$1]=$1;n=length(a);print NR,n; if(n<=3) print $0}END{print n}'  test.dat
 ##### 实现join
 
 ```shell
+#!/usr/bin/awk -f 
+# awk实现join,不断扩展其功能
 
+BEGIN{
+    FS=",";
+    OFS=FS;
+    if(jtype !~ /^(inner|left|right|full)$/) {print "error join type:"jtype",exit.";exit_flag=1;}
+#   jfc1="1,3";split(jfc1,fc1,","); for(c in fc1) c1=c1"$"c",";c1=substr(c1,1,length(c1)-1);
+#   jfc2="1,2";split(jfc2,fc2,","); for(c in fc2) c2=c2"$"c",";c2=substr(c2,1,length(c2)-1);
+#   print c1c2
+}
+{
+   # 根据join的条件，构建多维初始数组
+    if(NR==FNR){
+        arra[$1,$2]=$0;
+        nfa=NF;
+        }
+    else{
+        arrb[$1,$2]=$0;
+        nfb=NF;
+    }
+    #print $0;
+}
+END{ 
+    if(exit_flag==1) exit;
+
+        # 根据join的类型和输出字段选择输出
+        if(jtype=="inner"){
+        for(ka in arra){
+            if(ka in arrb)
+                print arra[ka],arrb[ka];   
+        }
+    }
+    else if(jtype=="left")
+    {
+        print "left join";
+        for(ka in arra){
+            if(ka in arrb)
+                print arra[ka],arrb[ka];
+            else{
+                blank="";
+                for(i=0;i<nfb;i++)
+                    blank=blank""OFS;
+                printf("%s%s\n",arra[ka],blank);
+            }
+        }
+    }
+    else if(jtype=="right")
+    {
+        print "right join";
+        for(kb in arrb){
+            if(kb in arra)
+                print arrb[kb],arra[kb];
+            else{
+                blank="";
+                for(i=0;i<nfa;i++)
+                    blank=blank""OFS;
+                printf("%s%s\n",arrb[kb],blank);
+            }
+        }
+    }
+    else if(jtype=="full")
+    { 
+        print "full join"; 
+        # 左全
+        for(ka in arra){
+            if(ka in arrb)
+                print arra[ka],arrb[ka];
+            else{
+                blank="";
+                for(i=0;i<nfb;i++)
+                    blank=blank""OFS;
+                printf("%s%s\n",arra[ka],blank);
+            }
+        }
+        # 右部分(剔除公共)
+        for(kb in arrb){
+            if(kb in arra)
+                continue;
+            else{
+                blank="";
+                for(i=0;i<nfa;i++)
+                    blank=blank""OFS;
+                printf("%s%s\n",blank,arrb[kb]);
+            }
+        }
+    }
+    else
+    {
+        print "error jtype";
+        exit;
+    }
+}
 ```
 
 ### sed
@@ -2123,7 +2219,7 @@ sed '/hrwang/{s/hrwang/HRWANG/;q;}' datafile  #匹配到hrwang的行处理后就
 
 ##### 正则
 
-sed添加-r才支持扩展正则
+sed添加-r才支持扩展正则，此时扩展符合才不需要转义
 
 ```shell
 sed -nr '/^xxx(.*)a$/s/vvv/xxx/gp' 

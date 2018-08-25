@@ -512,11 +512,15 @@ https://github.com/tuling56/shared_common_libs.git
 git clone https://127.0.0.1/home/yjm/Documents/gitrepo/gitbook.git
 ```
 
+##### https仓库
+
+https的仓库只要配置了https的服务器即可正常clone，但是在push的时候会遇到问题
+
 ### 测试
 
 本测试是针对上文发布部分的，匿名http方式、非匿名http方式:
 
-```
+```shell
 # 匿名方式
 git clone http://host:port/xxx.git
 
@@ -538,7 +542,7 @@ git init --bare sample_pure.git
 
 ##### http
 
-- git clone http://47.95.195.31/gitrepo/sample_pure.git
+- git clone http://47.95.195.31/gitrepo/sample_pure.git  sample_pure_http
 
 ```shell
 # 存在的问题是可以clone但无法提交,提示错误：
@@ -548,7 +552,7 @@ error: failed to push some refs to 'http://47.95.195.31/gitrepo/sample_pure.git'
 
 ##### https
 
-- git clone https://47.95.195.31/gitrepo/sample_pure.git
+- git clone https://47.95.195.31/gitrepo/sample_pure.git  sample_pure_https
 
 ```shell
 # 存在的问题是可以clone但无法提交，提示错误：
@@ -556,9 +560,15 @@ fatal: git-http-push failed
 error: failed to push some refs to 'https://47.95.195.31/gitrepo/sample_pure.git'
 ```
 
+> 问题解决：[git-http-push failed问题的解决过程](https://stackoverflow.com/questions/25312542/git-push-to-nginxgit-http-backend-error-cannot-access-url-http-return-code-2)
+
+问题猜测：
+
+应该是nginx用户的nobody或者授权认证的yjm，这两个用户没有权限写gitrepo文件夹导致的 
+
 ##### ssh
 
-- git clone root@47.95.195.31:/usr/local/nginx/site/gitrepo/sample_pure.git
+- git clone root@47.95.195.31:/usr/local/nginx/site/gitrepo/sample_pure.git   sample_pure_ssh
 
 ```shell
 # 可以clone也可以提交，但是找不到工作区是啥回事
@@ -572,12 +582,14 @@ norpure仓库的建立方式如下:
 git init sample_nopure.git
 ```
 
-非裸仓库不能push,需要先设置.git/config文件，添加如下：
+非裸仓库不能push,需要先设置.git/config文件(服务器上仓库上的)，添加如下：
 
 ```shell
 [receive]
 denyCurrentBranch = ignore
 ```
+
+> 修改之后可以正常push了
 
 ##### http
 

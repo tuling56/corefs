@@ -637,8 +637,8 @@ CSV（Comma-Separated Values逗号分隔值）
 
 1. 安全性
 2. 提高查询性能
-3. 灵活应对功能的改变
-4. 复杂的查询需求
+3. 利用虚拟表灵活应对功能的改变
+4. 复杂的查询需求，
 
 通过更新视图更新真实表，更新视图的方法：
 
@@ -647,9 +647,47 @@ CSV（Comma-Separated Values逗号分隔值）
 
 ##### 创建视图
 
+创建视图标准语法
+
+```mysql
+CREATE [OR REPLACE] [ALGORITHM = {UNDEFINED | MERGE | TEMPTABLE}]
+    VIEW view_name [(column_list)]
+    AS select_statement
+    [WITH [CASCADED | LOCAL] CHECK OPTION]
+```
+
+其中视图的更新算法：
+
+ALGORITHM可取三个值：MERGE、TEMPTABLE或UNDEFINED。
+
+如果没有ALGORITHM子句，**默认算法是UNDEFINED（未定义的）**。算法会影响MySQL处理视图的方式。
+
+对于MERGE，会将引用视图的语句的文本与视图定义合并起来，使得视图定义的某一部分取代语句的对应部分。
+
+对于TEMPTABLE，视图的结果将被置于临时表中，然后使用它执行语句。
+
+对于UNDEFINED，MySQL自己选择所要使用的算法。如果可能，它倾向于MERGE而不是TEMPTABLE，
+
+这是因为MERGE通常更有效，而且如果使用了临时表，视图是不可更新的。
+
 ```mysql
  create or replace view v1(书名,价格) as
 ```
+
+##### 查看视图
+
+```mysql
+# 查看视图基本结构
+desc 视图名; 
+
+# 查看视图详细信息
+show table status like '%视图名%';
+
+# 查看视图创建方式
+show create view 视图名；
+```
+
+在MYSQL中，INFORMATION_SCHEMA VIEWS表存储了关于数据库中的视图的信息 
 
 ##### 删除视图
 
@@ -661,22 +699,75 @@ drop view if exists v1;
 
 ##### 修改视图
 
-插入
+修改视图是指修改数据库中存在的视图，当基本表的某些字段发生变化时，可以通过修改视图来保持与基本表的一致性。
+
+###### 更新
+
+更新视图是指通过视图来插入、更新、删除表数据，因为视图是虚表，其中没有数据，通过视图更新的时候是转到基表进行更新的，如果对视图增加或者删除记录，实际上是对基表增加或删除记录
+
+update
 
 ```mysql
-
+ALTER VIEW  stu_class AS SELECT stuno,stuname FROM student;
+UPDATE stu_class SET stuname='xiaofang' WHERE stuno=2；#stuno是表暴露给视图的
 ```
 
-更新
-
-```
-
-```
-
-删除
+insert
 
 ```mysql
+INSERT INTO stu_class VALUES(6,'haojie');
+```
 
+delete
+
+```mysql
+DELETE FROM stu_class WHERE stuno=1;
+```
+
+**注意：**
+
+当视图中包含如下内容的时候，视图的更新操作将不能被执行
+
+- 视图中包含基本表中被定义为非空的列
+- 定义视图的select语句后的字段列表中使用了数学表达式或者聚合函数
+- 定义视图的select语句中使用了distinct、union、group by、having等子句 
+
+###### 修改
+
+**方法1:**
+
+```mysql
+ALTER OR REPLACE [ALGORITHM = {UNDEFINED | MERGE | TEMPTABLE}]
+VIEW view_name [(column_list)]
+AS select_statement
+[WITH [CASCADED | LOCAL] CHECK OPTION]
+```
+
+其语法与创建语法类似，当视图不存在时创建，存在时则进行修改。
+
+**方法2：**
+
+```mysql
+ALTER [ALGORITHM = {UNDEFINED | MERGE | TEMPTABLE}]
+VIEW view_name [(column_list)]
+AS select_statement
+[WITH [CASCADED | LOCAL] CHECK OPTION]
+```
+
+例子：
+
+```mysql
+alter view xxx as select * from student;
+```
+
+###### 删除
+
+drop能够删除一个或多个视图，必须在每个视图上拥有drop权限
+
+```mysql
+DROP VIEW [IF EXISTS]
+view_name1 [, view_name2] ...
+[RESTRICT | CASCADE]
 ```
 
 #### 子句
@@ -1156,6 +1247,10 @@ END
 
 [MySQL触发器](http://www.toutiao.com/i6468771136527139341/)
 
+#### 权限
+
+视图和表的设置权限
+
 ### 查询
 
 基础查询
@@ -1384,23 +1479,27 @@ FROM
 inner join 其实等同于join
 
 ```mysql
-#SELECT Persons.LastName, Persons.FirstName, Orders.OrderNo
-#FROM Persons
-#INNER JOIN Orders
-#ON Persons.Id_P = Orders.Id_P
-#ORDER BY Persons.LastName;
+SELECT 
+	Persons.LastName
+   ,Persons.FirstName
+   ,Orders.OrderNo
+FROM Persons
+INNER JOIN Orders
+ON Persons.Id_P = Orders.Id_P；
 
-# 该语句等效于
+# 等效于
 SELECT
-	Persons.LastName,
-	Persons.FirstName,
-	Orders.OrderNo
+	Persons.LastName
+   ,Persons.FirstName
+   ,Orders.OrderNo
 FROM
 	Persons,
 	Orders
 WHERE
 	Persons.Id_P = Orders.Id_P
 ```
+
+> 不确定hive有没有这种写法
 
 多表连接：
 
@@ -1500,10 +1599,11 @@ where
 #2，不带where子句的产生的查询结果才是笛卡尔积
 ```
 
-#####  join注意事项
+#####  注意事项
 
-- [join on where的执行顺序](https://www.cnblogs.com/Jessy/p/3525419.html)	
-  - join的时候先对两张表做where条件筛选，然后再做join,这样可以减小联表的量
+###### [on where的执行顺序](https://www.cnblogs.com/Jessy/p/3525419.html)	
+
+- join的时候先对两张表做where条件筛选，然后再做join,这样可以减小联表的量
 
 ````mysql
 # 在on条件中过滤
@@ -1575,6 +1675,30 @@ select * from t_join_a a left join t_join_b  b on a.id=b.id where a.amount=200;
 
 ```mysql
 
+```
+
+###### 等值连接
+
+条件运算，on支持等值的数学运算
+
+```mysql
+select a.ds,b.ds 
+from tbl_a
+inner join tbl_b
+on a.ds=b.ds+1;
+```
+
+> on中的数学运算的计算负载有多高
+
+###### 非等值连接
+
+判断一个表中的一个字符串包含另一个表中一个字段的子串
+
+```mysql
+SELECT *
+FROM table1
+RIGHT JOIN table2
+ON table2.x LIKE CONCAT('%' , table2.y , '%')；
 ```
 
 ### 积累
@@ -2945,6 +3069,8 @@ mysqluserclone     clone a MySQL user account to one or more new users
 
   [视图的修改更新和删除](https://www.cnblogs.com/xinwenpiaoxue/p/7278023.html)
 
+  [我的MYSQL学习心得-视图](http://www.cnblogs.com/lyhabc/p/3801527.html)
+
 - 高级
 
   [SQL的存储过程和函数](http://www.toutiao.com/a6391569028531831041/)
@@ -2977,6 +3103,8 @@ mysqluserclone     clone a MySQL user account to one or more new users
   [MySQL分组取TopN](http://www.jb51.net/article/31590.htm)
 
   [Mysql区间分组统计](https://www.cnblogs.com/lazyx/p/5577105.html)
+
+  [MySQLjoin详解（强烈推荐）](https://www.cnblogs.com/blueoverflow/p/4714470.html)
 
 - 积累
 

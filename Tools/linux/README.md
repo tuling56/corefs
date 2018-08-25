@@ -759,15 +759,25 @@ host www.baidu.com
 host ip
 ```
 
-
-
 #### 性能监控
 
-##### htop/top
+htop/top命令
 
 ```shell
 yum install htop
 ```
+
+负载主要体现在CPU负载和IO负载
+
+##### 排查流程
+
+1.查看平均负载（top/uptime命令）
+
+2.确认CPU、IO有无瓶颈；（使用 sar vmstat）
+
+3.CPU负载过高时寻找流程：
+
+4.IO负载过高时寻找流程；
 
 #### 其它
 
@@ -1980,6 +1990,8 @@ q -d, -H -T  "select a.f1,a.f2,b.f3 from aa a left join bb b on (a.f1=b.f1)"
   [手把手教你使用sftp进行文件传输](https://www.tuicool.com/articles/FZRF7v)
 
   [axel文件下载利器使用说明](https://www.2daygeek.com/axel-command-line-downloader-accelerator-for-linux/#)
+
+  [怎样查看Linux单机负载](https://www.toutiao.com/i6592948945104667140/)
 
 - **环境配置**
 
