@@ -406,7 +406,7 @@ alter table newexample add address varchar(110) after stu_id;
 # 修改字段类型
 alter table table_name change old_field_name new_field_name field_type;
 
-#例子：
+# 例子：
 alter table study.test change author author varchar(25) not null default '';
 ```
 
@@ -989,8 +989,6 @@ substring_index
 
 ```
 
-
-
 ###### 类型转换
 
 ```mysql
@@ -1029,6 +1027,33 @@ select substring_index(substring_index('http://wz.cnblogs.com/my/search/?q=cooki
 
 ##### 自定义函数
 
+自定义函数的语法
+
+```mysql
+delimiter /
+use study;
+drop function if exists `study`.`getchild`;
+create function `getchild`(rootid varchar(36))
+returns varchar(1000)
+begin
+    declare ptemp varchar(1000);
+    declare ctemp varchar(1000);
+    set ptemp = '#';
+    set ctemp = rootid;
+    while ctemp is not null do
+        set ptemp = concat(ptemp, ',', ctemp);
+        select group_concat(id)
+        into ctemp
+        from dim_parent_son2
+        where find_in_set(pid, ctemp) > 0;
+    end while;
+    return ptemp;
+end; /
+delimiter ;
+```
+
+> [delimiter用法详解](https://blog.csdn.net/yuxin6866/article/details/52722913)
+
 - Nth Highest
 
 ```mysql
@@ -1059,6 +1084,14 @@ BEGIN
 	RETURN result;
 END
 ```
+
+- 树型查询
+
+```mysql
+
+```
+
+
 
 ##### 函数集锦
 
@@ -1390,8 +1423,13 @@ select * from xx where xx like '%_%'
 # 内层不和外层联系
 select id-(select pv_int from study.task where id=2) from study.task;
 
-# 内层和外层联系
+# 内层和外层联系-字段
 select price-(select amount from study.test where articleid=t.articleid) from study.test t;
+
+# 内存和外层联系-where
+select ftime,funnel_pos,funnel_name
+from ad_funnel_test t
+where funnel_level=(select min(funnel_level) from ad_funnel_test where ftime=t.ftime and funnel_pos=t.funnel_pos);
 ```
 
 ##### 关键字
@@ -2145,6 +2183,12 @@ UPDATE Test SET detail = REPLACE(detail, CHAR(13) + CHAR(10), '<br><br>');
 ```mysql
 # imgName格式：bc9077f6.jpg,073eb23f.jpg
 select if(imgName='',0,1+(length(imgName)-length(replace(imgName,',','')))) as arraycnt from contribute;
+```
+
+##### 字符串分割
+
+```mysql
+
 ```
 
 #### join问题

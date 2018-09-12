@@ -76,6 +76,30 @@ SELECT concat(v_timestr,LPAD(order_sn,7,0)) as order_sn from order_seq WHERE tim
 commit;
 
 
+# 函数
+delimiter /
+use study;
+drop function if exists `study`.`getchild`;
+create function `getchild`(rootid varchar(36))
+returns varchar(1000)
+begin
+    declare ptemp varchar(1000);
+    declare ctemp varchar(1000);
+    set ptemp = '#';
+    set ctemp = rootid;
+    while ctemp is not null do
+        set ptemp = concat(ptemp, ',', ctemp);
+        select group_concat(id)
+        into ctemp
+        from dim_parent_son2
+        where find_in_set(pid, ctemp) > 0;
+    end while;
+    return ptemp;
+end; /
+delimiter ;
+
+
+
 
 #只导出表结构
 mysqldump -uroot -proot -d study >studydb_struct.sql

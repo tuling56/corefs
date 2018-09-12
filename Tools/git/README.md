@@ -77,6 +77,20 @@ ssh-keygen -t rsa -C "xxx@gmail.com"
 
 ##### 用户配置
 
+查看配置
+
+```shell
+[root@yjmaliecs python]# git config --list
+core.repositoryformatversion=0
+core.filemode=true
+core.bare=false
+core.logallrefupdates=true
+remote.origin.fetch=+refs/heads/*:refs/remotes/origin/*
+remote.origin.url=git@github.com:tuling56/Python.git
+branch.master.remote=origin
+branch.master.merge=refs/heads/master
+```
+
 ###### 账号配置
 
 设置Git的全局user name和email：

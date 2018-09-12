@@ -1220,6 +1220,8 @@ MYSQL="/usr/bin/mysql -uroot -proot -N"
 SENDMAIL="/usr/sbin/sendemail -s mail.cc.sandai.net -f monitor@cc.sandai.net -xu monitor@cc.sandai.net -xp 121212 -o message-charset=utf8 "
 ```
 
+> 变量和别名的配置最好放在`~/.bashrc`文件里，也可以在这个文件中引用
+
 ###### 公共方法
 
 global_fun.sh
@@ -1306,9 +1308,9 @@ fi
 
 > 对比下这两种方式之间的区别，验证-e选项
 
-###### 传递带空格参数
+###### 传递参数
 
-需要将参数用[双引号括起来](https://blog.csdn.net/victor0127/article/details/47314619)，而且要养成好习惯，变量的引用都用双引号括起来
+传递带空格的参数，需要将参数用[双引号括起来](https://blog.csdn.net/victor0127/article/details/47314619)，而且要养成好习惯，变量的引用都用双引号括起来
 
 ```shell
 get_browser "$line"
@@ -1327,8 +1329,31 @@ done
 
 ###### paste/cat/zcat
 
+paste
+
 ```shell
-# paste命令
+# paste命令不接受流输入，只能处理文件
+```
+
+##### 特殊应用
+
+###### 随机数
+
+[shell生成随机数的七种方法](https://blog.csdn.net/taiyang1987912/article/details/39997303)
+
+```shell
+function getRandom()
+{
+	begin=$1;
+	end=$2;
+	numrange=${end}-${begin}
+	randomnum=`date +"%s%N"`
+	((retnum=randomnum%numrange+min))
+	echo $retnum; ##通过echo打印出结果，可以用做返回值。
+}
+
+num=`getRandom 1 100` ##生成1-100之间的随机数
+echo $num
 ```
 
 ### awk
@@ -1459,7 +1484,7 @@ awk 'BEGIN{a[0,0]=12;a[1,1]=13;}
 > #普通数组
 > if(k in arra) # 注意，此处否定的使用不能是if(k not in arra)
 > print (k in a)
-> 
+>
 > # 关联数组
 > awk -F"," 'BEGIN{s="1,2,15,22";split(s,a,",");print (3 in a)}'
 > ```
@@ -1812,21 +1837,21 @@ awk 'BEGIN{print ENVIRON["test"];}{print ENVIRON["test"];}END{print ENVIRON["tes
 
 ##### [字符串](https://www.cnblogs.com/anny-1980/articles/3616086.html)
 
-| 函数                             | 说明                                                         | 备注 |
-| -------------------------------- | ------------------------------------------------------------ | ---- |
-| gsub(r,s)                        | 在整个$0中用s替代r                                           |      |
-| gsub(r,s,t)                      | 在整个t中用s替代r                                            |      |
-| index(s,t)                       | 返回s中字符串t的第一位置                                     |      |
-| length(s)                        | 返回s长度                                                    |      |
-| match(s,r)                       | 测试s是否包含匹配r的字符串                                   |      |
-| split(s,a,fs)                    | 在fs上将s分成序列a                                           |      |
-| sprint(fmt,exp)                  | 返回经fmt格式化后的exp                                       |      |
-| sub(r,s)                         | 用$0中最左边最长的子串代替s                                  |      |
-| substr(s,p)                      | 返回字符串s中从p开始的后缀部分                               |      |
-| substr(s,p,n)                    | 返回字符串s中从p开始长度为n的后缀部分                        |      |
+| 函数                               | 说明                                       | 备注   |
+| -------------------------------- | ---------------------------------------- | ---- |
+| gsub(r,s)                        | 在整个$0中用s替代r                              |      |
+| gsub(r,s,t)                      | 在整个t中用s替代r                               |      |
+| index(s,t)                       | 返回s中字符串t的第一位置                            |      |
+| length(s)                        | 返回s长度                                    |      |
+| match(s,r)                       | 测试s是否包含匹配r的字符串                           |      |
+| split(s,a,fs)                    | 在fs上将s分成序列a                              |      |
+| sprint(fmt,exp)                  | 返回经fmt格式化后的exp                           |      |
+| sub(r,s)                         | 用$0中最左边最长的子串代替s                          |      |
+| substr(s,p)                      | 返回字符串s中从p开始的后缀部分                         |      |
+| substr(s,p,n)                    | 返回字符串s中从p开始长度为n的后缀部分                     |      |
 | gensub(/123/,"x",1,$1)           | 替换\$1中 第一次匹配到的123为字符x，返回值为\$1替换后的内容，且$1的内容并没有改变 |      |
-| gensub(/a(.*)b/,"\\1",1)         | 返回值为匹配正则第1对()内的内容                              |      |
-| gensub(/a(.\*)b(.\*)c/,"\\\2",1) | 返回值为匹配正则第2对()内的内容                              |      |
+| gensub(/a(.*)b/,"\\1",1)         | 返回值为匹配正则第1对()内的内容                        |      |
+| gensub(/a(.\*)b(.\*)c/,"\\\2",1) | 返回值为匹配正则第2对()内的内容                        |      |
 | gensub(a,b,c[,d])                | 全局替换，匹配正则a， 用b替换，c为指定替换目标是第几次匹配，d为指定替换目标是哪个域如\$1,\$2，若无d指$0，返回值为target替换后内容(未替换还是返回 target原内容)，与sub、gsub不同的是，target内容替换后不改变。 |      |
 
 ###### 字符串分割
@@ -2394,7 +2419,7 @@ sed -n '1~1p' test.txt
 
 ####  基础
 
-grep排除指定的文件夹
+排除指定文件夹
 
 ```shell
 grep -i --exclude-dir=\.svn --exclude-dir=".git" -Rl --color
@@ -2416,39 +2441,43 @@ grep和sed结合使用
 sed -i 's/oldstr/newstr/g' `grep oldstr -rl odlstr $datadir`
 ```
 
+#### 进阶
+
 ##### 正则
 
 grep支持BRE、ERE、PRE，默认支持BRE
 
 grep -F快速正则，相当于fgrep,不使用任何正则匹配的时候使用，不会解析任何正则元字符，均当成默认字符.
 
-###### 分类
+###### **基本正则BRE**
 
-**基本正则BRE**
-
-在使用基本正则表达式的时候，`? + | () {}`这些符号前加上转义字符`\`才能代表正则的意义，否则只代表该字符的默认意义:
+在使用基本正则表达式的时候，`? + | () {}`这些符号前加上转义字符`\`才能代表正则的意义，否则只代表该字符的默认意义
 
 ```shell
-
+grep -i --color  -C2  "trial_over\|xl_tbc_navigation" xlx
 ```
 
-**扩展正则ERE**
+###### **扩展正则ERE**
 
 grep加-E支持扩展正则`？+ |（）{}`,相当于egrep
 
 ```shell
-
+# 搜索匹配zhang或者wang的行
+grep -E 'zhang|wang' xxx.data
 ```
 
-**Perl正则PRE**
+###### **Perl正则PRE**
 
 grep加-P选项支持Perl格式的正则，注意此处不能缩写为pgrep,断言等高级使用是Perl正则才有的
 
 ```shell
-
+# 断言的实验
+echo "zhangshaohan:16" |grep -oP '(?<=zhangshaohan:).*$'
 ```
 
-###### 应用
+#### 应用
+
+##### 抽取
 
 精确匹配多个的一个
 
@@ -2470,11 +2499,7 @@ grep -E -w 'push_pop|push_click|push_error' new.data
 grep -P -o '(?<=from)\s+\b[.\w]+\b' a.txt |sed -n 's/ //gp'
 ```
 
-
-
-#### 进阶
-
-##### 抽取匹配的内容
+指定位置后的内容
 
 ```shell
 # 例如抽取16
@@ -2483,17 +2508,15 @@ echo "zhangshaohan:16" |grep -oP '(?<=zhangshaohan:).*$'
 
 > 此处使用了到[正则的断言](http://deerchao.net/tutorials/regex/regex.htm)和grep的Perl风格正则(参考全栈数据之路部分)
 
-##### 按文件后缀过滤
+##### 过滤
+
+按文件后缀过滤
 
 ```shell
 egrep '\.mp4$|\.rmvb$|\.avi$' test.txt
 # 当匹配的规则较多的时候使用-f
 egrep -f pattern.file text.txt
 ```
-
-#### 应用
-
-
 
 ### find
 
@@ -2519,7 +2542,9 @@ zip calc_bak.zip $(find xmp_odl -path "*dev*" -prune -o -type f  \( -name "*.py"
 
 #### 进阶
 
-输出处理
+##### 转换
+
+###### 输出修饰
 
 ```shell
 # 为输出的文件名加上双引号
@@ -2529,17 +2554,7 @@ find . -type f -exec echo "{}" \;
 find . -type f -printf "%T@\t%p\n"|sort -n|cut -f2|xargs ls -lrt
 ```
 
-搜索指定类型文件
-
-```shell
-# 搜索py类型文件中包含xhsn的
-find . -type f -name "*.py" -print0|xarags grep 'xhsn'
-
-grep 'xhsn' $(find . -type f -name "*.py")
-grep 'xhsn' `find . -type f -name "*.py"`
-```
-
-##### 文件名空格
+###### 文件名空格
 
 文件名中存在空格的时候无法处理，解决方式如下：
 
@@ -2564,6 +2579,18 @@ function method2()
 method2
 
 exit 0
+```
+
+##### 过滤
+
+搜索指定类型文件
+
+```shell
+# 搜索py类型文件中包含xhsn的
+find . -type f -name "*.py" -print0|xarags grep 'xhsn'
+
+grep 'xhsn' $(find . -type f -name "*.py")
+grep 'xhsn' `find . -type f -name "*.py"`
 ```
 
 #### 应用
@@ -2598,7 +2625,7 @@ zip calc_bak.zip.$date $(find xmp_odl -path "*dev*" -prune -o -type f  \( -name 
 
 行转列，实现方法如下：
 
-标准shell
+###### shell实现
 
 ```shell
 headrow=($(head -1 $inputf))
@@ -2616,7 +2643,7 @@ done
 
 > 存在的问题是内存超出限制（处理超长列的时候）
 
-awk实现
+###### awk实现
 
 ```shell
 awk '{i=1;
@@ -2668,13 +2695,17 @@ alias s2t="sed -i 's/    /\t/g' "  # 4个空格替换为tab
 
 ```shell
 # dos转linux
+yum install dos2unix
 dos2unix xx.txt  # 或者sed -i 's/\r$//g' ttt.txt
 
 # linux转dos
+yum install unix2dos
 unix2dos xx.txt
 ```
 
 #### 输出修饰
+
+##### 加引号
 
 输入：
 
@@ -2771,6 +2802,8 @@ while read line;do echo -n "'$line',";done < ttt.txt
   [sed命令](http://man.linuxde.net/sed)
 
   [sed处理流程概述（推荐）](http://blog.csdn.net/yiqingnian28/article/details/23133043)
+
+  [强大的sed(强烈强烈推荐)](http://sed.sourceforge.net/sed1line.txt)
 
 - **grep部分**
 

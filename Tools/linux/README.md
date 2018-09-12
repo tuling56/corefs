@@ -8,6 +8,13 @@
 
 ##### [用户](https://www.cnblogs.com/xd502djj/archive/2011/11/23/2260094.html)
 
+显示用户
+
+```mysql
+# 显示所有用户
+awk -F":" '{print $1}' /etc/passwd 
+```
+
 添加用户
 
 ```shell
@@ -241,12 +248,22 @@ for d in 201603??;do echo ${d}; cd ${d}; rename -n 's/\*\.log\.gz//' *.log.gz ; 
 
 ##### 目录
 
-###### 创建
+###### [系统目录](https://mp.weixin.qq.com/s/yuyRNlNQQQs6BHJKtQJOQg)
+
+![文件系统详解](http://tuling56.site/imgbed/2018-08-28_111126.png)
+
+###### 创建和修改
 
 一次性创建多级目录
 
 ```shell
 mkdir -p ./application/{controllers,models,static,static/css,static/js,templates}
+```
+
+批量修改目录
+
+```shell
+
 ```
 
 ###### 跳转
@@ -273,14 +290,6 @@ alias c2='cd ../../ && ll'
 
 ```
 
-###### 重命名
-
-批量命名
-
-```shell
-
-```
-
 ###### 获取目录
 
 获取当前运行文件所在的目录
@@ -293,17 +302,44 @@ dir=`dirname $0` && dir=`cd $dir && pwd`
 fpath=$(echo $dir|awk -F'/' '{print $(NF-1);}')
 ```
 
+全局函数获取参数文件的目录
 
+```shell
+function gd()
+{
+    local fname=$1
+    ffname=$(readlink -f $fname)
+    echo $ffname
+}
+```
+
+##### 管道
+
+###### 未命名管道
+
+会话
+
+```shell
+echo "xxx"|grep 
+```
+
+###### 命名管道
+
+[命名管道的应用](https://www.cnblogs.com/xupeiyuan/p/shell_pipe_base.html)
+
+```shell
+
+```
 
 ##### 权限
 
-**文件**
+###### 文件
 
 文件的最高权限是666，umask的默认是0022，第一位0是特殊权限，022是默认权限，
 
 最高权限-默认权限=文件的真实权限`_rw_r__r__`
 
-**文件夹**
+###### 文件夹
 
 文件夹的最高权限是777，umask的默认是0033，第一位0是特殊权限，033是默认权限
 
@@ -503,6 +539,30 @@ make test & make install
 
 ##### 系统启动
 
+[启动过程](https://www.toutiao.com/i6582013297011196430/)：
+
+```mermaid
+graph LR
+
+A[BIOS自检]-->B[内核加载]
+B-->C[init进程]
+C-->D[运行级别]
+```
+
+![启动过程](http://p9.pstatp.com/large/pgc-image/1532493927955735c3d66d8)
+
+> 运行级别：
+
+```
+运行级别0：系统停机状态，系统默认运行级别不能设为0，否则不能正常启动
+运行级别1：单用户工作状态，root权限，用于系统维护，禁止远程登陆
+运行级别2：多用户状态(没有NFS)
+运行级别3：完全的多用户状态(有NFS)，登陆后进入控制台命令行模式
+运行级别4：系统未使用，保留
+运行级别5：X11控制台，登陆后进入图形GUI模式
+运行级别6：系统正常关闭并重启，默认运行级别不能设为6，否则不能正常启动
+```
+
 ###### 开机启动
 
 `chkconfig`和`systemctl enable`
@@ -620,7 +680,7 @@ pgrep re
 ps -A -o stat,ppid,pid,cmd | grep -e '^[Zz]'
 ```
 
-lsof
+[lsof](http://man.linuxde.net/lsof)
 
 ```shell
 # 查看端口占用的进程
@@ -761,13 +821,40 @@ host ip
 
 #### 性能监控
 
-htop/top命令
+##### 监控命令
+
+###### **top**
 
 ```shell
 yum install htop
+htop
 ```
 
-负载主要体现在CPU负载和IO负载
+平均负载分别表明从左到右1分钟、5分钟、15分钟内，单位时间内处于等待状态的任务数；（等待 的意思 表明在等待cpu、或者等待IO）,负载主要体现在CPU负载和IO负载,排查具体的负载原因的方式如下
+
+###### [**sar**](https://www.cnblogs.com/howhy/p/6396437.html)
+
+  sar（System ActivityReporter系统活动情况报告）是目前Linux上最为全面的系统性能分析工具之一，可以从多方面对系统的活动进行报告，包括：文件的读写情况、系统调用的使用情况、磁盘I/O、CPU效率、内存使用状况、进程活动及IPC有关的活动等 
+
+```shell
+07:00:01 PM     CPU     %user     %nice   %system   %iowait    %steal     %idle
+07:10:01 PM     all      0.17      0.00      0.12      0.00      0.00     99.71
+07:20:01 PM     all      0.17      0.00      0.11      0.00      0.00     99.72
+```
+
+> %user 用户空间的CPU使用
+>
+> %nice 改变过优先级的进程的CPU使用率
+>
+> %system 内核空间的CPU使用率
+>
+> %iowait CPU等待IO的百分比 
+>
+> %steal 虚拟机的虚拟机CPU使用的CPU
+>
+> %idle 空闲的CPU
+
+iowait过高表示存在I/O瓶颈，
 
 ##### 排查流程
 
@@ -778,6 +865,20 @@ yum install htop
 3.CPU负载过高时寻找流程：
 
 4.IO负载过高时寻找流程；
+
+**CPU负载过高排查**
+
+```
+使用top/sar确认目标，然后通过ps查看进程状态和cpu使用时间，最后使用strace和oprofile进一步查看
+```
+
+**IO负载过高排查**
+
+```
+
+```
+
+
 
 #### 其它
 
@@ -803,6 +904,8 @@ vim /etc/sysconfig/iptables
 ```
 
 ##### 命令积累
+
+这部分参考：[Linux命令速查表](https://blog.csdn.net/waitig1992/article/details/51884653)
 
 ###### 随机数
 
@@ -1640,6 +1743,24 @@ ssh xxx@xxxx < test.sh
 
 > 远程执行的另一个命令参考[rsh](http://man.linuxde.net/rsh)
 
+#### pssh
+
+pssh命令是一个python编写可以在多台服务器上执行命令的工具，同时支持拷贝文件 。
+
+##### 安装
+
+其本质是一个python包，可以像其它python包的安装方式安装，可以pip安装也可以编译安装
+
+```shell
+pip install pssh #建议 
+# 或者
+yum install pssh
+```
+
+##### 使用
+
+//待补充
+
 #### jq
 
 json格式化筛选和查询工具,可以在shell streaming流里使用
@@ -1915,7 +2036,9 @@ q -d, -H -T  "select a.f1,a.f2,b.f3 from aa a left join bb b on (a.f1=b.f1)"
 
 > 注意：RIGHT and FULL OUTER JOINs are not currently supported
 
-#### lynx/w3m 
+#### 信息获取
+
+##### lynx/w3m 
 
 无界面浏览器
 
@@ -1931,9 +2054,21 @@ q -d, -H -T  "select a.f1,a.f2,b.f3 from aa a left join bb b on (a.f1=b.f1)"
 
 ```
 
-#### pandoc
+#### 格式转换
+
+##### pandoc
 
 [pandoc](http://pandoc.org/demos.html)是文档格式转换，尤其是在md和各种格式之间，其中typero导出成其它格式的引擎就是pandoc,但是感觉进行了很多的美化参数，比直接使用pandoc导出的效果好了很多，具体优化未知。
+
+#### 其它
+
+##### [cheat.sh](https://www.toutiao.com/i6595716151420912141/)
+
+命令行手册参考工具，
+
+##### [shellcheck](https://www.shellcheck.net/)
+
+shell语法检查工具
 
 ## 参考
 
