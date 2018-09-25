@@ -114,13 +114,17 @@ echo "I'm singing while you're"|grep '\b\w+(?=ing\b)'
 
 而Singleline修饰的是'.'的时候，就是说有Singleline的时候匹配的是所有字符（包括\n），没有Singleline的时候，匹配的是除\n外的所有字符。
 
+```shell
 
+```
 
 ##### 多行模式
 
 Multiline修饰的是\^与$，就是说没有Multiline的时候，把\^和$与当作每一行(\n结尾的)的开头和结束来匹配，有Multiline的时候是与整个字符串的开头和结尾匹配;
 
+```shell
 
+```
 
 #### 贪婪和懒惰
 
@@ -160,24 +164,24 @@ echo "abc周def杰" | awk '{for (i=1; i<=length($1); ++i) if(substr($1,i,1) > "\
 ([\s\S]*) 同时，也可以用 ([\d\D]*)、([\w\W]*)来表示
 ```
 
-
-
  ##参考
 
-- 基础
+- **基础**
 
   [正则表达式30分钟入门教程](http://www.oschina.net/question/12_9507)
 
   [正则表达式入门教程（推荐）](http://www.cnblogs.com/deerchao/archive/2006/08/24/zhengzhe30fengzhongjiaocheng.html)
 
+  [Python正则表达式大全](https://www.toutiao.com/i6599513623159112200/)
+
   [正则表达式教程(强烈推荐)](http://deerchao.net/tutorials/regex/regex.htm)
 
-- 进阶
+- **进阶**
 
   [单行和多行模式](https://www.cnblogs.com/elycir/articles/2351779.html)
 
-- 积累
+- **积累**
 
   [正则表达式积累(推荐)](https://www.toutiao.com/i6586058272338346500/)
 
-  ​
+  

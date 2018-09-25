@@ -101,12 +101,14 @@ slave start;
 
 ## 参考
 
-- 基础
+- **基础**
 
   [数据库部署方案](https://www.toutiao.com/i6557238786713993741/)
 
   [Mysql主从服务器配置](https://blog.csdn.net/rdisme/article/details/78910841)
 
-- 实现
+  [基于navicate的从主配置](https://www.toutiao.com/i6602953011939508740/)
 
-- 进阶
+- **实现**
+
+- **进阶**

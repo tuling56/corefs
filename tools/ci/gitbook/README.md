@@ -516,6 +516,35 @@ git clone https://127.0.0.1/home/yjm/Documents/gitrepo/gitbook.git
 
 https的仓库只要配置了https的服务器即可正常clone，但是在push的时候会遇到问题
 
+#### 发布操作
+
+##### 发布到alecs
+
+远程建立裸仓
+
+```shell
+cd /usr/local/nginx/site/gitrepo/
+git init --bare reponame.git
+```
+
+> 配置钩子:
+>
+> ```shell
+> cp /usr/local/nginx/site/gitrepo/sample/sample_pure.git/hooks/post-receive  reponame.git/hooks
+> ```
+
+添加远程仓库
+
+```shell
+git remote add alecs root@tuling56.top:/usr/local/nginx/site/gitrepo/reponame.git
+```
+
+修改和推送
+
+```
+git push alecs
+```
+
 ### 测试
 
 本测试是针对上文发布部分的，匿名http方式、非匿名http方式:
@@ -562,7 +591,7 @@ error: failed to push some refs to 'https://47.95.195.31/gitrepo/sample_pure.git
 
 > 问题解决：[git-http-push failed问题的解决过程](https://stackoverflow.com/questions/25312542/git-push-to-nginxgit-http-backend-error-cannot-access-url-http-return-code-2)
 
-问题猜测：
+**问题猜测**：
 
 应该是nginx用户的nobody或者授权认证的yjm，这两个用户没有权限写gitrepo文件夹导致的 
 
@@ -581,15 +610,6 @@ norpure仓库的建立方式如下:
 ```shell
 git init sample_nopure.git
 ```
-
-非裸仓库不能push,需要先设置.git/config文件(服务器上仓库上的)，添加如下：
-
-```shell
-[receive]
-denyCurrentBranch = ignore
-```
-
-> 修改之后可以正常push了
 
 ##### http
 
@@ -614,6 +634,15 @@ denyCurrentBranch = ignore
 ```shell
 # 可以clone，但无法push
 ```
+
+==非裸仓库不能push,需要先设置.git/config文件(服务器上仓库上的)，添加如下：==
+
+```shell
+[receive]
+denyCurrentBranch = ignore
+```
+
+> 修改之后可以正常push了
 
 ## 参考
 

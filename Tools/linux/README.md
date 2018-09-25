@@ -280,15 +280,24 @@ alias c2='cd ../../ && ll'
 
 软件-[autojump](https://blog.csdn.net/caojinlei_91/article/details/80502753)
 
+```shell
+# 手动安装
+git clone git://github.com/wting/autojump.git
+cd autojump
+./install.py or ./uninstall.py
 ```
 
-```
-
-软件-z.sh
+软件-[z.sh](https://blog.csdn.net/molaifeng/article/details/14123123)
 
 ```shell
-
+z.sh只是一个sh文件，放在开机启动中执行即可使用
 ```
+
+参考：
+
+[autojump的github官网](https://github.com/wting/autojump)
+
+[z.sh的github官网](https://github.com/rupa/z/blob/master/z.sh)
 
 ###### 获取目录
 
@@ -591,6 +600,8 @@ chkconfig --level 345 mysql on
 
 ###### crontab
 
+crontab其实是文件，目录地址是/var/spool/cron/，该文件夹下存在着所有用户的crontab文件，每个用户的crontab都是在其以其用户名命名的文件。 
+
 在计算机正常的情况下，才执行，参数列表如下:
 
 ```shell
@@ -615,8 +626,6 @@ file：file是命令文件的名字,表示将file做为crontab的任务列表文
 
 crontab最小单位是分
 
-
-
 ###### anacron
 
 处理服务器开关机问题,在该执行的时候因为故障没有执行，在服务器正常的时候，重新执行
@@ -627,13 +636,9 @@ crontab最小单位是分
 
 ##### 应用服务
 
-###### 服务配置
+应用服务器的配置，centos6采用的是service service action的方式，而centos7采用的是systemctl action servicename
 
-//有哪些应用服务，这些服务是如何配置的
-
-###### 启动/停止
-
-**service命令**
+###### service命令
 
 ```shell
 service nginx start
@@ -642,7 +647,7 @@ service nginx stop
 service nginx reload
 ```
 
-**[systemctl命令](http://man.linuxde.net/systemctl)**
+###### **[systemctl命令](http://man.linuxde.net/systemctl)**
 
 systemctl命令是系统服务管理器指令，它实际上将 [service](http://man.linuxde.net/service) 和 [chkconfig](http://man.linuxde.net/chkconfig) 这两个命令组合到一起。
 
@@ -655,6 +660,8 @@ systemctl命令是系统服务管理器指令，它实际上将 [service](http:/
 | 启动某服务           | service httpd start                                          | systemctl start httpd.service                                |
 | 停止某服务           | service httpd stop                                           | systemctl stop httpd.service                                 |
 | 重启某服务           | service httpd restart                                        | systemctl restart httpd.service                              |
+
+参考：[centos6和centos7的区别](https://www.toutiao.com/i6602411750178423309/)
 
 #### 进程管理
 
@@ -882,7 +889,20 @@ iowait过高表示存在I/O瓶颈，
 
 #### 其它
 
+##### 系统信息
+
+主机名
+
+```shell
+# centos6
+/etc/sysconfig/network
+# centos7
+/etc/hostname
+```
+
 ##### 防火墙
+
+centos6采用的是iptables，centos7采用的是firewalld
 
 ###### iptables
 
@@ -901,6 +921,12 @@ service iptables start/stop/restart
 ```shell
 vim /etc/sysconfig/iptables-config
 vim /etc/sysconfig/iptables
+```
+
+###### firewalld 
+
+```shell
+
 ```
 
 ##### 命令积累
@@ -1609,6 +1635,8 @@ strings /lib64/libc.so.6 | grep GLIBC
 
 makefile文件的编写
 
+程序员的自我修养，链接装载与库
+
 ### 软件使用
 
 linux下软件安装的方式：
@@ -1626,55 +1654,7 @@ linux下软件安装的方式：
 4) make install(这一步要有root权限)
 ```
 
-#### ffmpeg
-
-##### 安装
-
-```shell
-git clone https://git.ffmpeg.org/ffmpeg.git ffmpeg
-
-#安装依赖项yasm:
-yum install yasm
-
-#编译安装：
-./configure –enable-shared –prefix=/usr/local/ffmpeg
-make&make install
-```
-
-##### 配置
-
-使用
-
-
-```shell
-# 将ffmpeg工具添加到环境变量中去
-sudo vim ~/.bashrc #末尾添加 export PATH=/usr/local/ffmpeg/bin
-```
-
-开发
-```shell
-# 添加库：
-vim /etc/ld.so.conf，# 末尾添加/usr/local/ffmpeg/lib
-ldconfig # 更新
-```
-测试
-
-```shell
-ffmpeg --help
-```
-> ffmpeg -version查看版本信息，如下：
->
-> [root@local122 ld.so.conf.d]# ffmpeg -version
-> ffmpeg version N-82301-g1bbb18f Copyright (c) 2000-2016 the FFmpeg developers
-> built with gcc 5.3.1 (GCC) 20160406 (Red Hat 5.3.1-6)
-> configuration: --enable-shared --prefix=/usr/local/ffmpeg
-> libavutil      55. 35.100 / 55. 35.100
-> libavcodec     57. 66.101 / 57. 66.101
-> libavformat    57. 57.100 / 57. 57.100
-> libavdevice    57.  2.100 / 57.  2.100
-> libavfilter     6. 66.100 /  6. 66.100
-> libswscale      4.  3.100 /  4.  3.100
-> libswresample   2.  4.100 /  2.  4.100
+> 
 
 #### ssh
 
@@ -1761,11 +1741,313 @@ yum install pssh
 
 //待补充
 
-#### jq
+#### 数据科学
+
+##### q
+
+[q](http://harelba.github.io/q/examples.html#example1)是像mysql一样对csv等格式化的文本数据进行统计
+
+###### 安装
+
+```shell
+wget -c  --no-check-certificate https://github.com/harelba/packages-for-q/raw/master/rpms/q-text-as-data-1.7.1-1.noarch.rpm
+
+rpm -ivh q-text-as-data-1.7.1-1.noarch.rpm
+rpm -U q-text-as-data-1.7.1-1.noarch.rpm
+```
+
+参数配置
+
+```shell
+# 输入参数
+-H	输入是否包含头部（加—H代表有头部）
+-d	输入分割符
+-t	输入分割符为tab
+-q	从指定的输入分割符文件列表中读取
+
+# 输出参数
+-O	输出头
+-D	输出分割符
+-T	输出分割符为tab
+```
+
+列名
+
+```
+Use  -H  to  signify  that  the  input contains a header line. Column names will be detected automatically in that case, and can be used in the query. If this option is not provided,
+       columns will be named cX, starting with 1 (e.g. q "SELECT c3,c8 from ...").
+```
+
+首先使用`man q`进行帮助查看
+
+```shell
+# 读取单个文件
+q -H -d, "select max(wt),count(distinct cyl) from ./mtcars.csv"
+q -H -d, "select name,cyl,wt from ./mtcars.csv where cyl=4 order by wt limit 10"
+q -H -d, "select cyl,count(*) from ./mtcars.csv group by cyl"
+
+# 读取多个文件
+SELECT * FROM datafile1+datafile2+datefile3;
+SELECT * FROM mydata*.dat;
+```
+
+###### 使用
+
+读取标准输入
+
+```shell
+# 处理文件目录
+sudo find /tmp -ls | q "SELECT c5,c6,sum(c7)/1024.0/1024 AS total FROM - GROUP BY c5,c6 ORDER BY total desc"
+
+# 读取文件的标注输入
+cat ./mtcars.csv |q -H -d, "select cyl,count(*) from - group by cyl"
+
+# 序列计算
+seq 1 1000 | q "select avg(c1),sum(c1) from -"
+```
+
+> 像mysql一样使用，若没有列则直接用c1,c2来表示
+
+文件关联join实现
+
+```shell
+q -H -d, "SELECT myfiles.c8,emails.c2 
+	FROM exampledatafile myfiles 
+	JOIN group-emails-example emails 
+	ON (myfiles.c4 = emails.c1) 
+	WHERE myfiles.c8 = 'ppp'
+	"
+```
+
+> 支持join的使用：表必须起别名，不能直接使用原始的表名
+
+例子:
+
+```shell
+[root@yjmaliecs join]# cat aa bb
+f1,f2,f3
+aa,1,2
+bb,2,3
+cc,4,6
+dd,3,3
+
+f1,f2,f3
+aa,2,1
+bb,8,2
+ff,2,4
+cc,4,4
+dd,5,5
+
+
+q -d, -H -T  "select a.f1,a.f2,b.f3 from aa a join bb b on (a.f1=b.f1)"
+aa      1       1
+bb      2       2
+cc      4       4
+dd      3       5
+
+q -d, -H -T  "select a.f1,a.f2,b.f3 from aa a left join bb b on (a.f1=b.f1)"
+```
+
+> 注意：RIGHT and FULL OUTER JOINs are not currently supported
+
+##### [csvtotable](https://github.com/vividvilla/csvtotable)
+
+csv命令行处理工具，快速的将csv文件转换为可搜索的html表格网页
+
+![csvtotable](https://raw.githubusercontent.com/vividvilla/csvtotable/master/sample/table.gif)
+
+###### 安装
+
+```shell
+pip install csvtotable
+```
+
+>该包安装完成之后会在`/usr/local/bin`目录下添加可执行文件`csvtotable`,可利用此命令进行格式转换
+
+###### 使用
+
+```shell
+[root@local122 yjm]# csvtotable --help
+Usage: csvtotable [OPTIONS] INPUT_FILE [OUTPUT_FILE]
+
+  CSVtoTable commandline utility.
+
+Options:
+  -c, --caption TEXT              Table caption
+  -d, --delimiter TEXT            CSV delimiter
+  -q, --quotechar TEXT            String used to quote fields containing
+                                  special characters
+  -dl, --display-length INTEGER   Number of rows to show by default. Defaults
+                                  to -1 (show all rows)
+  -o, --overwrite                 Overwrite the output file if exisits.
+  -s, --serve                     Open output html in browser instead of
+                                  writing to file.
+  -h, --height TEXT               Table height in px or in %.
+  -p, --pagination                Enable/disable table pagination.
+  -vs, --virtual-scroll INTEGER   Number of rows after which virtual scroll is
+                                  enabled.Set it to -1 to disable and 0 to
+                                  always enable.
+  -nh, --no-header                Disable displaying first row as headers.
+  -e, --export                    Enable filtered rows export options.
+  -eo, --export-options [copy|csv|json|print]
+                                  Enable specific export options. By default
+                                  shows all. For multiple options use -eo flag
+                                  multiple times. For ex. -eo json -eo csv
+  --help                          Show this message and exit.
+```
+
+**备注：**
+
+该包后台使用的模板依然是jinja2,自己有利用jinja2实现的源码版本,可以将mysql中的表，或者csv格式的文件等直接转换为可搜索的html
+
+```python
+#!/usr/bin/env python
+# -*- coding: utf8 -*-
+__author__ = 'yjm'
+'''
+  功能注释：Python的SQL操作模板类面向对象
+  改进说明：接口泛化
+'''
+
+import sys
+reload(sys)
+sys.setdefaultencoding('utf8')
+
+import os
+import MySQLdb
+import json
+import urllib2
+import time
+import hues
+from datetime import date,datetime, timedelta
+from collections import OrderedDict
+
+from jinja2 import Environment,FileSystemLoader,PackageLoader,Template
+from jinja2 import TemplateError,TemplateNotFound,UndefinedError,TemplateSyntaxError#异常处理
+
+#########################  面向对象 Methods ##################################
+class Aggr(object):
+    def __init__(self):
+        self.__conn = MySQLdb.connect(host='localhost', port=3306, user='root', passwd='root', db='labs')
+        self.__cursor = self.__conn.cursor(cursorclass=MySQLdb.cursors.DictCursor) 
+        self.__cursor.execute('set names utf8')
+        self.env=Environment(loader=FileSystemLoader('templates'))                    # 模板环境加载-本地文件
+
+    def __del__(self):
+        self.__cursor.close()
+        self.__conn.close()
+
+    # 导出成csv文件
+    def _export_2_csv(self):
+        sql="select pageurl,title,site,source,tags,abstract from collection_base_info;"
+        self.__cursor.execute(sql)
+        dictlist=self.__cursor.fetchall()
+        keys=["site","source","tags","abstract"];
+        with open('collection.csv','w') as f:
+            tb_head="title,"+','.join(keys)+'\r\n'
+            f.write(tb_head)
+            for row in dictlist:
+                link_title="\"<a href='%s'>%s</a>\"" %(row['pageurl'],row['title']) 
+                other=','.join(['"'+str(row[k])+'"' for k in keys])+'\r\n'
+                tb_row=link_title+','+other
+                f.write(tb_row)
+    
+    # 导出成字典列表    
+    def _export_2_ldict(self):
+        sql="select pageurl,title,site,source,tags,abstract from collection_base_info;"
+        keys=["site","source","tags","abstract"];
+        dictlist=[]
+        try:
+            self.__cursor.execute(sql)
+            row=self.__cursor.fetchone()
+            while row:
+                od=OrderedDict()
+                od['title']="<a href='%s'>%s</a>" %(row['pageurl'],row['title']) 
+                for k in keys:
+                    od[k]=row[k]
+                dictlist.append(od)
+                row=self.__cursor.fetchone()
+            return dictlist
+        except Exception,e:
+            print str(e)
+   
+    # 入口1:利用jinja2模板渲染
+    def jinja2_render(self):
+        template=self.env.get_template('collection_template.html')
+        dictlist=self._export_2_ldict()
+        html=template.render(data=dictlist)
+        with open('collection.html','w') as f:
+            f.write(html)
+
+    # 入口2:利用csvtotable转化
+    def csv2tbl_convert(self):
+        self._export_2_csv()
+        cmd="c2t -o -c '聚合搜索中心' collection.csv collection.html"
+        if os.system(cmd)!=0:
+            hues.error("csv2table 转化失败")
+        else:
+            hues.success("转化成功,删除collection.csv中间文件")
+            os.remove('./collection.csv')
+
+    # upload to aliyunos
+    def upload_aliyun(self):
+        cmd='lftp -f lftp_collection.ini'
+        if os.system(cmd)!=0:
+            hues.error("上传collection.html到阿里云失败")
+        else:
+            hues.success("上传collection.html到阿里云成功")
+
+# 测试入口
+if __name__ == "__main__":
+    agr=Aggr()
+    #agr.jinja2_render()
+    agr.csv2tbl_convert()
+    agr.upload_aliyun()
+```
+
+> 补充说明的是利用原生jinja2制作的html表格样式上不如csvtotable生成的，可参考：[线上收藏聚合](http://tuling56.site/aggr/dynamic/)
+
+##### csvkit
+
+csvkit是强化版的csv命令行处理工具，是表格数据处理的王者。
+
+###### 安装
+
+```shell
+pip install csvkit
+```
+
+###### 使用
+
+详细参考：Data Science at the Command Line.pdf
+
+工具推荐参考：[超级牛叉的开源小工具](https://dataxujing.github.io/%E8%B6%85%E7%BA%A7%E7%89%9BX%E7%9A%84%E5%BC%80%E6%BA%90%E5%B0%8F%E5%B7%A5%E5%85%B71/) 
+
+#### 信息获取
+
+##### lynx/w3m 
+
+无界面浏览器
+
+##### [lynx](http://man.linuxde.net/lynx)
+
+```shell
+
+```
+
+##### w3m
+
+```
+
+```
+
+#### 格式转换
+
+##### jq
 
 json格式化筛选和查询工具,可以在shell streaming流里使用
 
-##### 安装
+###### 安装
 
 ```shell
 git clone https://github.com/stedolan/jq.git
@@ -1778,7 +2060,7 @@ sudo make install
 
 > jq处理的json格式必须是标准的json格式
 
-##### 使用
+###### 使用
 
 ```json
 {
@@ -1858,7 +2140,7 @@ cat test.json | jq '.results[0].index'
 >
 > ```shell
 > cat test.json |jq '.results[] | .index[] | [{biaoti: .title, miaoshu: .des}]|map(select(.biaoti=="穿衣"))'
->
+> 
 > [
 >   {
 >     "biaoti": "穿衣",
@@ -1925,146 +2207,79 @@ cat test.json |jq '.results[] | .index|map(select(.title=="运动"))'
 cat test.json|jq 'if .error==0 then "ok" elif .error==1 then "false" else "null" end'
 ```
 
-#### q
-
-[q](http://harelba.github.io/q/examples.html#example1)是像mysql一样对csv等格式化的文本数据进行统计
-
-##### 安装
-
-```shell
-wget -c  --no-check-certificate https://github.com/harelba/packages-for-q/raw/master/rpms/q-text-as-data-1.7.1-1.noarch.rpm
-
-rpm -ivh q-text-as-data-1.7.1-1.noarch.rpm
-rpm -U q-text-as-data-1.7.1-1.noarch.rpm
-```
-
-##### 使用
-
-参数配置
-
-```shell
-# 输入参数
--H	输入是否包含头部（加—H代表有头部）
--d	输入分割符
--t	输入分割符为tab
--q	从指定的输入分割符文件列表中读取
-
-# 输出参数
--O	输出头
--D	输出分割符
--T	输出分割符为tab
-```
-
-列名
-
-```
-Use  -H  to  signify  that  the  input contains a header line. Column names will be detected automatically in that case, and can be used in the query. If this option is not provided,
-       columns will be named cX, starting with 1 (e.g. q "SELECT c3,c8 from ...").
-```
-
-###### 基础 
-
-首先使用`man q`进行帮助查看
-
-```shell
-# 读取单个文件
-q -H -d, "select max(wt),count(distinct cyl) from ./mtcars.csv"
-q -H -d, "select name,cyl,wt from ./mtcars.csv where cyl=4 order by wt limit 10"
-q -H -d, "select cyl,count(*) from ./mtcars.csv group by cyl"
-
-# 读取多个文件
-SELECT * FROM datafile1+datafile2+datefile3;
-SELECT * FROM mydata*.dat;
-```
-
-###### 高级
-
-读取标准输入
-
-```shell
-# 处理文件目录
-sudo find /tmp -ls | q "SELECT c5,c6,sum(c7)/1024.0/1024 AS total FROM - GROUP BY c5,c6 ORDER BY total desc"
-
-# 读取文件的标注输入
-cat ./mtcars.csv |q -H -d, "select cyl,count(*) from - group by cyl"
-
-# 序列计算
-seq 1 1000 | q "select avg(c1),sum(c1) from -"
-```
-
-> 像mysql一样使用，若没有列则直接用c1,c2来表示
-
-文件关联join实现
-
-```shell
-q -H -d, "SELECT myfiles.c8,emails.c2 
-	FROM exampledatafile myfiles 
-	JOIN group-emails-example emails 
-	ON (myfiles.c4 = emails.c1) 
-	WHERE myfiles.c8 = 'ppp'
-	"
-```
-
-> 支持join的使用：表必须起别名，不能直接使用原始的表名
-
-例子:
-
-```shell
-[root@yjmaliecs join]# cat aa bb
-f1,f2,f3
-aa,1,2
-bb,2,3
-cc,4,6
-dd,3,3
-
-f1,f2,f3
-aa,2,1
-bb,8,2
-ff,2,4
-cc,4,4
-dd,5,5
-
-
-q -d, -H -T  "select a.f1,a.f2,b.f3 from aa a join bb b on (a.f1=b.f1)"
-aa      1       1
-bb      2       2
-cc      4       4
-dd      3       5
-
-q -d, -H -T  "select a.f1,a.f2,b.f3 from aa a left join bb b on (a.f1=b.f1)"
-```
-
-> 注意：RIGHT and FULL OUTER JOINs are not currently supported
-
-#### 信息获取
-
-##### lynx/w3m 
-
-无界面浏览器
-
-##### [lynx](http://man.linuxde.net/lynx)
-
-```shell
-
-```
-
-##### w3m
-
-```
-
-```
-
-#### 格式转换
-
 ##### pandoc
 
 [pandoc](http://pandoc.org/demos.html)是文档格式转换，尤其是在md和各种格式之间，其中typero导出成其它格式的引擎就是pandoc,但是感觉进行了很多的美化参数，比直接使用pandoc导出的效果好了很多，具体优化未知。
+
+###### 安装
+
+```shell
+
+```
+
+###### 使用
+
+```shell
+
+```
+
+##### ffmpeg
+
+###### 安装
+
+```shell
+git clone https://git.ffmpeg.org/ffmpeg.git ffmpeg
+
+#安装依赖项yasm:
+yum install yasm
+
+#编译安装：
+./configure –enable-shared –prefix=/usr/local/ffmpeg
+make&make install
+```
+
+###### 配置
+
+使用
+
+```shell
+# 将ffmpeg工具添加到环境变量中去
+sudo vim ~/.bashrc #末尾添加 export PATH=/usr/local/ffmpeg/bin
+```
+
+开发
+
+```shell
+# 添加库：
+vim /etc/ld.so.conf，# 末尾添加/usr/local/ffmpeg/lib
+ldconfig # 更新
+```
+
+测试
+
+```shell
+ffmpeg --help
+```
+
+> ffmpeg -version查看版本信息，如下：
+>
+> [root@local122 ld.so.conf.d]# ffmpeg -version
+> ffmpeg version N-82301-g1bbb18f Copyright (c) 2000-2016 the FFmpeg developers
+> built with gcc 5.3.1 (GCC) 20160406 (Red Hat 5.3.1-6)
+> configuration: --enable-shared --prefix=/usr/local/ffmpeg
+> libavutil      55. 35.100 / 55. 35.100
+> libavcodec     57. 66.101 / 57. 66.101
+> libavformat    57. 57.100 / 57. 57.100
+> libavdevice    57.  2.100 / 57.  2.100
+> libavfilter     6. 66.100 /  6. 66.100
+> libswscale      4.  3.100 /  4.  3.100
+> libswresample   2.  4.100 /  2.  4.100
 
 #### 其它
 
 ##### [cheat.sh](https://www.toutiao.com/i6595716151420912141/)
 
-命令行手册参考工具，
+命令行手册参考工具
 
 ##### [shellcheck](https://www.shellcheck.net/)
 
@@ -2097,6 +2312,8 @@ shell语法检查工具
   [一张图掌握基本的iptables操作](https://www.toutiao.com/i6581300820061454855/)
 
   [linux权限控制基本原理](https://mp.weixin.qq.com/s/NOmUGsozkWF1IExo8OKC0g)
+
+  [前后台进程切换(推荐)](https://www.cnblogs.com/itech/archive/2012/04/19/2457499.html)
 
 - **技能积累**
 
@@ -2145,6 +2362,8 @@ shell语法检查工具
 - **软件使用**
 
   [linux下安装编译ffmpeg](http://www.toutiao.com/a6348252505277841666/)
+
+  [5分钟了解ssh工作原理](https://www.toutiao.com/i6604429962927669767/)
 
   [SSH 远程执行任务](http://www.cnblogs.com/sparkdev/p/6842805.html)
 

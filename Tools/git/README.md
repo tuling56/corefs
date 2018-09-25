@@ -196,18 +196,21 @@ git init
 ###### 添加远程仓库
 
 ```shell
-#查看当前所有远程仓库
+# 查看当前所有远程仓库
 get remote -v
 
 # 添加远程仓库
 git remote add [reponame] [repoaddress]
+
+# 删除远程仓库
+git remote remove reponame
 ```
 
 > 其中reponame是远程仓库的别名(自取)，repoaddress是远程仓库的地址，支持http[s]/git等协议格式，例:
 >
 > `https://tuling56@bitbucket.org/tuling56/tutorial.git` 或者`git@github.com:tuling56/CPP.git`
 
-可以添加多个远程仓库，在推送的时候选择要推送的仓库即可
+可以添加多个远程仓库，在推送的时候选择要推送的仓库即可.利用此功能可以实现从一个主仓库中拉取东西，然后同步到另一个仓库中去
 
 ###### 推送到远程仓库
 
@@ -222,8 +225,6 @@ git push origin dev
 
 若推送的远程仓库是https协议的，在推送的时候可能会弹出登录框，输入账号和密码，即可。
 
-
-
 ##### 命令解释
 
 ######  clone
@@ -237,7 +238,7 @@ git clone -b 仓库地址  [本地仓库名]
 ###### commit
 
 ```powershell
-
+git commit -m "xxxx"
 ```
 
 ###### fetch

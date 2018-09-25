@@ -70,17 +70,22 @@ user=rxxx
 password='xxxx'
 ```
 
-
-
-
-
 ###### 账号
 
-创建新用户并设置密码
+[创建和删除](https://www.cnblogs.com/wanghetao/p/3806888.html)
 
 ```mysql
-create user 'username'@'host' identified by 'password';
+# 创建新用户并设置密码
+create user 'username'@'localhost' identified by 'password';
+create user 'yjm'@'%' identified by 'a112233';
+
+# 删除用户
+drop user 'username'@'host';
 ```
+
+> 注意：
+>
+> - 此处的"localhost"，是指该用户只能在本地登录，不能在另外一台机器上远程登录。如果想远程登录的话，将"localhost"改为"%"，表示在任何一台电脑上都可以登录。也可以指定某台机器可以远程登录。 
 
 授权管理
 
@@ -254,6 +259,9 @@ SELECT CAST(filedName as SIGNED);
 
 # 若查看某种类型的变量
 show [global] variables like "%_time";
+
+# 查看数据存储路径
+show global variables like '%datadir%';
 ```
 
 修改变量
@@ -699,7 +707,7 @@ drop view if exists v1;
 
 ##### 修改视图
 
-修改视图是指修改数据库中存在的视图，当基本表的某些字段发生变化时，可以通过修改视图来保持与基本表的一致性。
+修改视图是指修改数据库中存在的视图，当基本表的某些字段发生变化时，可以通过修改视图来保持与基本表的一致性。视图的权限需要完善下
 
 ###### 更新
 
@@ -1988,19 +1996,52 @@ having gcs like '%念经%' and gcs like '%变化%';
 
 > 此处主要牵涉到集合操作，目前还没有比较好的实现方式
 
+##### 更新技巧
+
+###### 关联更新
+
+根据另一个表的数据，更新当前表的数据:
+
+```mysql
+# 在a表和b表满足xx条件的时候更新a表的什么内容
+update pgv_stat.xmp_version_active a 
+inner join 
+(select date,version,sum(online_user) user,sum(total_uv) vod 
+from pgv_stat.xmp_total_vod where date='$dt' and channel='all' group by version) b 
+on a.date=b.date and substring_index(a.version,'.',-1)=b.version 
+set a.online_user=b.user,a.total_uv=b.vod where a.date='$dt';
+```
+
+```mysql
+# 在a表和b表满足xx条件的时候更新a表的什么内容
+UPDATE downloaddatas a, downloadfee b 
+SET a.ThunderPrice=$PRICE, a.ThunderAMT=(a.ThunderCop+a.btdownnum3)*$PRICE 
+WHERE a.CopartnerId=b.copartnerid AND b.inuse=1 AND a.BalanceDate>=DATE_FORMAT(b.starttime,'%Y-%m-%d') AND a.BalanceDate='$BALANCEDATE'
+
+#在a表和b表满足xx条件的时候更新b表的什么内容
+update union_kuaichuan_download_data a,downloaddatas b set b.ThunderQty=b.ThunderQty+a.copdowntimes 
+where a.dayno=$d and b.BalanceDate=_gbk\"${dt}\" and b.CopartnerId=a.copid  and b.ProductNo=4
+```
+
+###### 批量更新
+
+```mysql
+
+```
+
 ##### 删除技巧
 
-###### 删除重复数据
+###### 删除重复
 
 在删除的时候可能会根据某些条件保留其中的一条
 
 ```mysql
-# 删除重复邮件地址，重复的多条，只保留其中id最小的
+# 删除所有重复
+//待补充
+
+# 删部分重复，只保留其中id最小的
 delete from Person 
-where Id not in (select a.Id from (
-  									select min(Id) as Id from Person group by Email
-									)a
-                );
+where Id not in (select a.Id from (select min(Id) as Id from Person group by Email)a);
 ```
 
 ##### [累进税率](https://www.imooc.com/learn/449)
@@ -2191,7 +2232,7 @@ select if(imgName='',0,1+(length(imgName)-length(replace(imgName,',','')))) as a
 
 ```
 
-#### join问题
+#### Join问题
 
 ##### 跨库Join
 
@@ -2227,10 +2268,6 @@ COMMENT='task.xmp_uninstall－链接表[3306]';
 3.不支持事务
 4.不支持表结构修改
 ```
-
-
-
-
 
 ### 应用
 
@@ -2311,18 +2348,42 @@ from sales group by 年;
 
 ###### 行转单列
 
+![行转单列](http://tuling56.site/imgbed/2018-09-13_212053.png)
+
 ```mysql
-# 在行转多列的基础上，进行列合并成单列
+# 在行转多列的基础上，进行group_concat列合并成单列
+select name,group_concat(course),group_concat(score) from name_course_score group by name;
 ```
 
 ##### 列转行
+
+输入：
+
+| name  | sign  | flag1 | flag2 | flag3 |
+| ----- | ----- | ----- | ----- | ----- |
+| zhang | 1_2_4 | a     | b     | c     |
+| li    | 1_3   | c     |       | d     |
+| er    | 5     | e     |       |       |
+
+输出：
+
+| name  | sign | flag |
+| ----- | ---- | ---- |
+| zhang | 1    | a    |
+| zhang | 2    | b    |
+| zhang | 4    | c    |
+| li    | 1    | c    |
+| li    | 3    | d    |
+| er    | 5    | e    |
+
+> sign和flag之间不再做笛卡儿积，此外在列转行的时候丢失了列的意义
 
 ###### 单列转行
 
 有两种实现方式:`序列化表`和`union all` 
 
 ```mysql
-# 利用序列化表的方式实现列转行
+# 1.利用序列化表的方式实现列转行
 SELECT
 	user_name,
 	REPLACE (SUBSTRING(SUBSTRING_INDEX(mobile, ',', a.id), CHAR_LENGTH(SUBSTRING_INDEX(mobile, ',', a.id - 1)) + 1), ',', '') as moblie
@@ -2336,7 +2397,7 @@ CROSS JOIN (
 		user1 b
 ) b on a.id <= b.size;
 
-# 利用union实现列转行
+# 2.利用union实现列转行
 SELECT user_name,'skills1' as 'jineng',skills1 from nameskills_col
 UNION ALL
 SELECT user_name,'skills2',skills2 from nameskills_col
@@ -2344,7 +2405,7 @@ UNION ALL
 SELECT user_name,'skills2',skills3 from nameskills_col ORDER BY user_name;
 ```
 
-> 这部分还有很多要完善的地方！，进一步扩展的是求一行的最大值和最小值等
+> 这部分还有很多要完善的地方！进一步扩展的是求一行的最大值和最小值等
 
 ###### 多列转行
 
@@ -2386,30 +2447,6 @@ select
 	count(d.id) as cnt
  from k1 d   
 group by elt(interval(d.yb, 0, 100, 500, 1000), '1/less100', '2/100to500', '3/500to1000', '4/more1000K');
-```
-
-
-
-#### 关联更新
-
-根据另一个表的数据，更新当前表的数据:
-
-```mysql
-# 在a表和b表满足xx条件的时候更新a表的什么内容
-update pgv_stat.xmp_version_active a 
-inner join 
-(select date,version,sum(online_user) user,sum(total_uv) vod 
- from pgv_stat.xmp_total_vod where date='$dt' and channel='all' group by version) b 
-on a.date=b.date and substring_index(a.version,'.',-1)=b.version 
-set a.online_user=b.user,a.total_uv=b.vod where a.date='$dt';
-```
-
-```mysql
-# 在a表和b表满足xx条件的时候更新a表的什么内容
-UPDATE downloaddatas a, downloadfee b SET a.ThunderPrice=$PRICE, a.ThunderAMT=(a.ThunderCop+a.btdownnum3)*$PRICE WHERE a.CopartnerId=b.copartnerid AND b.inuse=1 AND a.BalanceDate>=DATE_FORMAT(b.starttime,'%Y-%m-%d') AND a.BalanceDate='$BALANCEDATE'
-
-#在a表和b表满足xx条件的时候更新b表的什么内容
-update union_kuaichuan_download_data a,downloaddatas b set b.ThunderQty=b.ThunderQty+a.copdowntimes where a.dayno=$d and b.BalanceDate=_gbk\"${dt}\" and b.CopartnerId=a.copid  and b.ProductNo=4"
 ```
 
 #### GTopN

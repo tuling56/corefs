@@ -376,7 +376,13 @@ done < test.data
 标准输出
 
 ```shell
+# echo
+echo "xxxx"
 
+# printf
+printf "%s %s %s\n" a b c d e f g h i j
+printf "%-6s %-6s %-6s\n" a b c d e f g h i j  # 等宽输出
+printf "%s\t\t%s\t%s\n" a b c d e f g h i j
 ```
 
 输出重定向
@@ -384,6 +390,8 @@ done < test.data
 ```shell
 sh xxx.sh > xxx.log 2>&1 
 ```
+
+颜色修饰：[参考shell颜色输出](https://misc.flogisoft.com/bash/tip_colors_and_formatting%E3%80%82)
 
 ##### [运算符](http://c.biancheng.net/cpp/view/2736.html)
 
@@ -815,13 +823,12 @@ function main()
 > - 在hive中使用，必须要结合streaming实现，不然没法获取到这个字段每行的内容
 > - 在shell中用这个映射的话，直接将行内容作为
 >
->
 
 #### 应用
 
 ##### 字符串
 
-###### 字符串复制
+###### 循环复制
 
 循环拼接的方式
 
@@ -835,6 +842,16 @@ for i in `seq 10`;do
 done
 echo $res
 ```
+
+###### URL
+
+[解码](https://blog.csdn.net/carlostyq/article/details/7928585)
+
+```shell
+awk 'BEGIN{for(i=0;i<10;i++)hex[i]=i;hex["A"]=hex["a"]=10;hex["B"]=hex["b"]=11;hex["C"]=hex["c"]=12;hex["D"]=hex["d"]=13;hex["E"]=hex["e"]=14;hex["F"]=hex["f"]=15;}{gsub(/\+/," ");i=$0;while(match(i,/%../)){;if(RSTART>1);printf"%s",substr(i,1,RSTART-1);printf"%c",hex[substr(i,RSTART+1,1)]*16+hex[substr(i,RSTART+2,1)];i=substr(i,RSTART+RLENGTH);}print i;}' xxx.data
+```
+
+> 建议处理成awk的脚本，到时候直接使用此脚本即可
 
 ##### 生成序列
 
@@ -866,11 +883,24 @@ seq 1 2 10  # 生成序列：1 3 5 7 9
 for i in {1..10};do echo $i;done  # 生成序列1，2,3,4,....19
 ```
 
-[生成随机数](https://blog.csdn.net/taiyang1987912/article/details/39997303)
+###### 随机数
 
 ```shell
+function getRandom()
+{
+	begin=$1;
+	end=$2;
+	numrange=${end}-${begin}
+	randomnum=`date +"%s%N"`
+	((retnum=randomnum%numrange+min))
+	echo $retnum; ##通过echo打印出结果，可以用做返回值。
+}
 
+num=`getRandom 1 100` ##生成1-100之间的随机数
+echo $num
 ```
+
+参考：[shell生成随机数的七种方法](https://blog.csdn.net/taiyang1987912/article/details/39997303)
 
 ##### 文件目录
 
@@ -1050,6 +1080,8 @@ join file1 file2 | join - file3 | join - file4
 
 ##### 多进程
 
+###### 后台进程
+
 ```shell
 tables=(xmpcloud2 xmpconv xmpconv2 xmptipsex2)
 dbs=(pgv3_split_t1 pgv3_split_t2 pgv3_split_c1 pgv3_split_c2)
@@ -1077,6 +1109,14 @@ done
 > 此处的多进程是处理每个表的多个数据来源的时候采用并发的多进程来处理，没有锁的高级使用
 
 shell的多进程之间没有锁，只有靠wait变相实现
+
+###### 进程切换
+
+利用fg和bg命令实现的前台[进程切换](https://www.cnblogs.com/itech/archive/2012/04/19/2457499.html)
+
+```shell
+
+```
 
 ##### 进制转换
 
@@ -1335,26 +1375,36 @@ paste
 # paste命令不接受流输入，只能处理文件
 ```
 
-##### 特殊应用
-
-###### 随机数
-
-[shell生成随机数的七种方法](https://blog.csdn.net/taiyang1987912/article/details/39997303)
+###### tr/xargs
 
 ```shell
-function getRandom()
-{
-	begin=$1;
-	end=$2;
-	numrange=${end}-${begin}
-	randomnum=`date +"%s%N"`
-	((retnum=randomnum%numrange+min))
-	echo $retnum; ##通过echo打印出结果，可以用做返回值。
-}
 
-num=`getRandom 1 100` ##生成1-100之间的随机数
-echo $num
 ```
+
+###### printf/echo
+
+printf
+
+```
+
+printf命令
+printf '输出类型输出格式' 输出内容
+printf 不支持数据流
+输出类型
+%ns     输出字符串，输出n个字符
+%ni      输出整数，n指代输出几个数字
+%m.nf  输出浮点数。总共m位，其中n位是小数。
+输出格式
+\n 
+\t
+\b
+\f 清除屏幕
+printf '%s\t%s\t%\t%\n' $(cat student.txt)
+```
+
+echo
+
+![颜色输出高亮](http://tuling56.site/imgbed/2018-09-14_171950.png)
 
 ### awk
 
@@ -1604,6 +1654,8 @@ awk 'BEGIN{FS="\n";RS="";OFS=",";ORS=";"}{print $1,$2,$3,$5,$NF}' mutiline.data
 
 ##### 运算符
 
+运算符的位置很灵活
+
 | 运算符                     | 描述               |
 | ----------------------- | ---------------- |
 | **赋值运算符**               |                  |
@@ -1632,7 +1684,11 @@ awk 'BEGIN{FS="\n";RS="";OFS=",";ORS=";"}{print $1,$2,$3,$5,$NF}' mutiline.data
 `||`和`&&`
 
 ```shell
+# 内部
 awk 'BEGIN{a=1;b=2;print (a>5 && b<=2),(a>5 || b<=2);}'
+
+# 外部
+awk '$1>5 && $2<=2{print $0;}'
 ```
 
 ###### 赋值运算符
@@ -1644,6 +1700,8 @@ awk 'BEGIN{a=1;b=2;print (a>5 && b<=2),(a>5 || b<=2);}'
 ```
 
 ###### 算术运算符
+
+`+  -  *  \  &  ++  -- ^`
 
 ```
 
@@ -1996,7 +2054,7 @@ awk -v s="20110510" -v t="20110605" 'BEGIN{"date +%s -d "s|getline a;"date +%s -
 
 [awk计算时间差](http://bbs.chinaunix.net/forum.php?mod=viewthread&tid=2316841&page=1#pid15618823)
 
-##### 输入输出重定向
+##### 重定向
 
 ###### 输出重定向
 
@@ -2050,20 +2108,6 @@ f 6
 awk '{a[$1]=$1;n=length(a);print NR,n; if(n<=3) print $0}END{print n}'  test.data
 
 # 注意此处不要用asort或asorti求数组的长度
-```
-
-##### 行列转换
-
-###### 列转行
-
-```powershell
-
-```
-
-###### 行转列
-
-```shell
-
 ```
 
 ##### 实现join
@@ -2181,6 +2225,20 @@ sed维护着两个数据缓冲区：一个活动的模版空间(pattern space)�
 ```
 
 #### 基础
+
+##### 地址
+
+| 地址        | 说明                                                         |
+| ----------- | ------------------------------------------------------------ |
+| n           | 行号，n 是一个正整数。                                       |
+| $           | 最后一行。                                                   |
+| /regexp/    | 所有匹配一个 POSIX 基本正则表达式的文本行。注意正则表达式通过 斜杠字符界定。选择性地，这个正则表达式可能由一个备用字符界定，通过\cregexpc 来 指定表达式，这里 c 就是一个备用的字符。 |
+| addr1,addr2 | 从 addr1 到 addr2 范围内的文本行，包含地址 addr2 在内。地址可能是上述任意 单独的地址形式。若两个地址都是正则表达式，则[地址范围的确定方法](https://segmentfault.com/a/1190000004696613) |
+| first~step  | 匹配由数字 first 代表的文本行，然后随后的每个在 step 间隔处的文本行。例如 1~2 是指每个位于偶数行号的文本行，5~5 则指第五行和之后每五行位置的文本行。 |
+| addr1,+n    | 匹配地址 addr1 和随后的 n 个文本行。                         |
+| addr!       | 匹配所有的文本行，除了 addr 之外，addr 可能是上述任意的地址形式。 |
+
+###### 举例
 
 sed多条指令执行
 
@@ -2365,7 +2423,7 @@ echo -e 'a\ncoy\nc' |sed -e "s/c/&xx/"
 echo -e "inet addr:172.17.54.137  Bcast:1 \n  Mask:40.0" |sed -n 's/inet/\u&/p'
 ```
 
-
+> 扩展成关键字的大小写转换，目前还有问题
 
 ##### 其它
 
@@ -2522,7 +2580,64 @@ egrep -f pattern.file text.txt
 
 #### 基础
 
+##### 查找
+
+######  按文件名
+
+````shell
+# 该命令查询文件名为’tmp’或是匹配’mina*’的所有文件
+find –name "tmp" –o –name "mina*"
+````
+
+###### 按文件类型
+
+-type 查找某一类型的文件 
+
+ 文件类型：  f-普通文件  d-目录  l-符号链接文件  c-字符设备文件  p-管道文件  b-块设备文件  s-socket文件
+
+```shell
+
+```
+
+###### 按文件大小
+
+-size 按文件大小
+
+```shell
+ find ~ -size +1M -size -10M
+```
+
+###### 按文件日期
+
+-atime   最近一次访问时间      单位：天
+-mtime 最近一次内容修改时间  单位：天
+-ctime  最近一次属性修改时间  单位：天
+-amin   最近一次访问时间      单位：分钟
+-mmin  最近一次内容修改时间  单位：分钟
+-cmin   最近一次属性修改时间  单位：分钟
+-newer file1 ! file2 查找更改时间比文件file1新但比文件file2旧的文件 
+
+```shell
+find /tmp -atime +5  #表示查找在五天内没有访问过的文件
+```
+
+###### 按文件权限
+
+找出具有执行权限的文件
+
+```shell
+
+```
+
+找出属于某个用户或组的文件
+
+```shell
+
+```
+
 ##### 排除   
+
+###### 排除文件
 
 ```shell
 #  搜索但跳出指定目录
@@ -2531,16 +2646,74 @@ find . -path "./sk" -prune -o -name "*.txt" -print
 
 
 # 搜索指定类型文件的内容
-alias sllua='grep -i -a   -Rl --color `find . -type f -name "*.lua"`'
+alias sllua='grep -i -a  -Rl --color `find . -type f -name "*.lua"`'
 alias slpy='grep -i -a   -Rl --color `find . -type f -name "*.py"`'
 alias slsh='grep -i -a   -Rl --color `find . -type f -name "*.sh"`'
+
+# 搜索py类型文件中包含xhsn的
+find . -type f -name "*.py" -print0|xargs grep 'xhsn'
+grep 'xhsn' $(find . -type f -name "*.py")
+grep 'xhsn' `find . -type f -name "*.py"`
+
 
 
 #搜索文件夹下指定类型的文件并打包
 zip calc_bak.zip $(find xmp_odl -path "*dev*" -prune -o -type f  \( -name "*.py" -o -name "*.sh" -o -name "*.hql" -o -name "*.json" -o -name "*.conf" -o  -name "*.ini" \))
 ```
 
+###### 排除目录
+
+```shell
+
+```
+
 #### 进阶
+
+##### 动作
+
+###### 作为参数
+
+先搜索出找出指定类型文件
+
+```shell
+find xmp_odl -path "*dev*" -prune -o -type f  \( -name "*.py" -o -name "*.sh" -o -name "*.hql" -o -name "*.json" -o -name "*.conf" -o  -name "*.ini" \)
+
+```
+
+>  其中`-path "*dev*" -prune -o`是排除指定目录下的文件
+
+压缩打包
+
+```shell
+# 找出指定类型的文件并压缩打包
+zip calc_bak.zip.$date $(find xmp_odl -path "*dev*" -prune -o -type f  \( -name "*.py" -o -name "*.sh" -o -name "*.hql" -o -name "*.json" -o -name "*.conf" -o  -name "*.ini" \))
+```
+
+###### 后续动作
+
+删除
+
+```shell
+# 方法1
+find xmp_odl -path "*dev*" -prune -o -type f  \( -name "*.py" -o -name "*.sh" -o -name "*.hql" -o -name "*.json" -o -name "*.conf" -o  -name "*.ini" \) | xargs -0 rm -f {} \;
+
+# 方法2：
+find . -type f -name "*.log" -exec rm {} \;  
+```
+
+重命名
+
+```shell
+find xxx |xargs -0 
+```
+
+修改权限
+
+```shell
+
+```
+
+#### 积累
 
 ##### 转换
 
@@ -2579,42 +2752,6 @@ function method2()
 method2
 
 exit 0
-```
-
-##### 过滤
-
-搜索指定类型文件
-
-```shell
-# 搜索py类型文件中包含xhsn的
-find . -type f -name "*.py" -print0|xarags grep 'xhsn'
-
-grep 'xhsn' $(find . -type f -name "*.py")
-grep 'xhsn' `find . -type f -name "*.py"`
-```
-
-#### 应用
-
-##### 找出指定类型文件
-
-```shell
-find xmp_odl -path "*dev*" -prune -o -type f  \( -name "*.py" -o -name "*.sh" -o -name "*.hql" -o -name "*.json" -o -name "*.conf" -o  -name "*.ini" \)
-
-```
-
->  其中`-path "*dev*" -prune -o`是排除指定目录下的文件
-
-压缩打包
-
-```shell
-# 找出指定类型的文件并压缩打包
-zip calc_bak.zip.$date $(find xmp_odl -path "*dev*" -prune -o -type f  \( -name "*.py" -o -name "*.sh" -o -name "*.hql" -o -name "*.json" -o -name "*.conf" -o  -name "*.ini" \))
-```
-
-删除
-
-```shell
-
 ```
 
 ### 实践
@@ -2735,6 +2872,22 @@ awk '{printf("'\''%s'\'',",$1);}' ttt.txt
 while read line;do echo -n "'$line',";done < ttt.txt
 ```
 
+#### 行列转换
+
+##### 列转行
+
+```shell
+echo "1,2,3 "|tr ',' '\n'
+echo "1,2,3" |sed -n 's/,/\n/gp'
+```
+
+##### 行转列
+
+```shell
+echo -e "1\n2\n3" |xargs
+echo -e "1\n2\n3" |sed -n 's/\n/ /gp'
+```
+
 ## 参考
 
 - **bash部分**
@@ -2747,7 +2900,7 @@ while read line;do echo -n "'$line',";done < ttt.txt
 
   [shell关联数组](http://blog.csdn.net/mm_bit/article/details/48417157)
 
-  <Shell 编程范例>面向操作对象学Shell(推荐)
+  [<Shell 编程范例>面向操作对象学Shell(推荐)](https://tinylab.gitbooks.io/shellbook/)
 
   [数据工程师常用shell命令](https://www.jianshu.com/p/1ea90c81b659)
 
@@ -2766,6 +2919,10 @@ while read line;do echo -n "'$line',";done < ttt.txt
   [Shell速查手册(强烈推荐)](https://segmentfault.com/u/vvpale/articles?page=1)
 
   [Shell join命令详解](http://www.cnblogs.com/mfryf/p/3402200.html)
+
+  [Shell常用的文档编辑命令(建议收藏)](https://www.toutiao.com/i6600636341069808132/)
+
+  [写好shell脚本的13个建议](https://www.toutiao.com/i6570585538628157959/)
 
 - **awk部分**
 
@@ -2811,7 +2968,9 @@ while read line;do echo -n "'$line',";done < ttt.txt
 
 - **find部分**
 
-  //待补充
+  [find命令使用详解](https://blog.csdn.net/caomiao2006/article/details/12572965)
+
+  [find递归搜索文件名(强烈推荐)](https://blog.csdn.net/gexiaobaohelloworld/article/details/8206889)
 
 - **实践部分**
 
