@@ -1,4 +1,4 @@
-## Redis学习笔记
+## Redis笔记
 
 [TOC]
 
@@ -239,8 +239,6 @@ keys *
 key xx*
 ```
 
-
-
 ### 高级
 
 #### 发布和订阅
@@ -275,12 +273,18 @@ key xx*
 
 ## 参考
 
-[Centos6.5下Redis的安装和配置](http://blog.csdn.net/ludonqin/article/details/47211109)
+- **安装**
 
-[菜鸟Redis学习](http://www.runoob.com/redis/redis-sorted-sets.html)
+  [Centos6.5下Redis的安装和配置](http://blog.csdn.net/ludonqin/article/details/47211109)
 
-[Redis官方参考](http://www.redis.net.cn/order/3530.html) 
+  [redis可视化监控工具](https://www.toutiao.com/i6604430273859813895/)
 
-[Python操作Redis](http://www.cnblogs.com/clover-siyecao/p/5600078.html)
+- **基础**
 
-[MySQL快速数据同步到Redis](http://www.cnblogs.com/Buggo/p/5550358.html)(思路不错)
+  [菜鸟Redis学习](http://www.runoob.com/redis/redis-sorted-sets.html)
+
+  [Redis官方参考](http://www.redis.net.cn/order/3530.html) 
+
+  [Python操作Redis](http://www.cnblogs.com/clover-siyecao/p/5600078.html)
+
+  [MySQL快速数据同步到Redis](http://www.cnblogs.com/Buggo/p/5550358.html)(思路不错)

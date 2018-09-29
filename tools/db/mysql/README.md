@@ -43,6 +43,28 @@ chkconfig --add mysqld
 chkconfig mysqld on
 ```
 
+客户端连接
+
+```shell
+# 指定编码
+mysql --default-character-set-utf8 -uroot -proot
+
+# 指定数据库
+mysql --default-character-set-utf8 -uroot -proot -Ddbname
+
+# 其它指定
+```
+
+信息查看
+
+```shell
+＃查看相关信息
+status
+
+#查看支持的字符集
+show char set;
+```
+
 ##### 配置
 
 mysql的配置文件默认是`/etc/my.cnf`,其内容主要如下：
@@ -55,6 +77,8 @@ user=mysql
 # Disabling symbolic-links is recommended to prevent assorted security risks
 symbolic-links=0
 default-storage-engine=MyISAM
+character-set-server=utf8mb4
+collation-server=utf8mb4_unicode_ci
 
 # 开启bin-log
 log-bin=/var/lib/mysql/mysql-bin
@@ -68,6 +92,7 @@ pid-file=/var/run/mysqld/mysqld.pid
 host=localhost
 user=rxxx
 password='xxxx'
+default-character-set = utf8mb4 # 客户端连接字符集
 ```
 
 ###### 账号
@@ -87,11 +112,11 @@ drop user 'username'@'host';
 >
 > - 此处的"localhost"，是指该用户只能在本地登录，不能在另外一台机器上远程登录。如果想远程登录的话，将"localhost"改为"%"，表示在任何一台电脑上都可以登录。也可以指定某台机器可以远程登录。 
 
-授权管理
+[授权管理](https://www.cnblogs.com/fnlingnzb-learner/p/5833337.html)
 
 ```mysql
 grant privileges on databasename.tablename to 'username'@'host';
-# 其中的privileges可以是SELECT , INSERT , UPDATE或者all等 
+# 其中的privileges可以是select , insert , update或者all等 
 # 查看所有用户的授权
 select * from information_schema.user_privileges;
 
@@ -102,7 +127,11 @@ select distinct concat('user: ''',user,'''@''',host,''';') as query from mysql.u
 show grants for 'root'@'%';
 
 # 查看某用户的所有信息
-select * from mysql.user where user='cactiuser' \G;   
+select * from mysql.user where user='cactiuser' \G; 
+
+# 取消授权
+grant  all on *.* to   dba@localhost;  
+revoke all on *.* from dba@localhost; 
 ```
 
 更改密码
@@ -838,6 +867,111 @@ having sum(xx)>xx
 
 > 此处牵涉到别名的使用地点问题，只有在select和order by 中才能使用
 
+#### 其它
+
+##### 语句类型
+
+DML、DDL、DCL区别 .
+
+```shell
+DML(data manipulation language)：
+它们是SELECT、UPDATE、INSERT、DELETE，就象它的名字一样，这4条命令是用来对数据库里的数据进行操作的语言
+
+DDL(data definition language)：
+DDL比DML要多，主要的命令有CREATE、ALTER、DROP等，DDL主要是用在定义或改变表(TABLE)的结构，数据类型，表之间的链接和约束等初始化工作上，他们大多在建立表时使用
+
+DCL(Data Control Language)：
+是数据库控制功能。是用来设置或更改数据库用户或角色权限的语句，包括(grant,deny,revoke等)语句。在默认状态下，只有sysadmin,dbcreator,db_owner或db_securityadmin等人员才有权力执行DCL
+```
+
+##### 注释和别名
+
+###### 注释
+
+行注释
+
+```mysql
+# 到该行结束      # 这个注释直到该行结束 
+-- 到该行结束    -- 这个注释直到该行结束（注意断划线后的空格）
+```
+
+块注释
+
+```mysql
+SELECT 1+
+       /* 这是一个
+          多行注释
+          的形式
+      */
+      1;
+```
+
+###### 别名
+
+使用位置
+
+```mysql
+# 别名只能在select、order by、group by、having中使用，不能在where中使用
+select 
+	xx as alias_name
+from
+ 	xxxx
+where xxxx
+group by alias_name
+having alias_name>10
+order by alias_name
+```
+
+> 例子：
+>
+> ```mysql
+> select version cv,count(*) as cnt
+> from ad_funnel
+> where version in ('v1','v2','v3')
+> GROUP BY cv
+> having cnt>2
+> order by cnt;
+> ```
+
+##### 特殊处理
+
+###### 结果处理
+
+选取结果添加行号
+
+```mysql
+# 方法1 
+set @mycnt=0;
+select (@mycnt := @mycnt + 1) as ROWNUM , vv from task1_tbl order by vv;
+
+# 方法2
+# #将查询结果写入到某个拥有auto_increment字段的临时表中再做查询
+
+# 方法3
+# #用Python等脚本语言对查询结果进行二次组装
+```
+
+###### 自增列
+
+```mysql
+# 建表的时候指定
+# > // id列为无符号整型，该列值不可以为空，并不可以重复，而且id列从100开始自增.
+create table table_1 ( id int unsigned not null primary key auto_increment, 
+                       name varchar(5) not null ) auto_increment = 100;
+
+# 修改自增列的值
+alter table table_1 auto_increment = 2;
+```
+
+只能修改单机的，集群修改[自增列](http://www.jb51.net/article/42883.htm)无效
+
+###### NULL处理
+
+```mysql
+# NULL和任何值运算都是NULL，NULL是假
+select 1=1,NULL=1,NULL=NULL,NULL in (1,2),if(NULL in (1,2),'12','e'); #结果：1 NULL NULL e
+```
+
 ### 高级
 
 #### 锁
@@ -1446,13 +1580,15 @@ exists、any、all三个关键字，这些关键字此处配合的都是where子
 
 ###### exists关键字
 
-内层查询语句不返回查询记录，而是返回一个真假值。
+内层查询语句不返回查询记录，而是返回一个真假值
 
 ```mysql
-select employee_name,gender,email,job_title from employee where exists(select * from employee where employee_name='成龙');
+# 内层和外层无交互
+select ename,gender from employee where exists(select * from employee where ename='成龙');
 
-# 返回a表中满足id在b表中条件的记录
-select * from ecs_goods a where EXISTS(select cat_id from ecs_category b where a.cat_id = b.cat_id);
+# 返回a表中满足id在b表中条件的记录（内层和外层交互）
+select * from goods a where exists(select cat_id from category b where a.cat_id = b.cat_id);
+select * from row2col_tbl a where exists(select * from row2col_tbl b where a.date=b.date and b.stat_flag='click');
 ```
 
 ###### any关键字
@@ -1462,6 +1598,9 @@ select * from ecs_goods a where EXISTS(select cat_id from ecs_category b where a
 ```mysql
 # 这个就是查询所有购买数量大于49的订单的信息！
 select order_id,customer_id,order_number,order_date from `order` where order_id = any(select order_id from order_detail where buy_number>49);
+
+# 注意返回的比较情况
+select * from row2col_tbl a where date>any(select date from row2col_tbl b where a.date=b.date and b.stat_flag='click');
 ```
 
 ###### all关键字
@@ -1469,6 +1608,8 @@ select order_id,customer_id,order_number,order_date from `order` where order_id 
 ```mysql
 # 所有满足订单的总金额大于单价*10的订单的信息
 select order_id,customer_id,order_number,order_date from `order` where total_money > all(select price*10 from order_detail);
+
+select * from row2col_tbl a where date>=all(select date from row2col_tbl b where a.date=b.date and b.stat_flag='click');
 ```
 
 ==exists和in区别==
@@ -1747,114 +1888,43 @@ RIGHT JOIN table2
 ON table2.x LIKE CONCAT('%' , table2.y , '%')；
 ```
 
+###### 跨库Join
+
+跨库Join的几种方案：
+
+- 字段冗余设计
+- 表复制和同步到一个库中
+- 链接表
+
+**链接表**
+
+链接表的使用要求FEDERATED 的打开，默认是关闭的
+
+```mysql
+# 链接表的创建
+CREATE TABLE `link_tbl` (
+`uninstalldate`  varchar(10)  NOT NULL DEFAULT '' ,
+`newinstalldate`  varchar(10)  NOT NULL DEFAULT '' ,
+`coverinstalldate`  varchar(10)  NOT NULL DEFAULT '' 
+)
+ENGINE=FEDERATED
+DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci
+ROW_FORMAT=COMPACT
+CONNECTION='mysql://root:root@localhost:3306/task/xmp_uninstall'  
+COMMENT='task.xmp_uninstall－链接表[3306]';
+```
+
+链接表的注意事项：
+
+```
+1.本地的表结构必须与远程的完全一样
+2.远程数据库目前仅限MySQL（其它主流数据库暂不支持）
+3.不支持事务
+4.不支持表结构修改
+
+```
+
 ### 积累
-
-#### 基本
-
-##### 语句类型
-
-DML、DDL、DCL区别 .
-
-```shell
-DML(data manipulation language)：
-它们是SELECT、UPDATE、INSERT、DELETE，就象它的名字一样，这4条命令是用来对数据库里的数据进行操作的语言
-
-DDL(data definition language)：
-DDL比DML要多，主要的命令有CREATE、ALTER、DROP等，DDL主要是用在定义或改变表(TABLE)的结构，数据类型，表之间的链接和约束等初始化工作上，他们大多在建立表时使用
-
-DCL(Data Control Language)：
-是数据库控制功能。是用来设置或更改数据库用户或角色权限的语句，包括(grant,deny,revoke等)语句。在默认状态下，只有sysadmin,dbcreator,db_owner或db_securityadmin等人员才有权力执行DCL
-```
-
-##### 注释和别名
-
-###### 注释
-
-行注释
-
-```mysql
-# 到该行结束      # 这个注释直到该行结束 
--- 到该行结束    -- 这个注释直到该行结束（注意断划线后的空格）
-```
-
-块注释
-
-```mysql
-SELECT 1+
-       /* 这是一个
-          多行注释
-          的形式
-      */
-      1;
-```
-
-###### 别名
-
-使用位置
-
-```mysql
-# 别名只能在select、order by、group by、having中使用，不能在where中使用
-select 
-	xx as alias_name
-from
- 	xxxx
-where xxxx
-group by alias_name
-having alias_name>10
-order by alias_name
-```
-
-> 例子：
->
-> ```mysql
-> select version cv,count(*) as cnt
-> from ad_funnel
-> where version in ('v1','v2','v3')
-> GROUP BY cv
-> having cnt>2
-> order by cnt;
-> ```
-
-##### 特殊处理
-
-###### 结果处理
-
-选取结果添加行号
-
-```mysql
-# 方法1 
-set @mycnt=0;
-select (@mycnt := @mycnt + 1) as ROWNUM , vv from task1_tbl order by vv;
-
-# 方法2
-# #将查询结果写入到某个拥有auto_increment字段的临时表中再做查询
-
-# 方法3
-# #用Python等脚本语言对查询结果进行二次组装
-```
-
-###### 自增列
-
-```mysql
-# 建表的时候指定
-# > // id列为无符号整型，该列值不可以为空，并不可以重复，而且id列从100开始自增.
-create table table_1 ( id int unsigned not null primary key auto_increment, 
-                       name varchar(5) not null ) auto_increment = 100;
-
-# 修改自增列的值
-alter table table_1 auto_increment = 2;
-```
-
-只能修改单机的，集群修改[自增列](http://www.jb51.net/article/42883.htm)无效
-
-###### NULL处理
-
-```mysql
-# NULL和任何值运算都是NULL，NULL是假
-select 1=1,NULL=1,NULL=NULL,NULL in (1,2),if(NULL in (1,2),'12','e'); #结果：1 NULL NULL e
-```
-
-
 
 #### 技巧
 
@@ -2048,52 +2118,7 @@ where Id not in (select a.Id from (select min(Id) as Id from Person group by Ema
 
 //这个要不断的完善，把相关的技巧融合进实战中
 
-#### restful接口
 
-##### sandman2
-
-```shell
-pip install sandman2
-sandman2ctl 'mysql+mysqldb://root:root@localhost/pgv_stat_yingyin'
-* Running on http://0.0.0.0:5000/
-```
-
-其中mysql的链接方式可以有[以下几种](http://docs.sqlalchemy.org/en/latest/core/engines.html#mysql)：
-
-```python
-# default
-engine = create_engine('mysql://scott:tiger@localhost/foo')
-
-# mysql-python
-engine = create_engine('mysql+mysqldb://scott:tiger@localhost/foo')
-
-# MySQL-connector-python
-engine = create_engine('mysql+mysqlconnector://scott:tiger@localhost/foo')
-
-# OurSQL
-engine = create_engine('mysql+oursql://scott:tiger@localhost/foo')
-```
-
-sandman2ctl的配置有以下：
-
-```
-optional arguments:
-  -h, --help            show this help message and exit
-  -d, --debug           Turn on debug logging
-  -p PORT, --port PORT  Port for service to listen on
-  -l, --local-only      Only provide service on localhost (will not be
-                        accessible from other machines)
-  -r, --read-only       Make all database resources read-only (i.e. only the
-                        HTTP GET method is supported)
-  -s SCHEMA, --schema SCHEMA
-                        Use this named schema instead of default
-```
-
-> 问题是中文的查询结果是unicode显示，命令行配置jq才能正常显示，而web访问还没有查到显示中文的方式
-
-##### [xmysql](http://blog.csdn.net/dev_csdn/article/details/78480522)
-
-为mysql数据库快速生成restful api
 
 
 #### 日期时间
@@ -2230,43 +2255,6 @@ select if(imgName='',0,1+(length(imgName)-length(replace(imgName,',','')))) as a
 
 ```mysql
 
-```
-
-#### Join问题
-
-##### 跨库Join
-
-跨库Join的几种方案：
-
-- 字段冗余设计
-- 表复制和同步到一个库中
-- 链接表
-
-###### 链接表
-
-链接表的使用要求FEDERATED 的打开，默认是关闭的
-
-```mysql
-# 链接表的创建
-CREATE TABLE `link_tbl` (
-`uninstalldate`  varchar(10)  NOT NULL DEFAULT '' ,
-`newinstalldate`  varchar(10)  NOT NULL DEFAULT '' ,
-`coverinstalldate`  varchar(10)  NOT NULL DEFAULT '' 
-)
-ENGINE=FEDERATED
-DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci
-ROW_FORMAT=COMPACT
-CONNECTION='mysql://root:root@localhost:3306/task/xmp_uninstall'  
-COMMENT='task.xmp_uninstall－链接表[3306]';
-```
-
-链接表的注意事项：
-
-```
-1.本地的表结构必须与远程的完全一样
-2.远程数据库目前仅限MySQL（其它主流数据库暂不支持）
-3.不支持事务
-4.不支持表结构修改
 ```
 
 ### 应用
@@ -2520,6 +2508,10 @@ echo | awk 'BEGIN{arr["a"]=1;arr["b"]="b"";c=arr}{for(k in c) print c,arr[c];}' 
 
 问题排查部分请单独查看性能部分
 
+#### 规范
+
+具体的规范设计和约束
+
 #### 配置优化
 
 ##### 提高硬件配置
@@ -2763,7 +2755,7 @@ mysql -uxxxx -pxxx --default-character-set=utf8 < xxx.sql
 - 导出可执行的sql语句,可跨平台执行
 
 ```shell
-#1.导出整个数据库 
+#1.导出整个数据库(结构和数据)
 #mysqldump -u用户名 -p密码  数据库名 > 导出的文件名 
 mysqldump -uroot -pmysql db1   > e:\db1.sql 
 
@@ -2771,7 +2763,7 @@ mysqldump -uroot -pmysql db1   > e:\db1.sql
 #mysqldump -u用户名 -p密码  数据库名 表名> 导出的文件名 
 mysqldump -uroot -pmysql db1 tb1 tb2> e:\tb1_tb2.sql 
 
-#3.导出一个数据库结构 
+#3.导出整个数据库结构 
 mysqldump -uroot -pmysql -d db1 > e:\db1.sql 
 
 #4.导出一个表，只有表结构 
@@ -2802,9 +2794,9 @@ show variables like '%net_buffer_length%';
 
 mysqldump --defaults-extra-file=/etc/my.cnf  test -e --max_allowed_packet=1048576  --net_buffer_length=16384 > test.sql
 
+# 导出的时候指定编码
+mysqldump --default-character-set=gbk -uroot -proot -d study > e:\study.sql
 ```
-
-
 
 - 导出成文件
 
@@ -2923,6 +2915,55 @@ log-bin=/var/lib/mysql/mysql-bin
 # 第二个参数是binlog日志的基本文件名，后面会追加标识来表示每一个文件
 # 第三个参数指定的是binlog文件的索引文件，这个文件管理了所有的binlog文件的目录
 ```
+
+#### Restful接口
+
+##### sandman2
+
+```shell
+pip install sandman2
+sandman2ctl 'mysql+mysqldb://root:root@localhost/pgv_stat_yingyin'
+* Running on http://0.0.0.0:5000/
+```
+
+其中mysql的链接方式可以有[以下几种](http://docs.sqlalchemy.org/en/latest/core/engines.html#mysql)：
+
+```python
+# default
+engine = create_engine('mysql://scott:tiger@localhost/foo')
+
+# mysql-python
+engine = create_engine('mysql+mysqldb://scott:tiger@localhost/foo')
+
+# MySQL-connector-python
+engine = create_engine('mysql+mysqlconnector://scott:tiger@localhost/foo')
+
+# OurSQL
+engine = create_engine('mysql+oursql://scott:tiger@localhost/foo')
+```
+
+sandman2ctl的配置有以下：
+
+```
+optional arguments:
+  -h, --help            show this help message and exit
+  -d, --debug           Turn on debug logging
+  -p PORT, --port PORT  Port for service to listen on
+  -l, --local-only      Only provide service on localhost (will not be
+                        accessible from other machines)
+  -r, --read-only       Make all database resources read-only (i.e. only the
+                        HTTP GET method is supported)
+  -s SCHEMA, --schema SCHEMA
+                        Use this named schema instead of default
+
+
+```
+
+> 问题是中文的查询结果是unicode显示，命令行配置jq才能正常显示，而web访问还没有查到显示中文的方式
+
+##### [xmysql](http://blog.csdn.net/dev_csdn/article/details/78480522)
+
+为mysql数据库快速生成restful api
 
 ### 性能
 
