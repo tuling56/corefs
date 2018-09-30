@@ -2726,7 +2726,11 @@ find . -regex ".*[(\.txt)(\.pdf)]$"    #使用方括号
 -size 按文件大小
 
 ```shell
- find ~ -size +1M -size -10M
+# 小于10M的文件 
+find ~ -size +1M -size -10M 
+
+# 找出条件范围的文件，并列出其大小
+find . -type f  -size +10M  -print0 |xargs -0 ls -lh {} \;
 ```
 
 ###### 按文件日期

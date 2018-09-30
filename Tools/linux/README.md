@@ -563,6 +563,10 @@ yum clean			#表示清除yum缓存目录内容
 选项-y表示在所有需要交互式确认的地方默认输入yes
 ```
 
+参考：
+
+[yum配置与使用(推荐)](https://www.cnblogs.com/xiaochaohuashengmi/archive/2011/10/09/2203916.html)
+
 ###### apt
 
 apt和apt-get命令之间的区别
@@ -649,6 +653,8 @@ C-->D[运行级别]
 运行级别6：系统正常关闭并重启，默认运行级别不能设为6，否则不能正常启动
 ```
 
+参考：[linux系统的7种运行级别](http://blog.chinaunix.net/uid-22746363-id-383989.html) 
+
 ###### 开机启动
 
 `chkconfig`和`systemctl enable`
@@ -701,7 +707,9 @@ file：file是命令文件的名字,表示将file做为crontab的任务列表文
 00 01 * * * mysqldump -u root --password=passwd-d mustang > /tmp/mustang_$(date +\%Y\%m\%d_\%H\%M\%S).sql
 ```
 
-crontab最小单位是分
+crontab最小单位是分，可通过变化操作实现到半分钟的控制粒度
+
+参考：[Linux crontab定时任务管理](http://www.imooc.com/video/10979)
 
 ###### anacron
 
@@ -1032,6 +1040,8 @@ vim /etc/sysconfig/iptables-config
 vim /etc/sysconfig/iptables
 ```
 
+参考：[一张图掌握基本的iptables操作](https://www.toutiao.com/i6581300820061454855/)
+
 ###### firewalld 
 
 ```shell
@@ -1040,7 +1050,7 @@ vim /etc/sysconfig/iptables
 
 ##### 命令积累
 
-这部分参考：[Linux命令速查表](https://blog.csdn.net/waitig1992/article/details/51884653)
+参考：[Linux命令速查表](https://blog.csdn.net/waitig1992/article/details/51884653)
 
 ###### 随机数
 
@@ -1118,6 +1128,12 @@ vim /etc/grub.conf
 rpm -qa | grep kernel
 yum autoremove kernel-3.10.0-327.13.1.el7.x86_64
 ```
+
+参考：
+
+[Centos升级系统内核](http://blog.csdn.net/reyleon/article/details/52229293)
+
+[Centos/Linux升级系统内核](http://www.linuxidc.com/Linux/2015-02/112961.htm)
 
 ### 技能积累
 
@@ -1231,7 +1247,7 @@ fi
 ##### aria2
 
 ```shell
-# 待补充
+# 待补充，开源，提供操作界面
 ```
 
 #### 文件传输
@@ -1363,6 +1379,10 @@ rsync.exe -e "ssh -i /usr/rsync_id_dsa" /tmp/testfile csdn@remotehost:/tmp/
 > ```shell
 > chmod  600  id_rsa
 > ```
+
+参考：
+
+
 
 ##### scp
 
@@ -2459,27 +2479,17 @@ shell语法检查工具
 
 - **基础知识**
 
+  [Github的Linux-Tutorial仓库教程](https://github.com/judasn/Linux-Tutorial.git)
+
   [Linux命令大全(强烈推荐)](http://man.linuxde.net/)
 
   [书籍:Linux就该这么学](https://download.csdn.net/download/wqte45/10220346)
 
   [每天一个Linux命令(强烈推荐)](http://blog.jobbole.com/109781/)
 
-  [Centos/Linux升级系统内核](http://www.linuxidc.com/Linux/2015-02/112961.htm)
-
-  [Centos升级系统内核](http://blog.csdn.net/reyleon/article/details/52229293)
-
   [Linux性能工具集](https://www.toutiao.com/i6492996073429139982/)
 
-  [Linux crontab定时任务管理](http://www.imooc.com/video/10979)
-
-  [linux系统的7种运行级别](http://blog.chinaunix.net/uid-22746363-id-383989.html) 
-
   [Linux速查手册(强烈推荐)](https://segmentfault.com/u/vvpale/articles?page=1)
-
-  [yum配置与使用(推荐)](https://www.cnblogs.com/xiaochaohuashengmi/archive/2011/10/09/2203916.html)
-
-  [一张图掌握基本的iptables操作](https://www.toutiao.com/i6581300820061454855/)
 
   [linux权限控制基本原理](https://mp.weixin.qq.com/s/NOmUGsozkWF1IExo8OKC0g)
 
