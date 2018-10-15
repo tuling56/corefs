@@ -346,6 +346,10 @@ show variables like '%lower_case_table_names%';
 创建表
 
 ```mysql
+# 创建库（创建的时候指定编码）
+create database `test2` default character set utf8 collate utf8_general_ci;
+
+#　创建表
 CREATE TABLE if not exists `row2col_tbl` (
   `date` varchar(8) DEFAULT NULL,
   `xl_version` varchar(20) DEFAULT NULL,

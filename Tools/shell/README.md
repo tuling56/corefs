@@ -1275,7 +1275,7 @@ date -d "20120410 -1 day " +%Y-%m-%d
 diff_second=$(($(date +%s -d '2010-01-01') - $(date +%s -d '2009-01-01 11:11:11')));
 ```
 
-#### 积累
+#### 规范
 
 ##### 公共抽取
 
@@ -1361,6 +1361,8 @@ function calcdate_diff()
 注意事项：
 
 - 在牵涉到目录处理的情况下慎用，因为提升到公共.sh中的方法获取的是公共.sh所在的目录，并不能获取到运运行公共方法的目录，这个问题可以通过传递真实的操作目录来解决。
+
+#### 积累
 
 ##### 参数
 
@@ -2884,6 +2886,10 @@ method2
 exit 0
 ```
 
+##### 其它
+
+和find命令类似的是locate、[mlocate](https://www.toutiao.com/a6609762838850306573/)命令，使用这两个命令的时候需要先更新下索引updatedb
+
 ### 实践
 
 #### 文件转换
@@ -3066,6 +3072,8 @@ echo -e "1\n2\n3" |sed -n 's/\n/ /gp'
   [Shell常用的文档编辑命令(建议收藏)](https://www.toutiao.com/i6600636341069808132/)
 
   [写好shell脚本的13个建议](https://www.toutiao.com/i6570585538628157959/)
+
+  [编写shell脚本的最佳实践(强烈推荐)](https://kb.cnblogs.com/page/574767/)
 
   [DataScienceAttheCommandLine](https://github.com/jeroenjanssens/data-science-at-the-command-line)
 
