@@ -139,7 +139,7 @@ function rsync_gitconf()
 rsync_shell
 #rsync_studydb
 rsync_query
-rsync_complat
+#rsync_complat
 #rsync_docimg
 #rsync_gitconf
 

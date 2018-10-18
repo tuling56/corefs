@@ -1925,6 +1925,15 @@ vim ~/.tmux.conf
 
 ```
 
+##### mycli
+
+mycli是增强版的mysql终端连接工具，可以提供自动补全等功能，其使用方式和mysql命令一样
+
+```shell
+pip install mycli
+mycli -uroot -pxxx -Dstudy 
+```
+
 #### 数据科学
 
 ##### q

@@ -2174,8 +2174,6 @@ whatis="a.date as '当前日期',b.date as '上周同期',a.s_install_end as '�
 sql = "SELECT {whatis} FROM ({tablea}) a INNER JOIN ({tableb}) b on b.date=DATE_FORMAT(DATE_SUB(a.date,INTERVAL 7 day),'%Y%m%d') order by a.date desc".format(whatis=whatis,tablea=tablea,tableb=tableb)
 ```
 
-
-
 ##### 选取指定日期
 
 ```mysql
@@ -2183,6 +2181,8 @@ select (DATEDIFF(DATE_ADD(curdate, INTERVAL - DAY(curdate)+ 1 DAY), date_add(cur
 ```
 
 > 这段还没有完全调通
+
+
 
 #### 字符串
 
