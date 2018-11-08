@@ -38,6 +38,8 @@ x64/
 *.pdb
 *.ilk
 *.tlog
+*.out
+*.exe
 
 # Precompiled Headers
 *.gch
