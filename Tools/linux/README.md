@@ -573,24 +573,24 @@ apt和apt-get命令之间的区别
 
 虽然 apt 与 apt-get 有一些类似的命令选项，但它并不能完全向下兼容 apt-get 命令。也就是说，可以用 apt 替换部分 apt-get 系列命令，但不是全部。
 
-| apt 命令         | 取代的命令           | 命令的功能                     |
-| ---------------- | -------------------- | ------------------------------ |
-| apt install      | apt-get install      | 安装软件包                     |
-| apt remove       | apt-get remove       | 移除软件包                     |
-| apt purge        | apt-get purge        | 移除软件包及配置文件           |
-| apt update       | apt-get update       | 刷新存储库索引                 |
-| apt upgrade      | apt-get upgrade      | 升级所有可升级的软件包         |
-| apt autoremove   | apt-get autoremove   | 自动删除不需要的包             |
+| apt 命令           | 取代的命令                | 命令的功能           |
+| ---------------- | -------------------- | --------------- |
+| apt install      | apt-get install      | 安装软件包           |
+| apt remove       | apt-get remove       | 移除软件包           |
+| apt purge        | apt-get purge        | 移除软件包及配置文件      |
+| apt update       | apt-get update       | 刷新存储库索引         |
+| apt upgrade      | apt-get upgrade      | 升级所有可升级的软件包     |
+| apt autoremove   | apt-get autoremove   | 自动删除不需要的包       |
 | apt full-upgrade | apt-get dist-upgrade | 在升级软件包时自动处理依赖关系 |
-| apt search       | apt-cache search     | 搜索应用程序                   |
-| apt show         | apt-cache show       | 显示安装细节                   |
+| apt search       | apt-cache search     | 搜索应用程序          |
+| apt show         | apt-cache show       | 显示安装细节          |
 
 当然，apt 还有一些自己的命令：
 
-| 新的apt命令      | 命令的功能                           |
-| ---------------- | ------------------------------------ |
+| 新的apt命令          | 命令的功能              |
+| ---------------- | ------------------ |
 | apt list         | 列出包含条件的包（已安装，可升级等） |
-| apt edit-sources | 编辑源列表                           |
+| apt edit-sources | 编辑源列表              |
 
 ##### 源码编译
 
@@ -709,7 +709,7 @@ file：file是命令文件的名字,表示将file做为crontab的任务列表文
 
 crontab最小单位是分，可通过变化操作实现到半分钟的控制粒度
 
-参考：[Linux crontab定时任务管理](http://www.imooc.com/video/10979)
+参考：[Linux crontab定时任务管理](http://www.imooc.com/video/10979)，[开源crontab管理系统](https://gitee.com/terrytan/opencron/#%E8%BF%90%E8%A1%8C%E7%8E%AF%E5%A2%83)
 
 ###### anacron
 
@@ -736,15 +736,15 @@ service nginx reload
 
 systemctl命令是系统服务管理器指令，它实际上将 [service](http://man.linuxde.net/service) 和 [chkconfig](http://man.linuxde.net/chkconfig) 这两个命令组合到一起。
 
-| 任务                 | 旧指令                                                       | 新指令                                                       |
-| -------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| 使某服务自动启动     | chkconfig --level 3 [httpd](http://man.linuxde.net/httpd) on | systemctl [enable](http://man.linuxde.net/enable) httpd.service |
-| 使某服务不自动启动   | chkconfig --level 3 httpd off                                | systemctl disable httpd.service                              |
-| 检查服务状态         | service httpd status                                         | systemctl status httpd.service （服务详细信息） systemctl is-active httpd.service （仅显示是否 Active) |
-| 显示所有已启动的服务 | chkconfig --list                                             | systemctl list-units --[type](http://man.linuxde.net/type)=service |
-| 启动某服务           | service httpd start                                          | systemctl start httpd.service                                |
-| 停止某服务           | service httpd stop                                           | systemctl stop httpd.service                                 |
-| 重启某服务           | service httpd restart                                        | systemctl restart httpd.service                              |
+| 任务         | 旧指令                                      | 新指令                                      |
+| ---------- | ---------------------------------------- | ---------------------------------------- |
+| 使某服务自动启动   | chkconfig --level 3 [httpd](http://man.linuxde.net/httpd) on | systemctl [enable](http://man.linuxde.net/enable) httpd.service |
+| 使某服务不自动启动  | chkconfig --level 3 httpd off            | systemctl disable httpd.service          |
+| 检查服务状态     | service httpd status                     | systemctl status httpd.service （服务详细信息） systemctl is-active httpd.service （仅显示是否 Active) |
+| 显示所有已启动的服务 | chkconfig --list                         | systemctl list-units --[type](http://man.linuxde.net/type)=service |
+| 启动某服务      | service httpd start                      | systemctl start httpd.service            |
+| 停止某服务      | service httpd stop                       | systemctl stop httpd.service             |
+| 重启某服务      | service httpd restart                    | systemctl restart httpd.service          |
 
 参考：[centos6和centos7的区别](https://www.toutiao.com/i6602411750178423309/)
 
@@ -1265,11 +1265,11 @@ fi
 
 ###### 传输方式
 
-| 源地址                                 | 目的地址                                              | 备注                                                         |
-| -------------------------------------- | ----------------------------------------------------- | :----------------------------------------------------------- |
-| rsync  -av -P    root1@xxx:/data/xxx*  | /data/pgv_stat/                                       | shell 方式，主机名与资源之间使用单个冒号“:”作为分隔符        |
-| rsync  -av -P    tw07012:data/xmp*     | data/pgv_stat/                                        | shell 方式， 若本地登录用户与远程主机上的用户一致，可以省略 USER@ |
-| rsync  -av -P    xmp@tw07562::pgv_stat | /data/pgv_stat/   --password-file=/etc/rsync.pass.xmp | rsync服务器的方式                                            |
+| 源地址                                    | 目的地址                                     | 备注                                      |
+| -------------------------------------- | ---------------------------------------- | :-------------------------------------- |
+| rsync  -av -P    root1@xxx:/data/xxx*  | /data/pgv_stat/                          | shell 方式，主机名与资源之间使用单个冒号“:”作为分隔符         |
+| rsync  -av -P    tw07012:data/xmp*     | data/pgv_stat/                           | shell 方式， 若本地登录用户与远程主机上的用户一致，可以省略 USER@ |
+| rsync  -av -P    xmp@tw07562::pgv_stat | /data/pgv_stat/   --password-file=/etc/rsync.pass.xmp | rsync服务器的方式                             |
 
 注释：
 
@@ -2339,7 +2339,7 @@ cat test.json | jq '.results[0].index'
 >
 > ```shell
 > cat test.json |jq '.results[] | .index[] | [{biaoti: .title, miaoshu: .des}]|map(select(.biaoti=="穿衣"))'
-> 
+>
 > [
 >   {
 >     "biaoti": "穿衣",
