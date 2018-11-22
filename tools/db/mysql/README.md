@@ -1032,7 +1032,7 @@ MyISAM表的读和写是串行的，即在读操作时不能写操作，写操�
 - 函数中表名和列名都不能是变量
 - PREPARE语句只能用于MySQL5.0版本以上的存储过程里，不能用在函数或者触发器里
 - 调用方法不一样
-- 存储过程常用在事件和触发器中
+- 存储过程常用在事件和触发器中，函数用在sql语句中
 
 ##### 创建
 
@@ -1064,14 +1064,104 @@ BEGIN
   CLOSE  datas;
 END
 //
+
+DELIMITER ;
+```
+
+存储过程相关信息：
+
+```mysql
+# 显示创建语句
+show create procedure p1;
+# 显示创建时间、创建者等详细信息
+show procedure status like '%p1%';
+```
+
+###### 参数
+
+存储过程的参数共有三种类型:in,out,inout
+
+```mysql
+create procedure p1(in numer int,out total decimal(8,2))
+begin
+	-- 这是存储过程中的注释
+	select sum(1) from tbl1 where id=number into total;
+end
+```
+
+###### 逻辑
+
+在存储过程中包含业务规则和逻辑处理才是智能的存储过程。
+
+```mysql
+# 控制逻辑
+if xx then
+end if;
+
+# 循环
+repeat
+until xxx
+end repeat
 ```
 
 ##### 调用
 
+可在一个存储过程里调用另一个存储过程，存储过程的调用一般是在事件中进行
+
 ```mysql
-call  sp_name;
-# 存储过程的调用一般是在事件中进行
+# 无参
+call sp_name();
+
+# 有参
+call sp_name(@o1,@o2,'v',@io1);
+select @o1,@o2,@io1;
 ```
+
+###### 权限
+
+存储过程的创建权限和调用权限是分开设计的，可根据实际情况进行配置。
+
+##### 游标
+
+mysql返回一组称为结果集的行，使用简单的查询语句无法得到第一行、下一行或者前十行，也不存在每次一行的处理所有行的简单办法。而且mysql中游标只能用于存储过程和函数。
+
+游标的使用，遵循以下步骤：
+
+- 声明游标
+- 打开游标
+- 检索数据
+- 关闭游标
+
+例子：
+
+```mysql
+create procedure p1()
+begin
+	DECLARE 1_id INT DEFAULT 1;
+ 	DECLARE terminal_flag INT DEFAULT 0;
+	declare t decimal(8,2);
+	declare flag bool default 0;
+	# 声明游标
+	declare cname cursor for select id from xxx.xxx;
+	DECLARE CONTINUE HANDLER FOR <NOT FOUND> SET terminal_flag=1;
+	# 打开游标
+	open cname;
+	
+	# 检索数据
+	repeat
+		fetch cname into 1_id;
+	until terminal_flag
+	end repeat
+
+	# 关闭游标
+	close cname;
+end;
+```
+
+> 备注：
+>
+> - 其中的`NOT FOUND`是错误码，更多的错误码可以参考官方的error_handling
+> - 句柄必须在游标之后定义，句柄中使用的局部变量必须在游标前定义
 
 #### 函数
 
@@ -1173,7 +1263,7 @@ select substring_index(substring_index('http://wz.cnblogs.com/my/search/?q=cooki
 
 ##### 自定义函数
 
-自定义函数的语法
+语法
 
 ```mysql
 delimiter /
@@ -1199,6 +1289,10 @@ delimiter ;
 ```
 
 > [delimiter用法详解](https://blog.csdn.net/yuxin6866/article/details/52722913)
+
+注意
+
+###### 集锦
 
 - Nth Highest
 
@@ -1366,13 +1460,46 @@ DROP EVENT [IF EXISTS] event_name
 
 #### 事务
 
-//mysql的事务是如何处理的
+Myisam不支持事务，InnoDB支持事务，事务是用来维护数据库完整性的，它能保证成批的mysql操作，要么完全执行，要么完全不执行。
+
+##### 处理过程
+
+事务处理用来管理insert、update、delete操作，不能回退select、create、drop操作
+
+```mysql
+start transaction; # 开始事务
+# 相关操作
+commit;
+rollback；
+```
+
+###### commit
+
+一般的mysql语句都是直接针对数据库表执行和编写的，都是隐含提交，即提交操作都是自动进行的。但是在事务处理块中，提交不会隐含地进行，为进行明确的提交，需要使用commit语句。
+
+设置自动提交
+
+```mysql
+set autocommit=1;
+```
+
+###### 保留点
+
+复杂的事务处理需要部分提交或者回退。保留点的作用是在事务处理块中合适的位置放置占位符，如果需要回退的时候，可以回退到某个占位符。
+
+```mysql
+savepoint sp1;
+#操作
+rollback to sp1;
+```
 
 #### 外键
 
 //外键的作用
 
 #### 触发器
+
+想要在某条语句或者某些语句在事件发生时自动执行，触发器是mysql响应insert、update、delete时候自动执行的一组mysql语句。
 
 mysq表中允许有以下六种触发器:
 
@@ -1386,21 +1513,46 @@ mysq表中允许有以下六种触发器:
   - before delete 
   - after delete
 
-##### 创建触发器
+##### 操作
+
+###### 创建触发器
 
 ```mysql
-CREATE TRIGGER trigger_name trigger_time trigger_event ON tbl_name FOR EACH ROW trigger_stmt
-###参数说明：
-# trigger_time是触发程序的动作时间。它可以是 before 或 after，以指明触发程序是在激活它的语句之前或之后触发。
-# trigger_event指明了激活触发程序的语句的类型
+CREATE TRIGGER trigger_name trigger_time trigger_event 
+ON tbl_name FOR EACH ROW trigger_stmt
+
+### 参数说明：
+# trigger_name:触发器名称
+# trigger_time:触发的动作时间before或after，以指明触发程序是在激活它的语句之前或之后触发。
+# trigger_event:指明了激活触发程序的语句的类型
 	INSERT：将新行插入表时激活触发程序
 	UPDATE：更改某一行时激活触发程序
 	DELETE：从表中删除某一行时激活触发程序
-#tbl_name：监听的表，必须是永久性的表，不能将触发程序与TEMPORARY表或视图关联起来。
-#trigger_stmt：当触发程序激活时执行的语句。执行多个语句，可使用BEGIN...END复合语句结构
+# tbl_name：监听的表，必须是永久性的表，不能将触发程序与TEMPORARY表或视图关联起来。
+# trigger_stmt：当触发程序激活时执行的语句。执行多个语句，可使用BEGIN...END复合语句结构
 ```
 
-##### 删除触发器
+一个例子：
+
+```mysql
+create TRIGGER up_conter after insert 
+on documents for each row
+BEGIN
+	set new.content=new.title; # 注意不要在触发器的操作语句中使用update等操作
+END
+```
+
+注意事项:
+
+- 只有表才支持触发器，视图和临时表都不支持
+- 触发器按每个表每个时间定义，所以每个表最多支持6个触发器
+- 触发器不能关联多个表或者多个事件
+
+权限：
+
+创建触发器可能需要特殊权限，但是触发器的执行是自动，如果能执行insert、update、delete操作，则对应的触发器也能执行。
+
+###### 删除触发器
 
 ```mysql
 DROP TRIGGER [schema_name.]trigger_name
@@ -1410,12 +1562,43 @@ DROP TRIGGER [schema_name.]trigger_name
 #增加操作，只有new.
 ```
 
-一个例子：
+##### 应用
+
+触发器之前不能根据条件选择触发器是否触发，但是可以在触发器的处理逻辑里进行条件判断，从而选择需要执行的操作。
+
+触发器的执行单元必须是for each row吗？
+
+触发器的一个重要应用是进行审计跟踪，把更高记录到另一表中。
+
+mysql触发器内不支持调用存储过程？（后面的版本支持了吗）
+
+###### insert触发器
+
+可引用NEW的虚拟表，before insert触发器可允许在插入前更新被插入的值。
 
 ```mysql
-create TRIGGER up_conter after insert on documents for each row BEGIN
-set new.content=new.title; #注意不要在触发器的操作语句中使用update等操作
-END
+create trigger t1 after insert on orders for each row
+select new.order_num;
+```
+
+###### update触发器
+
+可引用NEW、OLD的虚拟表，before update触发器可运行在更新前修改被更新的值。
+
+```mysql
+create trigger t1 before update on vendors for each row
+set new.vend_state=upper(new.vend_state);
+```
+
+###### delete触发器
+
+可引用OLD的虚拟表，OLD中的值全部是只读的，不能更新
+
+```mysql
+create trigger t1 before delete on vendors for each row
+begin
+	insert into tbl1(x,x,x) values(old.x,old.x,old.x)
+end
 ```
 
 参考：

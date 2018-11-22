@@ -25,7 +25,7 @@ class ListNode(object):
     实现数据结构的运算
 '''
 class Solution(object):
-    def __init__(self)：
+    def __init__(self):
         self.node=None
 
     # 新加节点
@@ -38,9 +38,9 @@ class Solution(object):
 
         return node
     # 节点遍历
-    def visit(self,ListNode)
+    def visit(self,ListNode):
+        pass
 
 
 if __name__ == '__main__':
     ms=Solution()
-    ms.
