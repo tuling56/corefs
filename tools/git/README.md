@@ -390,9 +390,29 @@ git流程和状态图
 
 ##### 修改commit
 
-//待补充
+修改最近的commit
+
+```shell
+
+```
+
+修改以前的commit
+
+```shell
+
+```
+
+##### 撤销修改
+
+```shell
+
+```
 
 #### 忽略
+
+指定文件和文件夹不加入版本管理
+
+##### 指定文件
 
 .gitignore文件的配置
 
@@ -410,6 +430,8 @@ cat .gitignore
 
 #### 对比
 
+##### 工作区和远程仓库
+
 对比本地工作区和远程仓库的差异
 
 ```shell
@@ -417,6 +439,8 @@ git fetch origin
 #然后可以比对
 git diff 本地分支 origin/xxxx
 ```
+
+
 
 #### 冲突
 
@@ -430,8 +454,6 @@ git diff 本地分支 origin/xxxx
 
 1. 提示冲突后，手动编辑冲突文件，保存退出，然后git add 冲突文件
 2. git commit -m "解决冲突"(注意commit的实验一定不要带具体的文件名)
-
-
 
 ### 高级
 
@@ -510,6 +532,7 @@ git checkout test
 ```shell
 # 1. 先切换到准备合并到的分支上
 git checkout [准备合并到的分支]
+
 # 2. 合并要合并的分支到本分支上
 git merge [待合并的分支]
 ```
@@ -543,6 +566,8 @@ git branch -d test
 git branch -r -d origin/branch-name  
 ```
 
+在删除分支前需要将该分支上的事情处理完毕，比如分支的合并等
+
 #### 钩子
 
 钩子在运行的时候会调用GIT_DIR这个环境变量，而不是PWD这个
@@ -557,7 +582,7 @@ git branch -r -d origin/branch-name
 
 解决：
 
-```
+```shell
 #!/bin/sh
 unset $(git rev-parse --local-env-vars)
 cd /var/git/web3/etc/puppet
@@ -571,10 +596,10 @@ cd /var/git/web3/etc/puppet
 ##### 列出标签
 
 ```shell
-#列出所有标签
+# 列出所有标签
 git tag
 
-#列表指定系列的标签
+# 列出指定系列的标签
 git tag -l 'v1.85*'
 ```
 
@@ -627,6 +652,62 @@ git tag -a v1.4 xxxxx(校验和)
 > ```
 
 ### 积累
+
+#### 常见
+
+文件重命名
+
+```shell
+git mv xx xx
+```
+
+删除文件
+
+```shell
+git rm xxx
+```
+
+git log查看版本历史
+
+```shell
+git log
+```
+
+gitk图形界面工具查看版本历史
+
+```shell
+
+```
+
+.git目录
+
+```shell
+
+```
+
+修改commit的message
+
+```shell
+
+```
+
+commit合并
+
+```
+
+```
+
+如何指定不需要git管理的文件
+
+```shell
+编辑gitignore文件
+```
+
+如何将git仓库备份到本地
+
+```shell
+
+```
 
 #### 仓库
 

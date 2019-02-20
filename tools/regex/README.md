@@ -156,6 +156,12 @@ Multiline修饰的是\^与$，就是说没有Multiline的时候，把\^和$与�
 echo "abc周def杰" | awk '{for (i=1; i<=length($1); ++i) if(substr($1,i,1) > "\177") {print substr($1, i, 2) "\t中文"; ++i;} else {print substr($1, i, 1) "\tNot Chinese Character";}}'   
 ```
 
+中英文分割
+
+```shell
+tests = re.split(r'[^(a-z,0-9,\u4E00-\u9FA5)]',text)
+```
+
 ##### 匹配换行
 
 匹配任何字符包括换行
@@ -164,7 +170,7 @@ echo "abc周def杰" | awk '{for (i=1; i<=length($1); ++i) if(substr($1,i,1) > "\
 ([\s\S]*) 同时，也可以用 ([\d\D]*)、([\w\W]*)来表示
 ```
 
- ##参考
+###  参考
 
 - **基础**
 
@@ -183,5 +189,3 @@ echo "abc周def杰" | awk '{for (i=1; i<=length($1); ++i) if(substr($1,i,1) > "\
 - **积累**
 
   [正则表达式积累(推荐)](https://www.toutiao.com/i6586058272338346500/)
-
-  

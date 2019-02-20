@@ -889,9 +889,14 @@ awk 'BEGIN{for(i=0;i<10;i++)hex[i]=i;hex["A"]=hex["a"]=10;hex["B"]=hex["b"]=11;h
 start_date=`date -d"-7 day" +%Y%m%d`
 end_date=`date -d"-1 day" +%Y%m%d`
 while [[ $start_date -le $end_date ]];do
+	# 20180818格式
     echo -e "\e[1;31mstep:\e[0m"$start_date
     process ${start_date}
-    start_date=`date -d${start_date}"+1 day" +%Y%m%d`
+    
+    # 2018-08-18格式
+    date_params=$(date -d"${start_date}" +%Y-%m-%d)
+    echo -e "\e[1;31mstep:\e[0m"${date_params}
+    start_date=`date -d"${start_date} +1 day" +%Y%m%d`
 done
 
 a=($(seq -s" " -f"201809%02g" 1 10))
@@ -1960,7 +1965,30 @@ export test=xxxx
 awk 'BEGIN{print ENVIRON["test"];}{print ENVIRON["test"];}END{print ENVIRON["test"];}'
 ```
 
+###### 调用shell命令
 
+[awk调用shell命令](https://www.cnblogs.com/mfryf/p/3564779.html)的两种方式
+
+system方式
+
+```shell
+awk 'BEGIN{v1="echo";v2="abc";system(v1" "v2)}'
+```
+
+>  如果system()括号里面的参数没有加上双引号的话，awk认为它是一个变量，它会从awk的变量里面把它们先置换为常量，然后再回传给shell，如果system()括号里面的参数有加上双引号的话，那么awk就直接把引号里面的内容回传给shell，作为shell的“命令行”  
+
+print cmd | “/bin/bash"
+
+```shell
+awk 'BEGIN{print "echo","abc",";","echo","123"| "/bin/bash"}'
+awk 'BEGIN{print "echo abc;echo 123"| "/bin/bash"}'
+awk 'BEGIN{a="vvv";print "echo abc;echo ",a,";echo 123"| "/bin/bash"}'
+```
+
+总结：
+
+> 无论使用system（）还是print cmd | “/bin/bash”
+> awk都是新开一个shell，在相应的cmdline参数送回给shell，所以要注意当前shell变量与新开shell变量问题
 
 #### 进阶
 
@@ -3012,18 +3040,36 @@ while read line;do echo -n "'$line',";done < ttt.txt
 
 主要利用的还是printf函数
 
+方式1:
+
 ```shell
 function process_show()
 {
-        b=''
-        i=0
-        while [ $i -le 100 ];do
-                printf "[%-50s] %d%% \n" "$b" "$i";
-                sleep 0.2
-                ((i=i+2))
-                b+='#'
-                done
-        echo
+    b=''
+    i=0
+    while [ $i -le 100 ];do
+        printf "[%-50s] %d%% \n" "$b" "$i";
+        sleep 0.2
+        ((i=i+2))
+        b+='#'
+    done
+}
+```
+
+方式2:
+
+```shell
+# 该脚本同时还有进度控制功能
+function process_control()
+{
+    i=0
+    while read line;do
+        if [[ $(expr $i % 2) == 0 ]];then
+            echo "$i|$line"
+            sleep 2
+        fi
+        ((i=i+2))
+    done < test.hql
 }
 ```
 

@@ -1380,10 +1380,6 @@ rsync.exe -e "ssh -i /usr/rsync_id_dsa" /tmp/testfile csdn@remotehost:/tmp/
 > chmod  600  id_rsa
 > ```
 
-参考：
-
-
-
 ##### scp
 
 ​	scp是secure copy的简写，用于在Linux下进行远程拷贝文件的命令，获得远程服务器上的某个文件，远程服务器既没有配置ftp服务器，没有开启web服务器，也没有做共享，无法通过常规途径获得文件时，只需要通过scp命令便可轻松的达到目的；
@@ -1392,7 +1388,6 @@ rsync.exe -e "ssh -i /usr/rsync_id_dsa" /tmp/testfile csdn@remotehost:/tmp/
 
 ```
 在安装ssh的时候已经自带了
-
 ```
 
 参数指定
@@ -1403,7 +1398,6 @@ rsync.exe -e "ssh -i /usr/rsync_id_dsa" /tmp/testfile csdn@remotehost:/tmp/
 -r 表示递归复制；
 -v 和大多数 linux 命令中的 -v 意思一样，用来显示进度，可以用来查看连接、认证或是配置错误；
 -C 使能压缩选项；
-
 ```
 
 ###### 使用
@@ -1414,6 +1408,12 @@ rsync.exe -e "ssh -i /usr/rsync_id_dsa" /tmp/testfile csdn@remotehost:/tmp/
 scp /home/liujia/file1.txt  liujia@172.16.252.32:/user/liujia
 # 上传本地file1.txt到远程的/user/liujia目录，最终结果为/user/liujia/file1.txt
 ```
+
+> 若主要指定端口，则需要直接跟在scp命令后面，例如：
+>
+> ```shell
+> scp -P122 xxx.log xxx@localhost:/video
+> ```
 
 上传文件夹
 
