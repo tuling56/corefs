@@ -1,7 +1,5 @@
 ## Shell笔记
 
-[TOC]
-
 ### bash
 
 shell的分类，zsh和bash的区别
