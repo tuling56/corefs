@@ -2214,6 +2214,8 @@ pip install csvkit
 
 工具推荐参考：[超级牛叉的开源小工具](https://dataxujing.github.io/%E8%B6%85%E7%BA%A7%E7%89%9BX%E7%9A%84%E5%BC%80%E6%BA%90%E5%B0%8F%E5%B7%A5%E5%85%B71/) 
 
+类似的工具还有[csvq](https://github.com/mithrandie/csvq/)
+
 #### 信息获取
 
 ##### phantomjs/lynx/w3m 
