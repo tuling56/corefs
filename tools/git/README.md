@@ -1,7 +1,5 @@
 ## Git笔记
 
-[TOC]
-
 ### 基础
 
 集中式版本控制工具:CVS、SVN、VSS等，分布式版本控制工具：git、merucrial、bazarr等，选择git的原因：
@@ -149,13 +147,35 @@ git config --global merge.tool vimdiff
 # 还有一个比较常用的是，在解决合并冲突时使用哪种差异分析工具。比如要改用 vimdiff 的话
 ```
 
-##### 帮助
+##### 配置问题
+
+###### 帮助
 
 ```shell
 git help xxx
 git xxx --help
 man git-xxx
 # 其中xxx是具体的命令，例如config命令
+```
+
+###### 其它
+
+[git status中文乱码](https://blog.csdn.net/u012145252/article/details/81775362)
+
+```shell
+git config --global core.quotepath false
+```
+
+[git界面中文乱码](https://blog.csdn.net/qq_26416785/article/details/52837023)
+
+```shell
+git config --global gui.encoding utf-8
+
+#编辑%Git%\etc\gitconfig文件末尾添加：
+[gui]
+  encoding = utf-8
+[i18n]
+  commitencoding = {utf-8|gbk}
 ```
 
 #### 使用
@@ -788,6 +808,8 @@ Rebase和Merge的区别
   [git查看远程仓库](http://blog.csdn.net/wanghuihui02/article/details/48155627)
 
   [13条git命令，满足你的工作需求（推荐）](https://www.imooc.com/article/12473)
+
+  [极客时间和慕课网上有很多的Git教程]()
 
 - **进阶**
 
