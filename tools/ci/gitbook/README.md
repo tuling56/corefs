@@ -1,8 +1,6 @@
 ## GitBook笔记
 
-[TOC]
-
->  简介：GitBook 在文本编辑、多人协作、互动和电子书最终输出形式等方面的支持非常完善，基本上涵盖了现代出版物的整个生命周期，接下来的篇幅将详述这几个环节并介绍一些自己的实践经验
+简介：GitBook 在文本编辑、多人协作、互动和电子书最终输出形式等方面的支持非常完善，基本上涵盖了现代出版物的整个生命周期，接下来的篇幅将详述这几个环节并介绍一些自己的实践经验
 
 ### 安装
 
@@ -218,11 +216,13 @@ search_index.json	# 搜索数据
 
 #### pdf、epub、mobi格式
 
-​	在电子书存档目录，如:`E:\xx\gitbook\mybook_test`执行` gitbook pdf|epub|mobi .`或者上一级目录执行
+在电子书存档目录，如:`E:\xx\gitbook\mybook_test`执行` gitbook pdf|epub|mobi .`或者上一级目录执行
 
-``gitbook pdf|epub|mobi ./mybook_test`
+``gitbook pdf|epub|mobi ./mybook_test`，需要注意的是该命令生成的pdf是整个书籍，而不是单个的页面，此外还带有书签
 
 类似的转换方式还有`pandoc xx.md -o xx.pdf|epub|mobi`
+
+此外还有calibre这个转换工具
 
 #### html格式
 
