@@ -1,6 +1,6 @@
-## Linux笔记
+# Linux笔记
 
-### 基础知识
+## 基础知识
 
 #### 账号权限
 
@@ -1133,9 +1133,9 @@ yum autoremove kernel-3.10.0-327.13.1.el7.x86_64
 
 [Centos/Linux升级系统内核](http://www.linuxidc.com/Linux/2015-02/112961.htm)
 
-### 技能积累
+## 技能积累
 
-#### 日期时间
+### 日期时间
 
 ##### date
 
@@ -1150,7 +1150,7 @@ date -d "2010-10-18 00:00:00" +%s 输出形如：1287331200
 date -d @1287331200 "+%Y-%m-%d" 输出形如：2010-10-18
 ```
 
-#### 网络传输
+### 网络传输
 
 Apache开源四大镜像站点：
 
@@ -1248,9 +1248,9 @@ fi
 # 待补充，开源，提供操作界面
 ```
 
-#### 文件传输
+### 文件传输
 
-##### rsync
+#### rsync
 
 ​	rsync（remote synchronize）是一个远程数据同步工具，可通过 LAN/WAN 快速同步多台主机之间的文件。也可以使用 rsync 同步本地硬盘中的不同目录。rsync 是用于替代 rcp 的一个工具，rsync 使用所谓的 rsync算法进行数据同步，这种算法只传送两个文件的不同部分，而不是每次都整份传送，因此速度相当快。
 
@@ -1261,7 +1261,7 @@ fi
 
 在C/S方式下Server端会开一个873端口，当有连接过来时，会进行口令检查
 
-###### 传输方式
+##### 传输方式
 
 | 源地址                                    | 目的地址                                     | 备注                                      |
 | -------------------------------------- | ---------------------------------------- | :-------------------------------------- |
@@ -1308,11 +1308,27 @@ rsync [OPTION]... rsync://[USER@]HOST[:PORT]/SRC [DEST]   （rysnc列远程机�
 　　如：rsync -v rsync://172.16.78.192/www
 ```
 
-###### 应用情景
+**访问设置**
 
-**包含和排除**
+```shell
+# 在使用ssh的方式时候指定ssh的端口（https://segmentfault.com/q/1010000002405966）
+rsync.exe -e 'ssh -p 122' -avP dst.txt yjm@localhost:/tmp
 
-- include-from和exclude-from
+# 在使用ssh的是指定密钥（避免和原先用来登录用户密钥混合）（http://blog.csdn.net/fuguoq1984/article/details/32331941）
+rsync.exe -e "ssh -i /usr/rsync_id_dsa" /tmp/testfile csdn@remotehost:/tmp/ 
+```
+
+问题：
+
+> - It is required that your private key files are NOT accessible by others.
+>
+> ```shell
+> chmod  600  id_rsa
+> ```
+
+##### 包含和排除
+
+- 文件包含和排除：include-from和exclude-from
 
 ```shell
 #--include-from 指定目录下的部分目录的方法：
@@ -1322,7 +1338,7 @@ rsync  -avz -P --include-from=/home/include.txt --exclude=/*   /home/mnt /data/u
 rsync  -aSz  --exclude-from=/home/exclude.txt 	/home/mnt/ 	 ser@server1:/mnt/data
 ```
 
-- include和exclude
+- 规则包含和排除：include和exclude
 
 ```shell
 --exclude / --include=PATTERN	指定排除/包含传输的文件匹配模式
@@ -1351,6 +1367,8 @@ rsync -u -avP --include="bash.bashrc" --include="vimrc" --exclude="*" "$src" "$t
 rsync -u -avP --include="*/" --include="bash.bashrc" --include="vimrc" --exclude="*" "$src" "$target"
 ```
 
+##### 同步模式
+
 **删除**
 
 ```shell
@@ -1360,25 +1378,7 @@ rsync -avz --delete  dirA/ dirB/
 
 > --delete参数删除目标目录比源目录多余的文件
 
-**访问设置**
-
-```shell
-# 在使用ssh的方式时候指定ssh的端口（https://segmentfault.com/q/1010000002405966）
-rsync.exe -e 'ssh -p 122' -avP dst.txt yjm@localhost:/tmp
-
-# 在使用ssh的是指定密钥（避免和原先用来登录用户密钥混合）（http://blog.csdn.net/fuguoq1984/article/details/32331941）
-rsync.exe -e "ssh -i /usr/rsync_id_dsa" /tmp/testfile csdn@remotehost:/tmp/ 
-```
-
-问题：
-
-> - It is required that your private key files are NOT accessible by others.
->
-> ```shell
-> chmod  600  id_rsa
-> ```
-
-##### scp
+#### scp
 
 ​	scp是secure copy的简写，用于在Linux下进行远程拷贝文件的命令，获得远程服务器上的某个文件，远程服务器既没有配置ftp服务器，没有开启web服务器，也没有做共享，无法通过常规途径获得文件时，只需要通过scp命令便可轻松的达到目的；
 
@@ -1434,7 +1434,7 @@ scp -r liujia@172.16.252.32:/user/liujia/dir1  /home/projects
 # 复制远程的dir1目录到本地的/home/projects目录下，最终的结果是/home/projects/dir1
 ```
 
-##### sftp
+#### sftp
 
 ```shell
 sftp -o port=60066 user@serverip:/home/user/
@@ -1465,7 +1465,7 @@ put local_file_name
 put -r local_directory_name
 ```
 
-##### ftp/lftp
+#### ftp/lftp
 
 //使用方法待补充
 
@@ -1501,7 +1501,7 @@ lftp -f lftp_collection.ini
 > mv ./collection.html ./index.html
 > ```
 
-##### lrzsz
+#### lrzsz
 
 Linux/Unix同Windows进行ZModem文件传输的命令行工具， windows端需要支持ZModem的telnet/ssh客户端，例如：SecureCRT，XShell等 
 
@@ -1511,7 +1511,7 @@ Linux/Unix同Windows进行ZModem文件传输的命令行工具， windows端需�
 sudo apt-get install lrzsz
 ```
 
-##### curl/wget
+#### curl/wget
 
 ###### [curl](http://man.linuxde.net/curl)
 
@@ -1544,7 +1544,7 @@ mysql -e "select * from test.orders" |curl -uuser:pwd -T - ftp://xxx/tmp/xxx.rea
 wget --ftp-user=USERNAME --ftp-password=PASSWORD url
 ```
 
-##### 自建方案
+#### 自建方案
 
 基于ssh技术，使用Fabric、paramito和watchdog的组合方案
 
@@ -1565,7 +1565,7 @@ watchdog
 ![](http://p1.pstatp.com/large/31d30002e98f69b6957f)
 
 
-#### 文件监控
+### 文件监控
 
 ##### inotify-tools
 
@@ -1582,7 +1582,7 @@ inotify-tools安装完成后，会生成inotifywait和inotifywatch两个指令�
 
 //看门狗模块
 
-#### 邮件发送
+### 邮件发送
 
 ##### sendEmail
 
@@ -1724,7 +1724,7 @@ Synopsis:  sendEmail -f ADDRESS [options]
 使用相应的python包和自动发送邮件预警
 ```
 
-### 环境配置
+## 环境配置
 
 #### 环境变量
 
@@ -1772,6 +1772,8 @@ export PATH=$JAVA_HOME/bin:$PATH
 #验证安装是否成功: java -version
 ```
 
+参考：[centos7安装sun jdk](https://www.cnblogs.com/yjlch1016/p/8900841.html)
+
 #### GLIBC
 
 glibc是gnu发布的libc库，即c运行库，是linux系统中最底层的api，分散在`/lib`和`/usr/lib`等目录下
@@ -1795,13 +1797,13 @@ make  install
 strings /lib64/libc.so.6 | grep GLIBC
 ```
 
-### 程序编译
+## 程序编译
 
 makefile文件的编写
 
 程序员的自我修养，链接装载与库
 
-### 软件使用
+## 软件使用
 
 linux下软件安装的方式：
 
