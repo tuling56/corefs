@@ -1726,13 +1726,15 @@ Synopsis:  sendEmail -f ADDRESS [options]
 
 ## 环境配置
 
-#### 环境变量
+### 环境变量
 
-###### 设置环境变量
+#### 设置环境变量
 
 ![设置Linux环境变量的三种方法](pics/设置Linux环境变量的三种方法.jpg)
 
-#### JDK环境
+### 基础环境
+
+#### JDK
 
 要先删除open jdk，然后再安装sun jdk
 
@@ -1797,11 +1799,23 @@ make  install
 strings /lib64/libc.so.6 | grep GLIBC
 ```
 
+### DB系列
+
+#### PostgreSQL
+
+PostgreSQL的安装和使用
+
+#### MySQL
+
+
+
 ## 程序编译
 
 makefile文件的编写
 
 程序员的自我修养，链接装载与库
+
+### CMake
 
 ## 软件使用
 
@@ -2269,7 +2283,7 @@ sudo make install
   "status": "success",
   "date": "2016-02-02",
   "results": [{
-       "currentCity": "shanghai",
+      "currentCity": "shanghai",
       "pm25": "170",
       "index": [
         {
