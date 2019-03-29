@@ -1,6 +1,6 @@
-## MySQL笔记
+# MySQL笔记
 
-### 基础
+## 基础
 
 #### 基本
 
@@ -974,7 +974,7 @@ alter table table_1 auto_increment = 2;
 select 1=1,NULL=1,NULL=NULL,NULL in (1,2),if(NULL in (1,2),'12','e'); #结果：1 NULL NULL e
 ```
 
-### 高级
+## 高级
 
 #### 锁
 
@@ -1611,7 +1611,7 @@ end
 
 视图和表的设置权限
 
-### 查询
+## 查询
 
 基础查询
 
@@ -2112,7 +2112,7 @@ COMMENT='task.xmp_uninstall－链接表[3306]';
 
 更多参考：[如何玩转跨库Join-阿里云](https://m.aliyun.com/yunqi/articles/686027)
 
-### 积累
+## 积累
 
 #### 技巧
 
@@ -2445,7 +2445,7 @@ select if(imgName='',0,1+(length(imgName)-length(replace(imgName,',','')))) as a
 
 ```
 
-### 应用
+## 应用
 
 #### 行列互转
 
@@ -2692,7 +2692,7 @@ echo | awk 'BEGIN{arr["a"]=1;arr["b"]="b"";c=arr}{for(k in c) print c,arr[c];}' 
 
 ```
 
-### 调优
+## 调优
 
 问题排查部分请单独查看性能部分
 
@@ -2880,7 +2880,7 @@ NULL的缺点：
 
 
 
-### 备份
+## 备份
 
 备份对比
 
@@ -3048,7 +3048,7 @@ logstash的更强大的功能待挖掘
 对MyISAM引擎存储的文件，可以使用文件同步的方法
 ```
 
-##### mysql导入到redis
+##### 同步到redis
 
 - 遍历插入法
 
@@ -3077,6 +3077,14 @@ cat xxx.file |redis-cli [--pipe]
 
 ```shell
 输入源是mysql,输出源是redis,可以利用中间的filter达到初步的处理
+```
+
+##### 同步到postgresql
+
+使用navicat的数据传输功能可实现，脚本实现的方式暂时还没有找到
+
+```shell
+
 ```
 
 #### 恢复
@@ -3153,7 +3161,7 @@ optional arguments:
 
 为mysql数据库快速生成restful api
 
-### 性能
+## 性能
 
 #### 日志
 
@@ -3341,7 +3349,7 @@ mysqluserclone     clone a MySQL user account to one or more new users
 
 ```
 
-### 问题
+## 问题
 
 #### 面试
 

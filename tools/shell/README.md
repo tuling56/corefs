@@ -1,6 +1,6 @@
-## Shell笔记
+# Shell笔记
 
-### bash
+## bash
 
 shell的分类，zsh和bash的区别
 
@@ -1480,7 +1480,7 @@ echo
 
 ![颜色输出高亮](http://tuling56.site/imgbed/2018-09-14_171950.png)
 
-### awk
+## awk
 
 awk由模式和操作组成，主要用于列式文本处理，进行列的分割，判断处理。
 
@@ -2075,11 +2075,14 @@ c
 
 ```shell
 # 输出1
-awk '{printf("\"%s\",",$1);}' ttt.txt
+awk '{printf("\"%s\",",$1);}' xx
 
-#输出２
-awk '{printf("'\''%s'\'',",$1);}' ttt.txt
-awk 'BEGIN{printf("%s", "(");}{printf("'\''%s'\'',",$1);}END{printf("%s",")");}' ttt.txt
+# 输出２
+awk '{printf("'\''%s'\'',",$1);}' xx
+awk 'BEGIN{printf("%s", "(");}{printf("'\''%s'\'',",$1);}END{printf("%s",")");}' xx
+
+# 加单引号输出
+awk '{print ",'\''"$1"'\''"}' xx
 ```
 
 参考：[awk中输出单引号和双引号](https://www.cnblogs.com/emanlee/p/3620785.html)
@@ -2305,7 +2308,7 @@ END{
 }
 ```
 
-### sed
+## sed
 
 [sed](http://man.linuxde.net/sed)是一种流编辑器（Streaming Editor），它是文本处理中非常中的工具，能够完美的配合正则表达式使用，功能不同凡响。处理时，把当前处理的行存储在临时缓冲区中，称为“模式空间”（pattern space），接着用sed命令处理缓冲区中的内容，处理完成后，把缓冲区的内容送往屏幕。接着处理下一行，这样不断重复，直到文件末尾。文件内容并没有 改变，除非你使用重定向存储输出。Sed主要用来自动编辑一个或多个文件；简化对文件的反复操作；编写转换程序等。
 
@@ -2568,7 +2571,7 @@ sed -n '1~1p' test.txt
 # 比如：/usr/local/complat/cdh5.10.0/hive/bin/hive，要抽取complat那个位置的内容
 ```
 
-### grep
+## grep
 
 全局正则表达式匹配
 
@@ -2695,7 +2698,7 @@ egrep '\.mp4$|\.rmvb$|\.avi$' test.txt
 egrep -f pattern.file text.txt
 ```
 
-### find
+## find
 
 #### 基础
 
@@ -2916,7 +2919,7 @@ exit 0
 
 和find命令类似的是locate、[mlocate](https://www.toutiao.com/a6609762838850306573/)命令，使用这两个命令的时候需要先更新下索引updatedb
 
-### 实践
+## 实践
 
 #### 文件转换
 
