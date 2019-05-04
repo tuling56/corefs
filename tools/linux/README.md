@@ -2469,6 +2469,10 @@ cat test.json |jq '.results[] | .index|map(select(.title=="运动"))'
 cat test.json|jq 'if .error==0 then "ok" elif .error==1 then "false" else "null" end'
 ```
 
+##### [json2csv](https://github.com/zemirco/json2csv)
+
+json格式转换成csv格式的利器
+
 ##### pandoc
 
 [pandoc](http://pandoc.org/demos.html)是文档格式转换，尤其是在md和各种格式之间，其中typero导出成其它格式的引擎就是pandoc,但是感觉进行了很多的美化参数，比直接使用pandoc导出的效果好了很多，具体优化未知。
