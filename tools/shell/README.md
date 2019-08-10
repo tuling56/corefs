@@ -3108,6 +3108,12 @@ echo -e "1\n2\n3" |sed -n 's/\n/ /gp'
 
 - **bash部分**
 
+  [快乐的命令行（经典三部曲1）](http://billie66.github.io/TLCL/book/)
+
+  [命令行的艺术（经典三部曲2）](https://github.com/jlevy/the-art-of-command-line/blob/master/README-zh.md)
+
+  [Linux工具快速教程（经典三部曲3）](https://github.com/me115/linuxtools_rst)
+
   [shell脚本检查工具shellcheck](https://github.com/koalaman/shellcheck)
 
   [shell教程(c语言中文网)](http://c.biancheng.net/cpp/view/2740.html)(推荐)
