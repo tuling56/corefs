@@ -1,8 +1,0 @@
-package chen_demo;
-        message chen_info{
-            required int32 age = 1;
-            required string name = 2;
-            required string game = 3;
-            optional int32 id = 4;
-            required string pnum = 5;
-        }
