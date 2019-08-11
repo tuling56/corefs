@@ -1,0 +1,11 @@
+{
+   "key_array" : [ "array_string", 1234 ],
+   "key_boolean" : false,
+   "key_double" : 12.3450,
+   "key_number" : 12345,
+   "key_object" : {
+      "age" : 26,
+      "name" : "huchao"
+   },
+   "key_string" : "value_string"
+}
