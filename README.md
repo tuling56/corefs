@@ -60,32 +60,13 @@
 
 lua调用c模块，以.so的方式进行调用
 
-### tools
-
-> 写的工具库，包含实用shell脚本、自己写的小工具等
-
 #### git
-
-#### hive
 
 #### linux
 
 #### markdown
 
-#### mongodb
-
-#### mysql
-
-#### perl
-
-#### redis
-
-#### search
-
 #### shell
 
-#### sqlite
-
-#### web
 
 ## 参考
