@@ -4,16 +4,18 @@
 
 shell的分类，zsh和bash的区别
 
+
+
 ### 基础
 
-##### 变量
+#### 变量
 
-###### 变量命名
+##### 变量命名
 
 - var='harer'   #注意=号两边不能有空格shell变量区分大小写，引用的使用采\$var或者${var}
 - 变量的名称可以包含只有字母（a到z或A到Z），数字（0〜9）或下划线（_）,且必须以字母或者下划线开头，不能以数字开头
 
-###### 变量替换
+##### 变量替换
 
 ![变量替换](http://tuling56.site/imgbed/2018-08-02_125729.png)
 
@@ -344,6 +346,147 @@ function f2(){
 
 > 尚存在问题没有解决，只能传递数组的第一个值
 
+
+
+#### [运算符](http://c.biancheng.net/cpp/view/2736.html)
+
+##### 算术运算符
+
+| 运算符  | 说明                        | 举例                        |
+| ---- | ------------------------- | ------------------------- |
+| +    | 加法                        | `expr $a + $b` 结果为 30。    |
+| -    | 减法                        | `expr $a - $b` 结果为 10。    |
+| *    | 乘法                        | `expr $a \* $b` 结果为  200。 |
+| /    | 除法                        | `expr $b / $a` 结果为 2。     |
+| %    | 取余                        | `expr $b % $a` 结果为 0。     |
+| =    | 赋值                        | a=$b 将把变量 b 的值赋给 a。       |
+| ==   | 相等。用于比较两个数字，相同则返回 true。   | [ $a == $b ] 返回 false。    |
+| !=   | 不相等。用于比较两个数字，不相同则返回 true。 | [ $a != $b ] 返回 true。     |
+
+例子：
+
+```shell
+# expr 是一款表达式计算工具
+a=10
+b=20
+val=`expr $a + $b`  # 表达式和运算符之间要有空格
+echo "a + b : $val"
+
+if [ $a != $b ];then  # 注意条件表达式要放在方括号之间，并且要有空格
+   echo "a is not equal to b"
+fi
+```
+
+算术表达式嵌套
+
+```shell
+echo $(($((5**2)) * 3))
+```
+
+##### 关系运算符
+
+关系运算符只支持数字，不支持字符串，除非字符串的值是数字
+
+| 运算符  | 说明                            | 举例                      |
+| ---- | ----------------------------- | ----------------------- |
+| -eq  | 检测两个数是否相等，相等返回 true。          | [ $a -eq $b ] 返回 true。  |
+| -ne  | 检测两个数是否相等，不相等返回 true。         | [ $a -ne $b ] 返回 true。  |
+| -gt  | 检测左边的数是否大于右边的，如果是，则返回 true。   | [ $a -gt $b ] 返回 false。 |
+| -lt  | 检测左边的数是否小于右边的，如果是，则返回 true。   | [ $a -lt $b ] 返回 true。  |
+| -ge  | 检测左边的数是否大等于右边的，如果是，则返回 true。  | [ $a -ge $b ] 返回 false。 |
+| -le  | 检测左边的数是否小于等于右边的，如果是，则返回 true。 | [ $a -le $b ] 返回 true。  |
+
+例子：
+
+```shell
+if [ $a -le $b ]
+then
+   echo "$a -le $b: a is less or  equal to b"
+else
+   echo "$a -le $b: a is not less or equal to b"
+fi
+```
+
+##### 布尔运算符
+
+| 运算符  | 说明                                | 举例                                   |
+| ---- | --------------------------------- | ------------------------------------ |
+| !    | 非运算，表达式为 true 则返回 false，否则返回 true | [ ! false ] 返回 true。                 |
+| -o   | 或运算，有一个表达式为 true 则返回 true。        | [ $a -lt 20 -o \$b -gt 100 ] 返回 true |
+| -a   | 与运算，两个表达式都为 true 才返回 true         | [ $a -lt 20 -a \$b -gt 100 ] 返回      |
+
+例子：
+
+```shell
+
+```
+
+##### 字符串运算符
+
+| 运算符  | 说明                      | 举例                    |
+| ---- | ----------------------- | --------------------- |
+| =    | 检测两个字符串是否相等，相等返回 true。  | [ $a = $b ] 返回 false。 |
+| !=   | 检测两个字符串是否相等，不相等返回 true。 | [ $a != $b ] 返回 true。 |
+| -z   | 检测字符串长度是否为0，为0返回 true。  | [ -z $a ] 返回 false。   |
+| -n   | 检测字符串长度是否为0，不为0返回 true。 | [ -z $a ] 返回 true。    |
+| str  | 检测字符串是否为空，不为空返回 true。   | [ $a ] 返回 true。       |
+
+ 注意字符串运算符的等判断和数字的等判断的区别
+
+例子：
+
+```powershell
+if [ $a != $b ]
+then
+   echo "$a != $b : a is not equal to b"
+else
+   echo "$a != $b: a is equal to b"
+fi
+```
+
+##### 文件测试运算符
+
+| 操作符     | 说明                                       | 举例                     |
+| ------- | ---------------------------------------- | ---------------------- |
+| -b file | 检测文件是否是块设备文件，如果是，则返回 true。               | [ -b $file ] 返回 false。 |
+| -c file | 检测文件是否是字符设备文件，如果是，则返回 true。              | [ -b $file ] 返回 false。 |
+| -d file | 检测文件是否是目录，如果是，则返回 true。                  | [ -d $file ] 返回 false。 |
+| -f file | 检测文件是否是普通文件（既不是目录，也不是设备文件），如果是，则返回 true。 | [ -f $file ] 返回 true。  |
+| -g file | 检测文件是否设置了 SGID 位，如果是，则返回 true。           | [ -g $file ] 返回 false。 |
+| -k file | 检测文件是否设置了粘着位(Sticky Bit)，如果是，则返回 true。   | [ -k $file ] 返回 false。 |
+| -p file | 检测文件是否是具名管道，如果是，则返回 true。                | [ -p $file ] 返回 false。 |
+| -u file | 检测文件是否设置了 SUID 位，如果是，则返回 true。           | [ -u $file ] 返回 false。 |
+| -r file | 检测文件是否可读，如果是，则返回 true。                   | [ -r $file ] 返回 true。  |
+| -w file | 检测文件是否可写，如果是，则返回 true。                   | [ -w $file ] 返回 true。  |
+| -x file | 检测文件是否可执行，如果是，则返回 true。                  | [ -x $file ] 返回 true。  |
+| -s file | 检测文件是否为空（文件大小是否大于0），不为空返回 true。          | [ -s $file ] 返回 true。  |
+| -e file | 检测文件（包括目录）是否存在，如果是，则返回 true。             | [ -e $file ] 返回 true。  |
+
+ 例子：
+
+```shell
+-e #filename 如果 filename存在，则为真
+-d #filename 如果 filename为目录，则为真 
+-f #filename 如果 filename为常规文件，则为真
+-L #filename 如果 filename为符号链接，则为真
+-r #filename 如果 filename可读，则为真 
+-w #filename 如果 filename可写，则为真 
+-x #filename 如果 filename可执行，则为真
+-s #filename 如果文件长度不为0，则为真
+-h #filename 如果文件是软链接，则为真
+filename1 -nt filename2 #如果 filename1比 filename2新，则为真。
+filename1 -ot filename2 #如果 filename1比 filename2旧，则为真。
+-eq #等于
+-ne #不等于
+-gt #大于
+-ge #大于等于
+-lt #小于
+-le #小于等于
+#至于！号那就是取非
+```
+
+#### 其它
+
 ##### 输入输出
 
 ###### 输入
@@ -398,150 +541,13 @@ sh xxx.sh > xxx.log 2>&1
 
 颜色修饰：[参考shell颜色输出](https://misc.flogisoft.com/bash/tip_colors_and_formatting%E3%80%82)
 
-##### [运算符](http://c.biancheng.net/cpp/view/2736.html)
+##### 注释
 
-###### 算术运算符
-
-| 运算符  | 说明                        | 举例                        |
-| ---- | ------------------------- | ------------------------- |
-| +    | 加法                        | `expr $a + $b` 结果为 30。    |
-| -    | 减法                        | `expr $a - $b` 结果为 10。    |
-| *    | 乘法                        | `expr $a \* $b` 结果为  200。 |
-| /    | 除法                        | `expr $b / $a` 结果为 2。     |
-| %    | 取余                        | `expr $b % $a` 结果为 0。     |
-| =    | 赋值                        | a=$b 将把变量 b 的值赋给 a。       |
-| ==   | 相等。用于比较两个数字，相同则返回 true。   | [ $a == $b ] 返回 false。    |
-| !=   | 不相等。用于比较两个数字，不相同则返回 true。 | [ $a != $b ] 返回 true。     |
-
-例子：
-
-```shell
-# expr 是一款表达式计算工具
-a=10
-b=20
-val=`expr $a + $b`  # 表达式和运算符之间要有空格
-echo "a + b : $val"
-
-if [ $a != $b ];then  # 注意条件表达式要放在方括号之间，并且要有空格
-   echo "a is not equal to b"
-fi
-```
-
-算术表达式嵌套
-
-```shell
-echo $(($((5**2)) * 3))
-```
-
-###### 关系运算符
-
-关系运算符只支持数字，不支持字符串，除非字符串的值是数字
-
-| 运算符  | 说明                            | 举例                      |
-| ---- | ----------------------------- | ----------------------- |
-| -eq  | 检测两个数是否相等，相等返回 true。          | [ $a -eq $b ] 返回 true。  |
-| -ne  | 检测两个数是否相等，不相等返回 true。         | [ $a -ne $b ] 返回 true。  |
-| -gt  | 检测左边的数是否大于右边的，如果是，则返回 true。   | [ $a -gt $b ] 返回 false。 |
-| -lt  | 检测左边的数是否小于右边的，如果是，则返回 true。   | [ $a -lt $b ] 返回 true。  |
-| -ge  | 检测左边的数是否大等于右边的，如果是，则返回 true。  | [ $a -ge $b ] 返回 false。 |
-| -le  | 检测左边的数是否小于等于右边的，如果是，则返回 true。 | [ $a -le $b ] 返回 true。  |
-
-例子：
-
-```shell
-if [ $a -le $b ]
-then
-   echo "$a -le $b: a is less or  equal to b"
-else
-   echo "$a -le $b: a is not less or equal to b"
-fi
-```
-
-###### 布尔运算符
-
-| 运算符  | 说明                                | 举例                                   |
-| ---- | --------------------------------- | ------------------------------------ |
-| !    | 非运算，表达式为 true 则返回 false，否则返回 true | [ ! false ] 返回 true。                 |
-| -o   | 或运算，有一个表达式为 true 则返回 true。        | [ $a -lt 20 -o \$b -gt 100 ] 返回 true |
-| -a   | 与运算，两个表达式都为 true 才返回 true         | [ $a -lt 20 -a \$b -gt 100 ] 返回      |
-
-例子：
-
-```shell
-
-```
-
-###### 字符串运算符
-
-| 运算符  | 说明                      | 举例                    |
-| ---- | ----------------------- | --------------------- |
-| =    | 检测两个字符串是否相等，相等返回 true。  | [ $a = $b ] 返回 false。 |
-| !=   | 检测两个字符串是否相等，不相等返回 true。 | [ $a != $b ] 返回 true。 |
-| -z   | 检测字符串长度是否为0，为0返回 true。  | [ -z $a ] 返回 false。   |
-| -n   | 检测字符串长度是否为0，不为0返回 true。 | [ -z $a ] 返回 true。    |
-| str  | 检测字符串是否为空，不为空返回 true。   | [ $a ] 返回 true。       |
-
- 注意字符串运算符的等判断和数字的等判断的区别
-
-例子：
-
-```powershell
-if [ $a != $b ]
-then
-   echo "$a != $b : a is not equal to b"
-else
-   echo "$a != $b: a is equal to b"
-fi
-```
-
-###### 文件测试运算符
-
-| 操作符     | 说明                                       | 举例                     |
-| ------- | ---------------------------------------- | ---------------------- |
-| -b file | 检测文件是否是块设备文件，如果是，则返回 true。               | [ -b $file ] 返回 false。 |
-| -c file | 检测文件是否是字符设备文件，如果是，则返回 true。              | [ -b $file ] 返回 false。 |
-| -d file | 检测文件是否是目录，如果是，则返回 true。                  | [ -d $file ] 返回 false。 |
-| -f file | 检测文件是否是普通文件（既不是目录，也不是设备文件），如果是，则返回 true。 | [ -f $file ] 返回 true。  |
-| -g file | 检测文件是否设置了 SGID 位，如果是，则返回 true。           | [ -g $file ] 返回 false。 |
-| -k file | 检测文件是否设置了粘着位(Sticky Bit)，如果是，则返回 true。   | [ -k $file ] 返回 false。 |
-| -p file | 检测文件是否是具名管道，如果是，则返回 true。                | [ -p $file ] 返回 false。 |
-| -u file | 检测文件是否设置了 SUID 位，如果是，则返回 true。           | [ -u $file ] 返回 false。 |
-| -r file | 检测文件是否可读，如果是，则返回 true。                   | [ -r $file ] 返回 true。  |
-| -w file | 检测文件是否可写，如果是，则返回 true。                   | [ -w $file ] 返回 true。  |
-| -x file | 检测文件是否可执行，如果是，则返回 true。                  | [ -x $file ] 返回 true。  |
-| -s file | 检测文件是否为空（文件大小是否大于0），不为空返回 true。          | [ -s $file ] 返回 true。  |
-| -e file | 检测文件（包括目录）是否存在，如果是，则返回 true。             | [ -e $file ] 返回 true。  |
-
- 例子：
-
-```shell
--e #filename 如果 filename存在，则为真
--d #filename 如果 filename为目录，则为真 
--f #filename 如果 filename为常规文件，则为真
--L #filename 如果 filename为符号链接，则为真
--r #filename 如果 filename可读，则为真 
--w #filename 如果 filename可写，则为真 
--x #filename 如果 filename可执行，则为真
--s #filename 如果文件长度不为0，则为真
--h #filename 如果文件是软链接，则为真
-filename1 -nt filename2 #如果 filename1比 filename2新，则为真。
-filename1 -ot filename2 #如果 filename1比 filename2旧，则为真。
--eq #等于
--ne #不等于
--gt #大于
--ge #大于等于
--lt #小于
--le #小于等于
-#至于！号那就是取非
-```
-
-##### 其它
-
-###### 注释
-
-多行注释
+Shell中的多行注释是如何实现的
 
 ![多行注释](http://tuling56.site/imgbed/2018-09-28_103911.png)
+
+具体实现
 
 ```shell
 
@@ -1290,7 +1296,9 @@ date -d "20120410 -1 day " +%Y-%m-%d
 diff_second=$(($(date +%s -d '2010-01-01') - $(date +%s -d '2009-01-01 11:11:11')));
 ```
 
-### 规范
+### 积累
+
+#### 规范
 
 ##### 公共抽取
 
@@ -1377,11 +1385,11 @@ function calcdate_diff()
 
 - 在牵涉到目录处理的情况下慎用，因为提升到公共.sh中的方法获取的是公共.sh所在的目录，并不能获取到运运行公共方法的目录，这个问题可以通过传递真实的操作目录来解决。
 
-### 积累
 
-##### 参数
 
-###### 调试参数
+#### 参数
+
+##### 调试参数
 
 set -e 命令
 
@@ -1414,7 +1422,7 @@ fi
 
 > 对比下这两种方式之间的区别，验证-e选项
 
-###### 传递参数
+##### 传递参数
 
 传递带空格的参数，需要将参数用[双引号括起来](https://blog.csdn.net/victor0127/article/details/47314619)，而且要养成好习惯，变量的引用都用双引号括起来
 
@@ -1424,7 +1432,7 @@ get_browser "$line"
 
 参考：[linux参数太长的换行问题](http://blog.csdn.net/feng27156/article/details/39057773)
 
-##### 命令
+#### 命令
 
 ###### shift
 
@@ -1444,6 +1452,8 @@ paste
 ```
 
 ###### tr/xargs/exec
+
+tr
 
 ```shell
 

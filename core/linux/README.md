@@ -594,9 +594,7 @@ yum clean			#表示清除yum缓存目录内容
 选项-y表示在所有需要交互式确认的地方默认输入yes
 ```
 
-参考：
-
-[yum配置与使用(推荐)](https://www.cnblogs.com/xiaochaohuashengmi/archive/2011/10/09/2203916.html)
+参考：[yum配置与使用(推荐)](https://www.cnblogs.com/xiaochaohuashengmi/archive/2011/10/09/2203916.html)
 
 ##### apt
 
@@ -799,10 +797,13 @@ ps -ef|grep username
 ps -lu username
 
 # 查询进程名中包含re的进程
-pgrep re
+pgrep progressname
 
 # 查找僵尸进程
 ps -A -o stat,ppid,pid,cmd | grep -e '^[Zz]'
+
+# 以树的形式展示进程
+pstree -p
 ```
 
 [lsof](http://man.linuxde.net/lsof)
@@ -1919,11 +1920,11 @@ linux下软件安装的方式：
 
 ### 远程连接
 
-##### ssh
+#### ssh
 
 ssh本身会附带一个scp命令，用来进行文件的传输
 
-###### 安装
+##### 安装
 
 ```shell
 # 服务器端
@@ -1936,7 +1937,7 @@ sudo yum install openssh-client
 service ssh restart
 ```
 
-###### 使用
+##### 使用
 
 参数指定
 
@@ -1986,11 +1987,11 @@ ssh xxx@xxxx < test.sh
 
 > 远程执行的另一个命令参考[rsh](http://man.linuxde.net/rsh)
 
-##### pssh
+#### pssh
 
 pssh命令是一个python编写可以在多台服务器上执行命令的工具，同时支持拷贝文件 。
 
-###### 安装
+##### 安装
 
 其本质是一个python包，可以像其它python包的安装方式安装，可以pip安装也可以编译安装
 
@@ -2000,21 +2001,21 @@ pip install pssh #建议
 yum install pssh
 ```
 
-###### 使用
+##### 使用
 
 //待补充
 
-##### tmux
+#### tmux
 
 tmux是终端复用器，配合ssh使用，具体的教程参考041-tmux.mp4教程
 
-###### 安装
+##### 安装
 
 ```shell
 brew install tmux
 ```
 
-###### 配置
+##### 配置
 
 vim ~/.tmux.conf 
 
@@ -2022,9 +2023,11 @@ vim ~/.tmux.conf
 
 ```
 
+#### 应用终端
+
 ##### mycli
 
-mycli是增强版的mysql终端连接工具，可以提供自动补全等功能，其使用方式和mysql命令一样
+mycli是增强版的mysql终端连接工具，可以提供自动补全等功能，其使用方式和mysql命令一样，类似的还有pgcli等终端连接工具
 
 ```shell
 pip install mycli
@@ -2033,11 +2036,11 @@ mycli -uroot -pxxx -Dstudy
 
 ### 数据科学
 
-##### q
+#### q
 
 [q](http://harelba.github.io/q/examples.html#example1)是像mysql一样对csv等格式化的文本数据进行统计
 
-###### 安装
+##### 安装
 
 ```shell
 wget -c  --no-check-certificate https://github.com/harelba/packages-for-q/raw/master/rpms/q-text-as-data-1.7.1-1.noarch.rpm
@@ -2081,7 +2084,7 @@ SELECT * FROM datafile1+datafile2+datefile3;
 SELECT * FROM mydata*.dat;
 ```
 
-###### 使用
+##### 使用
 
 读取标准输入
 
@@ -2140,13 +2143,13 @@ q -d, -H -T  "select a.f1,a.f2,b.f3 from aa a left join bb b on (a.f1=b.f1)"
 
 > 注意：RIGHT and FULL OUTER JOINs are not currently supported
 
-##### [csvtotable](https://github.com/vividvilla/csvtotable)
+#### [csvtotable](https://github.com/vividvilla/csvtotable)
 
 csv命令行处理工具，快速的将csv文件转换为可搜索的html表格网页，注意还有个另外的csv2table
 
 ![csvtotable](https://raw.githubusercontent.com/vividvilla/csvtotable/master/sample/table.gif)
 
-###### 安装
+##### 安装
 
 ```shell
 pip install csvtotable
@@ -2154,7 +2157,7 @@ pip install csvtotable
 
 >该包安装完成之后会在`/usr/local/bin`目录下添加可执行文件`csvtotable`,可利用此命令进行格式转换
 
-###### 使用
+##### 使用
 
 ```shell
 [root@local122 yjm]# csvtotable --help
@@ -2297,17 +2300,17 @@ if __name__ == "__main__":
 
 > 补充说明的是利用原生jinja2制作的html表格样式上不如csvtotable生成的，可参考：[线上收藏聚合](http://tuling56.site/aggr/dynamic/)
 
-##### csvkit
+#### csvkit
 
 csvkit是强化版的csv命令行处理工具，是表格数据处理的王者。
 
-###### 安装
+##### 安装
 
 ```shell
 pip install csvkit
 ```
 
-###### 使用
+##### 使用
 
 详细参考：Data Science at the Command Line.pdf
 
@@ -2315,37 +2318,37 @@ pip install csvkit
 
 类似的工具还有[csvq](https://github.com/mithrandie/csvq/)
 
-### 信息获取
+### 信息处理
 
-##### phantomjs/lynx/w3m 
+#### 浏览器
 
-无界面浏览器
+phantomjs/lynx/w3m 这三者都属于无界面浏览器，可以处理类似html、xml等格式类型的文件
 
-###### phantomjs
-
-```shell
-# 待补充
-```
-
-###### [lynx](http://man.linuxde.net/lynx)
+##### phantomjs
 
 ```shell
 # 待补充
 ```
 
-###### w3m
+##### [lynx](http://man.linuxde.net/lynx)
+
+可以提取html中的文本
+
+```shell
+# 待补充
+```
+
+##### w3m
 
 ```
 # 待补充
 ```
 
-### 格式转换
+#### jq
 
-##### jq
+json格式化解析筛选和查询工具,可以在shell streaming流里使用，除了 [`jq`](http://stedolan.github.io/jq/). 交互式的jq可以参考 [`jid`](https://github.com/simeji/jid) 和 [`jiq`](https://github.com/fiatjaf/jiq).
 
-json格式化筛选和查询工具,可以在shell streaming流里使用
-
-###### 安装
+##### 安装
 
 ```shell
 git clone https://github.com/stedolan/jq.git
@@ -2358,7 +2361,7 @@ sudo make install
 
 > jq处理的json格式必须是标准的json格式
 
-###### 使用
+##### 使用
 
 ```json
 {
@@ -2505,27 +2508,27 @@ cat test.json |jq '.results[] | .index|map(select(.title=="运动"))'
 cat test.json|jq 'if .error==0 then "ok" elif .error==1 then "false" else "null" end'
 ```
 
-##### [json2csv](https://github.com/zemirco/json2csv)
+#### [json2csv](https://github.com/zemirco/json2csv)
 
 json格式转换成csv格式的利器
 
-##### pandoc
+#### pandoc
 
 [pandoc](http://pandoc.org/demos.html)是文档格式转换，尤其是在md和各种格式之间，其中typero导出成其它格式的引擎就是pandoc,但是感觉进行了很多的美化参数，比直接使用pandoc导出的效果好了很多，具体优化未知。
 
-###### 安装
+##### 安装
 
 ```shell
 
 ```
 
-###### 使用
+##### 使用
 
 ```shell
 
 ```
 
-##### ffmpeg
+#### ffmpeg
 
 ###### 安装
 
@@ -2593,11 +2596,19 @@ Apache开源四大镜像站点：
 
 ##### [cheat.sh](https://www.toutiao.com/i6595716151420912141/)
 
-命令行手册参考工具
+命令行手册参考工具，基本使用方式如下
+
+```shell
+curl cheat.sh/command
+```
 
 ##### [shellcheck](https://www.shellcheck.net/)
 
-shell语法检查工具
+shell语法检查工具,基本使用方式如下：
+
+```shell
+
+```
 
 ## 参考
 
