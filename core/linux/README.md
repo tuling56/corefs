@@ -957,7 +957,8 @@ netstat -l
 ```shell
 #第一步，查询使用该端口的进程的PID；
 lsof -i:7902
-# 第二步,查询该进程
+
+#第二步,查询该进程
 ps -ef|grep pid
 ```
 
@@ -971,8 +972,7 @@ route -n
 traceroute IP
 
 # dns查询，寻找域名domain对应的IP
-host www.baidu.com
-#或者ping查询，查找域名对应的ip
+host www.baidu.com # 或者ping查询，查找域名对应的ip
 
 # 反向dns查询
 host ip

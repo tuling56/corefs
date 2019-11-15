@@ -978,7 +978,7 @@ find . -maxdepth 1 -type f | awk '!/png$/{print "mv" $1,$1".png" }' |sh
 for sql in `find /root -name “*.sql”`;do  mv $sql `echo $sql|sed  ‘s/sql/txt/'` ;done
 
 # 第三种实现 rename
-rename  .sql  .txt *.sql  //好像不能递归目录,其中最后一个是要修改文件类型的列表
+rename  .sql  .txt  *.sql  //好像不能递归目录,其中最后一个是要修改文件类型的列表
 
 # find+xargs+sed
 ```
