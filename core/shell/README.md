@@ -601,7 +601,7 @@ esac
 
 ###### select
 
-  制作一个选择表，在列表中选择一个选项执行命令行。如果选择的变量不在列表序列中，则返回一个空值。需要用break退出循环。 
+  制作一个选择表，在列表中选择一个选项执行命令行。如果选择的变量不在列表序列中，则返回一个空值。需要用break退出循环。 
 
 ```shell
 select 变量 in 列表;do
@@ -2399,19 +2399,19 @@ sed -n '/6645/{=;p}' awk.data |sed 'N;s/\n/\t/'
 删除匹配行的下一行
 
 ```shell
-sed -n '/root/{n;d}'  /etc/passwd 		#将匹配root行的下一行删除 
+sed -n '/root/{n;d}'  /etc/passwd 		#将匹配root行的下一行删除 
 ```
 
 删除匹配行和下一行
 
 ```shell
-sed -n '/root/{N;d}' /etc/passwd 		# 将匹配root行和下一行都删除  
+sed -n '/root/{N;d}' /etc/passwd 		# 将匹配root行和下一行都删除  
 ```
 
 合并相邻行
 
 ```shell
-sed 'N;s/\n/:/' /etc/passwd 		# 合并相邻行，并用：分割（注意不要添加-n选项，不然无输出）
+sed 'N;s/\n/:/' /etc/passwd 		# 合并相邻行，并用：分割（注意不要添加-n选项，不然无输出）
 # awk实现是
 awk '{if(NR%2==0){printf $0 "\n"}else{printf "%s\t",$0}}' /etc/passwd
 ```
@@ -2766,9 +2766,9 @@ find . -regex ".*[(\.txt)(\.pdf)]$"    #使用方括号
 
 ###### 按文件类型
 
--type 查找某一类型的文件 
+-type 查找某一类型的文件 
 
- 文件类型：  f-普通文件  d-目录  l-符号链接文件  c-字符设备文件  p-管道文件  b-块设备文件  s-socket文件
+ 文件类型：  f-普通文件  d-目录  l-符号链接文件  c-字符设备文件  p-管道文件  b-块设备文件  s-socket文件
 
 ```shell
 
@@ -2788,13 +2788,13 @@ find . -type f  -size +10M  -print0 |xargs -0 ls -lh {} \;
 
 ###### 按文件日期
 
--atime   最近一次访问时间      单位：天
--mtime 最近一次内容修改时间  单位：天
--ctime  最近一次属性修改时间  单位：天
--amin   最近一次访问时间      单位：分钟
--mmin  最近一次内容修改时间  单位：分钟
--cmin   最近一次属性修改时间  单位：分钟
--newer file1 ! file2 查找更改时间比文件file1新但比文件file2旧的文件 
+-atime   最近一次访问时间      单位：天
+-mtime 最近一次内容修改时间  单位：天
+-ctime  最近一次属性修改时间  单位：天
+-amin   最近一次访问时间      单位：分钟
+-mmin  最近一次内容修改时间  单位：分钟
+-cmin   最近一次属性修改时间  单位：分钟
+-newer file1 ! file2 查找更改时间比文件file1新但比文件file2旧的文件 
 
 ```shell
 find /tmp -atime +5  #表示查找在五天内没有访问过的文件

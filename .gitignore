@@ -4,6 +4,7 @@ dev/
 trash/
 books/
 .idea/
+.Archive/
 
 *.log
 *.csv
