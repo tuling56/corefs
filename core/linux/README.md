@@ -827,14 +827,14 @@ lsof +d dir1/
 lsof +D dir1/ 同上，但是会搜索目录下的目录，时间较长
 ```
 
+> lsof非系统命令，需要先安装`yum install lsof`
+
 #### 杀死进程
 
 ```shell
 kill pid
-
 # 杀死相关进程
 kill -9 pid
-
 # 批量杀死进程
 pkill -9 pname
 ```

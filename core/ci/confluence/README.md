@@ -35,6 +35,15 @@ http://localhost:8090/
 <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/confluence?useUnicode=true&amp;characterEncoding=utf8</property>
 ```
 
+> 错误提示：MySQL isolation level 'REPEATABLE-READ' is no longer supported. Isolation level must be 'READ-COMMITTED'，在/etc/my.cnf增加如下
+>
+> ```
+> [mysqld]
+> transaction-isolation=READ-COMMITTED
+> ```
+>
+> 
+
 配置nginx
 
 ```json
