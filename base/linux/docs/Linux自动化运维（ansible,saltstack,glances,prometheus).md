@@ -1,4 +1,4 @@
-# 自动化运维笔记
+**自动化运维笔记**
 
 [TOC]
 
@@ -160,7 +160,7 @@ Ansible是属于Extra Packages for Enterprise Linux (EPEL)库的一部分，因�
 >
 > - 可以自定义rules，在prometheus.yml中配置包含的rules文件(如下格式)：
 >
->          ​```
+>          ```
 >          ------
 >          配置文件prometheus.yml的规则配置如下：
 >          # Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
